@@ -48,8 +48,17 @@ if [ ! -d .venv ]; then
 fi
 # shellcheck disable=SC1091
 source .venv/bin/activate
-python -m pip install --upgrade pip
-python -m pip install -r requirements-termux.txt
+# Mobile connections drop often, so retry the download a few times.
+pip_install() {
+  for attempt in 1 2 3 4 5; do
+    if python -m pip install --retries 10 --timeout 60 "$@"; then return 0; fi
+    echo "Download failed (attempt $attempt of 5). Retrying in 5 seconds..."
+    sleep 5
+  done
+  echo "Could not download the Python packages. Check your connection and run this script again."
+  return 1
+}
+pip_install -r requirements-termux.txt
 
 say "Creating backend settings (.env.development)"
 if [ ! -f .env.development ]; then
