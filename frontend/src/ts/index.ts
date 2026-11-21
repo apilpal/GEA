@@ -1,16 +1,5 @@
 // Main entry point for the frontend application
-// This file initializes the comprehensive app controller system
-
-// Import the app controller to trigger initialization
+// Install API and responsive-sidebar fixes before app initialization can make requests.
+import './responsive-sidebar';
 import './app-controller';
-// Add clearly labeled sample data for authenticated demo sessions.
 import './demo-data';
-
-// The app-controller handles:
-// - Custom element registrations (ChartComponent, StudentTable, StudentProfileCard, DriverInfo)
-// - Navigation initialization
-// - Authentication context setup
-// - Sidebar toggle functionality
-// - Chat functionality
-// - Dashboard stats updates
-// - Comprehensive error handling
