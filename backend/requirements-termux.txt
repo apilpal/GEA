@@ -1,0 +1,14 @@
+# Lean requirements for running the app locally (e.g. on Termux with SQLite).
+# Skips PostgreSQL drivers (asyncpg, psycopg2) and uvicorn[standard] extras,
+# which need compilers on a phone. 'cryptography' comes from Termux's own package.
+fastapi
+uvicorn
+sqlalchemy
+aiosqlite
+python-multipart
+python-jose
+python-dotenv
+bcrypt
+requests
+alembic
+slowapi
