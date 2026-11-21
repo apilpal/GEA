@@ -3,6 +3,8 @@
 
 // Import the app controller to trigger initialization
 import './app-controller';
+// Add clearly labeled sample data for authenticated demo sessions.
+import './demo-data';
 
 // The app-controller handles:
 // - Custom element registrations (ChartComponent, StudentTable, StudentProfileCard, DriverInfo)
