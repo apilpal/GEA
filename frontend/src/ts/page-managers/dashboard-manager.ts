@@ -31,6 +31,12 @@ export async function updateDashboardStats(): Promise<void> {
  * @param {boolean} isUnauthenticated - Whether this is for an unauthenticated user.
  */
 function updateDashboardElements(summary: any, isGuest: boolean, isUnauthenticated: boolean = false): void {
+    // Keep the demo numbers when the database is empty.
+    const hasRealData = (summary.total_students || 0) > 0 || (summary.total_drivers || 0) > 0;
+    if (!hasRealData && document.querySelector('[data-demo-data-notice]')) {
+        return;
+    }
+
     const totalStudentsDash = document.getElementById('total-students-dash');
     const totalDriversDash = document.getElementById('total-drivers-dash');
 
