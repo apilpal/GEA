@@ -1,0 +1,281 @@
+# ========================================
+# Python
+# ========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environments
+.venv
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Testing and Coverage
+.coverage
+htmlcov/
+.tox/
+.nox/
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+backend_coverage/
+frontend_coverage/
+e2e_coverage/
+backend_coverage.xml
+e2e_coverage.xml
+coverage/
+*.lcov
+
+# Type Checking
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+
+# Python-Specific Tools
+.python-version
+__pypackages__/
+celerybeat-schedule
+celerybeat.pid
+.spyderproject
+.spyproject
+.ropeproject
+.scrapy
+.webassets-cache
+cython_debug/
+
+# ========================================
+# Node.js/JavaScript
+# ========================================
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Build outputs
+dist/
+build/
+.next/
+.nuxt/
+out/
+
+# Generated JavaScript and Source Maps
+*.js.map
+frontend/src/js/**/*.js
+frontend/src/js/**/*.js.map
+
+# Caches
+.npm
+.eslintcache
+.stylelintcache
+.parcel-cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# TypeScript
+*.tsbuildinfo
+
+# Frontend Build (Project Specific)
+frontend/dist/
+frontend/build/
+frontend/.next/
+frontend/out/
+frontend_dist/
+
+# ========================================
+# Logs and Temporary Files
+# ========================================
+logs/
+*.log
+migration.log
+build.log
+vite.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Temporary Files
+tmp/
+temp/
+*.tmp
+*.bak
+.tmp
+temp/
+*.temp
+
+# ========================================
+# OS-Specific Files
+# ========================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+ehthumbs.db
+Thumbs.db
+*.tmp
+*.bak
+
+# Linux
+*~
+
+# ========================================
+# IDE and Editor Files
+# ========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.ropeproject
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# ========================================
+# Database Files
+# ========================================
+*.db
+*.sqlite3
+*.sqlite3-journal
+
+# Django
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+
+# ========================================
+# Build Outputs and Artifacts
+# ========================================
+# General build outputs
+dist/
+build/
+
+# Documentation builds
+docs/_build/
+site/
+
+# Storybook
+.out
+.storybook-out
+storybook-static
+
+# Grunt
+.grunt
+
+# Bower
+bower_components
+
+# node-waf
+.lock-wscript
+
+# Binary addons
+build/Release
+
+# JSPM
+jspm_packages/
+
+# Parcel
+.cache
+.parcel-cache
+
+# Yarn
+.yarn-integrity
+
+# NPM
+*.tgz
+
+# ========================================
+# Environment Variables
+# ========================================
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.development
+.env.production
+
+# ========================================
+# Project Specific
+# ========================================
+# Local databases and real data stay out of git; only fake sample CSVs are committed
+backend/data/*
+!backend/data/drivers/
+backend/data/drivers/*
+!backend/data/drivers/chacha.csv
+!backend/data/drivers/demo_driver.csv
+!backend/data/drivers/drivers_sample.csv
+!backend/data/drivers/testdriver.csv
+backend/guest_data_export_*.csv
+
+# Secrets: generated locally (JWT keys auto-generate on first run)
+backend/keys/
+backend/backend/certs/
+*.pem
+*.key
+
+images/
+main.cpyth*
+roo/*
+.npm-install-*.sh
+
+# ========================================
+# Docker
+# ========================================
+.dockerignore
+
+# ========================================
+# Legacy/Backup Patterns (Consolidated)
+# ========================================
+# These patterns are consolidated from various sections above
+# to avoid duplication while maintaining comprehensive coverage
+frontend/src/jscookies.txt

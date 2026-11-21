@@ -1,0 +1,61 @@
+interface AppConfig {
+    apiBaseUrl: string;
+    apiTimeout: number;
+    appName: string;
+    appVersion: string;
+    appEnv: 'development' | 'production' | 'test';
+    authRefreshThreshold: number;
+    enableDebugMode: boolean;
+    enableAnalytics: boolean;
+    enableErrorReporting: boolean;
+    googleMapsApiKey?: string;
+    defaultTheme: 'light' | 'dark';
+    enableDarkMode: boolean;
+    enableServiceWorker: boolean;
+    cacheExpiry: number;
+    sentryDsn?: string;
+    gaTrackingId?: string;
+    mixpanelToken?: string;
+    cspReportUri?: string;
+    cdnBaseUrl?: string;
+    apiRateLimit: number;
+    apiRateWindow: number;
+}
+declare class Config implements AppConfig {
+    apiBaseUrl: string;
+    apiTimeout: number;
+    appName: string;
+    appVersion: string;
+    appEnv: 'development' | 'production' | 'test';
+    authRefreshThreshold: number;
+    enableDebugMode: boolean;
+    enableAnalytics: boolean;
+    enableErrorReporting: boolean;
+    googleMapsApiKey?: string;
+    defaultTheme: 'light' | 'dark';
+    enableDarkMode: boolean;
+    enableServiceWorker: boolean;
+    cacheExpiry: number;
+    sentryDsn?: string;
+    gaTrackingId?: string;
+    mixpanelToken?: string;
+    cspReportUri?: string;
+    cdnBaseUrl?: string;
+    apiRateLimit: number;
+    apiRateWindow: number;
+    constructor();
+    private getEnvVar;
+    private getEnvVarOptional;
+    private getEnvVarNumber;
+    private getEnvVarBoolean;
+    private validateConfig;
+    private validateApiBaseUrl;
+    get isDevelopment(): boolean;
+    get isProduction(): boolean;
+    get isTest(): boolean;
+    get baseUrl(): string;
+    get fullAppName(): string;
+}
+export declare const config: Config;
+export type { AppConfig };
+//# sourceMappingURL=config.d.ts.map

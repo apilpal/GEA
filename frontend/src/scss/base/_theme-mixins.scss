@@ -1,0 +1,438 @@
+// Theme System - SCSS Mixins and Utilities
+// Theme-aware styling utilities and mixins
+
+// ============================================================================
+// THEME-AWARE MIXINS
+// ============================================================================
+
+/// Applies theme-aware background color
+/// @param {String} $property - The CSS custom property to use
+/// @param {Arglist} $fallbacks - Fallback values for older browsers
+@mixin theme-bg($property, $fallbacks...) {
+    background-color: var(#{$property}, $fallbacks);
+}
+
+/// Applies theme-aware text color
+/// @param {String} $property - The CSS custom property to use
+/// @param {Arglist} $fallbacks - Fallback values for older browsers
+@mixin theme-color($property, $fallbacks...) {
+    color: var(#{$property}, $fallbacks);
+}
+
+/// Applies theme-aware border color
+/// @param {String} $property - The CSS custom property to use
+/// @param {Arglist} $fallbacks - Fallback values for older browsers
+@mixin theme-border($property, $fallbacks...) {
+    border-color: var(#{$property}, $fallbacks);
+}
+
+/// Applies theme-aware shadow
+/// @param {String} $property - The CSS custom property to use
+/// @param {Arglist} $fallbacks - Fallback values for older browsers
+@mixin theme-shadow($property, $fallbacks...) {
+    box-shadow: var(#{$property}, $fallbacks);
+}
+
+/// Applies theme-aware transition with reduced motion support
+/// @param {String} $property - The CSS custom property to use
+/// @param {Arglist} $fallbacks - Fallback values for older browsers
+@mixin theme-transition($property: '--transition-base', $fallbacks...) {
+    transition: var(#{$property}, $fallbacks);
+}
+
+// ============================================================================
+// SEMANTIC COLOR MIXINS
+// ============================================================================
+
+/// Primary color (brand color)
+@mixin color-primary {
+    @include theme-color('--color-primary');
+}
+
+/// Secondary color (complementary to primary)
+@mixin color-secondary {
+    @include theme-color('--color-secondary');
+}
+
+/// Accent color (for highlights and CTAs)
+@mixin color-accent {
+    @include theme-color('--color-accent');
+}
+
+/// Success color (for positive actions/feedback)
+@mixin color-success {
+    @include theme-color('--color-success');
+}
+
+/// Warning color (for cautionary messages)
+@mixin color-warning {
+    @include theme-color('--color-warning');
+}
+
+/// Danger color (for errors and destructive actions)
+@mixin color-danger {
+    @include theme-color('--color-danger');
+}
+
+/// Info color (for informational content)
+@mixin color-info {
+    @include theme-color('--color-info');
+}
+
+/// Muted text color
+@mixin color-muted {
+    @include theme-color('--color-text-muted');
+}
+
+// ============================================================================
+// BACKGROUND MIXINS
+// ============================================================================
+
+/// Main background color
+@mixin bg-background {
+    @include theme-bg('--color-background');
+}
+
+/// Card background color (elevated surfaces)
+@mixin bg-card {
+    @include theme-bg('--color-card-background');
+}
+
+/// Surface background color (general surfaces)
+@mixin bg-surface {
+    @include theme-bg('--color-surface');
+}
+
+/// Elevated surface background color
+@mixin bg-surface-elevated {
+    @include theme-bg('--color-surface-elevated');
+}
+
+// ============================================================================
+// COMPONENT-SPECIFIC MIXINS
+// ============================================================================
+
+/// Button styling mixin
+@mixin button-base {
+    @include theme-bg('--color-surface');
+    @include theme-color('--color-text');
+    @include theme-border('--color-border');
+    border-width: 1px;
+    border-style: solid;
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius-md);
+    @include theme-transition('--transition-base');
+    cursor: pointer;
+
+    &:hover {
+        @include theme-bg('--color-surface-elevated');
+    }
+
+    &:focus {
+        outline: var(--focus-ring-width) solid var(--focus-ring-color);
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+}
+
+/// Primary button styling
+@mixin button-primary {
+    @include button-base;
+    @include theme-bg('--color-primary');
+    @include theme-color('--color-text-inverse');
+
+    &:hover {
+        opacity: 0.9;
+    }
+}
+
+/// Card component styling
+@mixin card {
+    @include theme-bg('--color-card-background');
+    @include theme-border('--color-border');
+    @include theme-shadow('--shadow-md');
+    border-radius: var(--border-radius-lg);
+    padding: 1.5rem;
+    @include theme-transition('--transition-base');
+
+    &.card-elevated {
+        @include theme-shadow('--shadow-lg');
+    }
+
+    &.card-flat {
+        box-shadow: none;
+    }
+}
+
+/// Input field styling
+@mixin input-base {
+    @include theme-bg('--color-surface');
+    @include theme-color('--color-text');
+    @include theme-border('--color-border');
+    border-width: 1px;
+    border-style: solid;
+    padding: 0.75rem;
+    border-radius: var(--border-radius-md);
+    @include theme-transition('--transition-base');
+
+    &::placeholder {
+        @include theme-color('--color-text-muted');
+    }
+
+    &:focus {
+        outline: none;
+        @include theme-border('--color-primary');
+        @include theme-shadow('--focus-ring-color');
+        box-shadow: 0 0 0 var(--focus-ring-width) var(--focus-ring-color);
+    }
+}
+
+// ============================================================================
+// LAYOUT AND SPACING MIXINS
+// ============================================================================
+
+/// Container with max-width and responsive padding
+@mixin container-responsive {
+    width: 100%;
+    max-width: var(--content-max-width);
+    margin: 0 auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+
+    @media (min-width: 640px) {
+        padding-left: 1.5rem;
+        padding-right: 1.5rem;
+    }
+
+    @media (min-width: 1024px) {
+        padding-left: 2rem;
+        padding-right: 2rem;
+    }
+}
+
+/// Flexbox utilities with theme awareness
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@mixin flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+@mixin flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+// ============================================================================
+// ACCESSIBILITY MIXINS
+// ============================================================================
+
+/// Focus styles that respect theme
+@mixin focus-visible {
+    &:focus-visible {
+        outline: var(--focus-ring-width) solid var(--focus-ring-color);
+        outline-offset: 2px;
+    }
+}
+
+/// High contrast mode support
+@mixin high-contrast {
+    @media (prefers-contrast: high) {
+        @content;
+    }
+}
+
+/// Reduced motion support
+@mixin reduced-motion {
+    @media (prefers-reduced-motion: reduce) {
+        @content;
+    }
+}
+
+/// Skip to content link (accessibility)
+@mixin skip-link {
+    position: absolute;
+    top: -40px;
+    left: 6px;
+    @include theme-bg('--color-primary');
+    @include theme-color('--color-text-inverse');
+    padding: 8px;
+    text-decoration: none;
+    border-radius: var(--border-radius-sm);
+    z-index: 1000;
+    @include theme-transition('--transition-base');
+
+    &:focus {
+        top: 6px;
+    }
+}
+
+// ============================================================================
+// ANIMATION AND TRANSITION MIXINS
+// ============================================================================
+
+/// Smooth theme transition
+@mixin theme-transition-smooth {
+    @include theme-transition('--transition-base');
+}
+
+/// Fade in animation with theme awareness
+@mixin fade-in {
+    @include reduced-motion {
+        opacity: 1;
+    }
+
+    opacity: 0;
+    animation: fadeIn var(--transition-base) ease-in-out;
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+}
+
+/// Slide in animation
+@mixin slide-in($direction: 'down') {
+    @include reduced-motion {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    opacity: 0;
+
+    @if $direction == 'down' {
+        transform: translateY(-20px);
+        animation: slideInDown var(--transition-base) ease-out;
+    } @else if $direction == 'up' {
+        transform: translateY(20px);
+        animation: slideInUp var(--transition-base) ease-out;
+    } @else if $direction == 'left' {
+        transform: translateX(20px);
+        animation: slideInLeft var(--transition-base) ease-out;
+    } @else if $direction == 'right' {
+        transform: translateX(-20px);
+        animation: slideInRight var(--transition-base) ease-out;
+    }
+
+    @keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes slideInLeft {
+        from {
+            opacity: 0;
+            transform: translateX(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @keyframes slideInRight {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+}
+
+// ============================================================================
+// RESPONSIVE THEME UTILITIES
+// ============================================================================
+
+/// Responsive text sizing with theme awareness
+@mixin text-responsive {
+    font-size: 0.875rem;
+
+    @media (min-width: 640px) {
+        font-size: 1rem;
+    }
+
+    @media (min-width: 768px) {
+        font-size: 1.125rem;
+    }
+}
+
+/// Theme-aware media query helpers
+@mixin dark-mode-only {
+    [data-theme="dark"] & {
+        @content;
+    }
+}
+
+@mixin light-mode-only {
+    [data-theme="light"] & {
+        @content;
+    }
+}
+
+@mixin high-contrast-only {
+    [data-theme="high-contrast"] & {
+        @content;
+    }
+}
+
+// ============================================================================
+// UTILITY MIXINS
+// ============================================================================
+
+/// Create a CSS custom property with fallback
+/// @param {String} $name - Property name
+/// @param {String} $value - Property value
+/// @param {String} $fallback - Fallback value
+@mixin css-var($name, $value, $fallback: null) {
+    #{$name}: $value;
+
+    @if $fallback {
+        #{$name}: $fallback;
+    }
+
+    #{$name}: var(#{$name}, $fallback);
+}
+
+/// Theme-aware gradient background
+@mixin gradient-bg($direction: 'to right', $colors...) {
+    background: linear-gradient(unquote($direction), $colors);
+}
+
+/// Glass morphism effect with theme awareness
+@mixin glass-morphism($opacity: 0.1) {
+    @include theme-bg('--color-surface');
+    background: rgba(var(--color-surface-rgb), $opacity);
+    backdrop-filter: blur(10px);
+    @include theme-border('--color-border');
+    border-width: 1px;
+    border-style: solid;
+}

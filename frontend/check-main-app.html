@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Main App Container Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="src/js/icons.js" defer></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Login Page (should be visible when not authenticated) -->
+        <div id="login-page" class="page active">
+            <div class="login-page-container">
+                <div class="login-header">
+                    <h1>Welcome to School Management System</h1>
+                    <p>Please sign in to continue</p>
+                </div>
+                <div class="login-form-container">
+                    <login-component id="loginComponent"></login-component>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App Container (hidden when not authenticated) -->
+        <div id="main-app" class="main-app" style="display: none;">
+            <p>Main app content (should be hidden)</p>
+        </div>
+    </div>
+
+    <script type="module" src="src/ts/index.ts"></script>
+    
+    <script>
+        // Analyze main-app container and its impact on login-page
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔍 MAIN-APP CONTAINER ANALYSIS');
+            console.log('==============================');
+            
+            const loginPage = document.getElementById('login-page');
+            const mainApp = document.getElementById('main-app');
+            
+            console.log('📍 DOM Structure:');
+            console.log('  Login page parent:', loginPage?.parentElement?.id || 'none');
+            console.log('  Main app parent:', mainApp?.parentElement?.id || 'none');
+            console.log('  Are they siblings?', loginPage?.parentElement === mainApp?.parentElement);
+            
+            if (mainApp) {
+                console.log('📏 Main App Styles:');
+                const mainAppStyles = window.getComputedStyle(mainApp);
+                console.log('  Display:', mainAppStyles.display);
+                console.log('  Visibility:', mainAppStyles.visibility);
+                console.log('  Position:', mainAppStyles.position);
+                console.log('  Z-index:', mainAppStyles.zIndex);
+                console.log('  Width:', mainAppStyles.width);
+                console.log('  Height:', mainAppStyles.height);
+                console.log('  Inline styles:', mainApp.getAttribute('style'));
+                console.log('  Class list:', mainApp.className);
+            }
+            
+            if (loginPage) {
+                console.log('📏 Login Page Styles:');
+                const loginPageStyles = window.getComputedStyle(loginPage);
+                console.log('  Display:', loginPageStyles.display);
+                console.log('  Position:', loginPageStyles.position);
+                console.log('  Z-index:', loginPageStyles.zIndex);
+                console.log('  Width:', loginPageStyles.width);
+                console.log('  Height:', loginPageStyles.height);
+            }
+            
+            // Check if main-app is interfering with login-page
+            console.log('🔍 Interference Check:');
+            const appContainer = document.getElementById('app');
+            if (appContainer) {
+                const appStyles = window.getComputedStyle(appContainer);
+                console.log('  App container display:', appStyles.display);
+                console.log('  App container position:', appStyles.position);
+                console.log('  App container flex:', appStyles.flex);
+            }
+            
+            // Check for any CSS that might be hiding content
+            console.log('🎨 CSS Analysis:');
+            const allElements = document.querySelectorAll('*');
+            let hiddenElements = 0;
+            let visibleElements = 0;
+            
+            allElements.forEach(el => {
+                const styles = window.getComputedStyle(el);
+                if (styles.display === 'none' || styles.visibility === 'hidden' || styles.opacity === '0') {
+                    hiddenElements++;
+                    if (el.id) {
+                        console.log(`  Hidden element: #${el.id} (${el.tagName})`);
+                    }
+                } else {
+                    visibleElements++;
+                }
+            });
+            
+            console.log(`📊 Visibility Summary: ${visibleElements} visible, ${hiddenElements} hidden`);
+            
+            // Check login component shadow DOM
+            const loginComponent = document.querySelector('login-component');
+            if (loginComponent && loginComponent.shadowRoot) {
+                console.log('🎭 Login Component Shadow DOM:');
+                const form = loginComponent.shadowRoot.querySelector('.login-form');
+                const submitBtn = loginComponent.shadowRoot.querySelector('#submit-btn');
+                
+                console.log('  Form found:', !!form);
+                console.log('  Submit button found:', !!submitBtn);
+                
+                if (submitBtn) {
+                    console.log('  Submit button disabled:', submitBtn.disabled);
+                    console.log('  Submit button type:', submitBtn.type);
+                    console.log('  Submit button events attached:', submitBtn.onclick || submitBtn.onsubmit ? 'Yes' : 'No');
+                }
+            }
+            
+            console.log('');
+            console.log('🎯 MAIN-APP ANALYSIS SUMMARY');
+            console.log('===========================');
+            console.log('If main-app is interfering with login-page visibility,');
+            console.log('we need to ensure login-page is completely independent.');
+        });
+    </script>
+</body>
+</html>

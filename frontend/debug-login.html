@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Component Debug</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="src/js/icons.js" defer></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .debug-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+        .debug-section h3 { margin-top: 0; color: #333; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 4px; cursor: pointer; }
+        .test-btn { background: #007bff; color: white; }
+        .test-btn:hover { background: #0056b3; }
+        .reset-btn { background: #6c757d; color: white; }
+        .reset-btn:hover { background: #545b62; }
+        .debug-output { background: #f8f9fa; padding: 10px; border-radius: 4px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; }
+        .error { color: #dc3545; }
+        .success { color: #28a745; }
+        .warning { color: #ffc107; }
+    </style>
+</head>
+<body>
+    <h1>Login Component Debug Tool</h1>
+
+    <div class="debug-section">
+        <h3>Component Registration Status</h3>
+        <button class="test-btn" onclick="checkComponentRegistration()">Check Component Registration</button>
+        <div id="registration-output" class="debug-output"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>DOM Elements Status</h3>
+        <button class="test-btn" onclick="checkDOMElements()">Check DOM Elements</button>
+        <div id="dom-output" class="debug-output"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>Authentication State</h3>
+        <button class="test-btn" onclick="checkAuthState()">Check Auth State</button>
+        <div id="auth-output" class="debug-output"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>Test Login Component</h3>
+        <button class="test-btn" onclick="testLoginComponent()">Create Test Login Component</button>
+        <button class="reset-btn" onclick="resetLoginComponent()">Reset Login Component</button>
+        <div id="login-output" class="debug-output"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>Browser Console Errors</h3>
+        <button class="test-btn" onclick="checkConsoleErrors()">Check Console Errors</button>
+        <div id="console-output" class="debug-output"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const timestamp = new Date().toISOString();
+            return `[${timestamp}] ${message}`;
+        }
+
+        function checkComponentRegistration() {
+            const output = document.getElementById('registration-output');
+            let result = '';
+
+            // Check if login-component is registered
+            if (customElements.get('login-component')) {
+                result += log('✓ login-component is registered\n', 'success');
+            } else {
+                result += log('✗ login-component is NOT registered\n', 'error');
+            }
+
+            // Check all registered custom elements
+            result += log('Registered custom elements:\n');
+            const registered = customElements.get;
+            // We can't easily list all, but we can check specific ones
+            const componentsToCheck = ['login-component', 'chart-component', 'student-table'];
+            componentsToCheck.forEach(name => {
+                if (customElements.get(name)) {
+                    result += log(`  ✓ ${name}\n`, 'success');
+                } else {
+                    result += log(`  ✗ ${name}\n`, 'error');
+                }
+            });
+
+            output.textContent = result;
+        }
+
+        function checkDOMElements() {
+            const output = document.getElementById('dom-output');
+            let result = '';
+
+            // Check login container
+            const loginContainer = document.getElementById('login-container');
+            if (loginContainer) {
+                const styles = window.getComputedStyle(loginContainer);
+                result += log(`Login container found:\n`);
+                result += log(`  Display: ${styles.display}\n`);
+                result += log(`  Visibility: ${styles.visibility}\n`);
+                result += log(`  Opacity: ${styles.opacity}\n`);
+                result += log(`  Width: ${styles.width}, Height: ${styles.height}\n`);
+
+                // Check for login component inside
+                const loginComponent = loginContainer.querySelector('login-component');
+                if (loginComponent) {
+                    result += log(`  ✓ Login component found inside container\n`, 'success');
+                    const componentStyles = window.getComputedStyle(loginComponent);
+                    result += log(`    Component display: ${componentStyles.display}\n`);
+                    result += log(`    Component visibility: ${componentStyles.visibility}\n`);
+                } else {
+                    result += log(`  ✗ No login component found inside container\n`, 'error');
+                }
+            } else {
+                result += log('✗ Login container not found in DOM\n', 'error');
+            }
+
+            // Check auth loading element
+            const authLoading = document.getElementById('auth-loading');
+            if (authLoading) {
+                const styles = window.getComputedStyle(authLoading);
+                result += log(`Auth loading element found:\n`);
+                result += log(`  Display: ${styles.display}\n`);
+                result += log(`  Visibility: ${styles.visibility}\n`);
+            } else {
+                result += log('✗ Auth loading element not found\n', 'error');
+            }
+
+            // Check main app
+            const mainApp = document.getElementById('main-app');
+            if (mainApp) {
+                const styles = window.getComputedStyle(mainApp);
+                result += log(`Main app found:\n`);
+                result += log(`  Display: ${styles.display}\n`);
+                result += log(`  Visibility: ${styles.visibility}\n`);
+            } else {
+                result += log('✗ Main app not found\n', 'error');
+            }
+
+            output.textContent = result;
+        }
+
+        function checkAuthState() {
+            const output = document.getElementById('auth-output');
+            let result = '';
+
+            // Check if authContext exists
+            if (typeof window.authContext !== 'undefined') {
+                result += log('✓ authContext found in global scope\n', 'success');
+                try {
+                    const state = window.authContext.getState();
+                    result += log(`Auth state:\n`);
+                    result += log(`  isAuthenticated: ${state.isAuthenticated}\n`);
+                    result += log(`  isLoading: ${state.isLoading}\n`);
+                    result += log(`  user: ${state.user ? state.user.username : 'null'}\n`);
+                    result += log(`  error: ${state.error || 'null'}\n`);
+                } catch (error) {
+                    result += log(`✗ Error getting auth state: ${error.message}\n`, 'error');
+                }
+            } else {
+                result += log('✗ authContext not found in global scope\n', 'error');
+
+                // Check if it's available via import
+                result += log('Checking for authContext in other scopes...\n');
+                const scripts = document.querySelectorAll('script[type="module"]');
+                result += log(`Found ${scripts.length} module scripts\n`);
+            }
+
+            output.textContent = result;
+        }
+
+        function testLoginComponent() {
+            const output = document.getElementById('login-output');
+            let result = '';
+
+            try {
+                // Try to create a login component manually
+                const loginContainer = document.getElementById('login-container');
+                if (!loginContainer) {
+                    result += log('✗ Login container not found, creating one\n', 'warning');
+                    const newContainer = document.createElement('div');
+                    newContainer.id = 'login-container';
+                    newContainer.className = 'login-container';
+                    newContainer.style.cssText = 'position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000;';
+                    document.body.appendChild(newContainer);
+                }
+
+                const container = document.getElementById('login-container');
+
+                // Clear existing content
+                container.innerHTML = '';
+
+                // Create login component
+                const loginComponent = document.createElement('login-component');
+                loginComponent.id = 'debugLoginComponent';
+                loginComponent.style.cssText = 'background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);';
+
+                container.appendChild(loginComponent);
+
+                result += log('✓ Login component created and added to DOM\n', 'success');
+                result += log('Login component should now be visible\n');
+
+                // Try to access the component instance
+                setTimeout(() => {
+                    const component = document.querySelector('login-component');
+                    if (component) {
+                        result += log('✓ Component element found in DOM\n', 'success');
+                        // Try to call methods on the component
+                        if (typeof component.reset === 'function') {
+                            result += log('✓ Component has reset method\n', 'success');
+                            component.reset();
+                            result += log('✓ Component reset method called\n', 'success');
+                        } else {
+                            result += log('✗ Component does not have reset method\n', 'error');
+                        }
+                    } else {
+                        result += log('✗ Component element not found after creation\n', 'error');
+                    }
+                    output.textContent += '\n' + result;
+                }, 100);
+
+            } catch (error) {
+                result += log(`✗ Error creating login component: ${error.message}\n`, 'error');
+            }
+
+            output.textContent = result;
+        }
+
+        function resetLoginComponent() {
+            const container = document.getElementById('login-container');
+            if (container) {
+                container.innerHTML = '';
+                const output = document.getElementById('login-output');
+                output.textContent = log('Login container cleared\n');
+            }
+        }
+
+        function checkConsoleErrors() {
+            const output = document.getElementById('console-output');
+            let result = '';
+
+            result += log('Console errors check:\n');
+            result += log('Open browser console (F12) to see detailed errors\n');
+            result += log('Look for:\n');
+            result += log('  - JavaScript errors during component initialization\n');
+            result += log('  - Failed network requests\n');
+            result += log('  - CSS loading issues\n');
+            result += log('  - Component registration errors\n');
+
+            // Try to access common error sources
+            if (typeof window.onerror === 'function') {
+                result += log('✓ Global error handler is set\n', 'success');
+            } else {
+                result += log('✗ No global error handler found\n', 'warning');
+            }
+
+            output.textContent = result;
+        }
+
+        // Auto-run checks on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                checkComponentRegistration();
+                checkDOMElements();
+                checkAuthState();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

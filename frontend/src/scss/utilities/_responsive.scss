@@ -1,0 +1,268 @@
+// Responsive Utilities
+@use "../base/_variables" as vars;
+@use "../base/_mixins" as mixins;
+
+// Container utilities
+.container {
+  width: 100%;
+  margin: 0 auto;
+  padding: 0 vars.$space-4;
+}
+
+.container-sm {
+  max-width: vars.$mobile-landscape;
+}
+
+.container-md {
+  max-width: vars.$tablet;
+}
+
+.container-lg {
+  max-width: vars.$tablet-landscape;
+}
+
+.container-xl {
+  max-width: vars.$desktop;
+}
+
+.container-xxl {
+  max-width: vars.$desktop-large;
+}
+
+// Responsive spacing utilities
+@each $size, $value in (
+  1: vars.$space-1,
+  2: vars.$space-2,
+  3: vars.$space-3,
+  4: vars.$space-4,
+  5: vars.$space-5,
+  6: vars.$space-6,
+  8: vars.$space-8,
+  10: vars.$space-10,
+  12: vars.$space-12,
+  16: vars.$space-16
+) {
+  .m-#{$size} { margin: $value; }
+  .mt-#{$size} { margin-top: $value; }
+  .mr-#{$size} { margin-right: $value; }
+  .mb-#{$size} { margin-bottom: $value; }
+  .ml-#{$size} { margin-left: $value; }
+  .mx-#{$size} { margin-left: $value; margin-right: $value; }
+  .my-#{$size} { margin-top: $value; margin-bottom: $value; }
+
+  .p-#{$size} { padding: $value; }
+  .pt-#{$size} { padding-top: $value; }
+  .pr-#{$size} { padding-right: $value; }
+  .pb-#{$size} { padding-bottom: $value; }
+  .pl-#{$size} { padding-left: $value; }
+  .px-#{$size} { padding-left: $value; padding-right: $value; }
+  .py-#{$size} { padding-top: $value; padding-bottom: $value; }
+}
+
+// Responsive typography
+@each $name, $size in (
+  xs: vars.$font-size-xs,
+  sm: vars.$font-size-sm,
+  base: vars.$font-size-base,
+  lg: vars.$font-size-lg,
+  xl: vars.$font-size-xl,
+  2xl: vars.$font-size-2xl,
+  3xl: vars.$font-size-3xl,
+  4xl: vars.$font-size-4xl
+) {
+  .text-#{$name} {
+    font-size: $size;
+  }
+}
+
+// Display utilities
+.d-none { display: none; }
+.d-block { display: block; }
+.d-inline { display: inline; }
+.d-inline-block { display: inline-block; }
+.d-flex { display: flex; }
+.d-inline-flex { display: inline-flex; }
+.d-grid { display: grid; }
+.d-inline-grid { display: inline-grid; }
+
+// Flex utilities
+.flex-row { flex-direction: row; }
+.flex-column { flex-direction: column; }
+.flex-row-reverse { flex-direction: row-reverse; }
+.flex-column-reverse { flex-direction: column-reverse; }
+
+.flex-wrap { flex-wrap: wrap; }
+.flex-nowrap { flex-wrap: nowrap; }
+.flex-wrap-reverse { flex-wrap: wrap-reverse; }
+
+@each $value in (start, end, center, between, around, evenly) {
+  .justify-content-#{$value} {
+    justify-content: if($value == start, flex-start, if($value == end, flex-end, $value));
+  }
+
+  .align-items-#{$value} {
+    align-items: if($value == start, flex-start, if($value == end, flex-end, $value));
+  }
+
+  .align-content-#{$value} {
+    align-content: if($value == start, flex-start, if($value == end, flex-end, $value));
+  }
+}
+
+// Self-alignment utilities
+.align-self-start { align-self: flex-start; }
+.align-self-end { align-self: flex-end; }
+.align-self-center { align-self: center; }
+.align-self-baseline { align-self: baseline; }
+.align-self-stretch { align-self: stretch; }
+
+// Flex grow and shrink
+.flex-grow-0 { flex-grow: 0; }
+.flex-grow-1 { flex-grow: 1; }
+.flex-shrink-0 { flex-shrink: 0; }
+.flex-shrink-1 { flex-shrink: 1; }
+
+// Responsive display utilities
+@include mixins.mobile {
+  .d-mobile-none { display: none; }
+  .d-mobile-block { display: block; }
+  .d-mobile-flex { display: flex; }
+}
+
+@include mixins.tablet {
+  .d-tablet-none { display: none; }
+  .d-tablet-block { display: block; }
+  .d-tablet-flex { display: flex; }
+}
+
+@include mixins.desktop {
+  .d-desktop-none { display: none; }
+  .d-desktop-block { display: block; }
+  .d-desktop-flex { display: flex; }
+}
+
+// Responsive spacing utilities
+@include mixins.tablet {
+  @each $size, $value in (
+    1: vars.$space-1,
+    2: vars.$space-2,
+    3: vars.$space-3,
+    4: vars.$space-4,
+    5: vars.$space-5,
+    6: vars.$space-6,
+    8: vars.$space-8,
+    10: vars.$space-10,
+    12: vars.$space-12,
+    16: vars.$space-16
+  ) {
+    .m-tablet-#{$size} { margin: $value; }
+    .mt-tablet-#{$size} { margin-top: $value; }
+    .mr-tablet-#{$size} { margin-right: $value; }
+    .mb-tablet-#{$size} { margin-bottom: $value; }
+    .ml-tablet-#{$size} { margin-left: $value; }
+    .mx-tablet-#{$size} { margin-left: $value; margin-right: $value; }
+    .my-tablet-#{$size} { margin-top: $value; margin-bottom: $value; }
+
+    .p-tablet-#{$size} { padding: $value; }
+    .pt-tablet-#{$size} { padding-top: $value; }
+    .pr-tablet-#{$size} { padding-right: $value; }
+    .pb-tablet-#{$size} { padding-bottom: $value; }
+    .pl-tablet-#{$size} { padding-left: $value; }
+    .px-tablet-#{$size} { padding-left: $value; padding-right: $value; }
+    .py-tablet-#{$size} { padding-top: $value; padding-bottom: $value; }
+  }
+}
+
+@include mixins.desktop {
+  @each $size, $value in (
+    1: vars.$space-1,
+    2: vars.$space-2,
+    3: vars.$space-3,
+    4: vars.$space-4,
+    5: vars.$space-5,
+    6: vars.$space-6,
+    8: vars.$space-8,
+    10: vars.$space-10,
+    12: vars.$space-12,
+    16: vars.$space-16
+  ) {
+    .m-desktop-#{$size} { margin: $value; }
+    .mt-desktop-#{$size} { margin-top: $value; }
+    .mr-desktop-#{$size} { margin-right: $value; }
+    .mb-desktop-#{$size} { margin-bottom: $value; }
+    .ml-desktop-#{$size} { margin-left: $value; }
+    .mx-desktop-#{$size} { margin-left: $value; margin-right: $value; }
+    .my-desktop-#{$size} { margin-top: $value; margin-bottom: $value; }
+
+    .p-desktop-#{$size} { padding: $value; }
+    .pt-desktop-#{$size} { padding-top: $value; }
+    .pr-desktop-#{$size} { padding-right: $value; }
+    .pb-desktop-#{$size} { padding-bottom: $value; }
+    .pl-desktop-#{$size} { padding-left: $value; }
+    .px-desktop-#{$size} { padding-left: $value; padding-right: $value; }
+    .py-desktop-#{$size} { padding-top: $value; padding-bottom: $value; }
+  }
+}
+
+// Grid utilities
+@each $cols in (1, 2, 3, 4, 5, 6, 12) {
+  .grid-cols-#{$cols} {
+    grid-template-columns: repeat($cols, minmax(0, 1fr));
+  }
+}
+
+@each $gap, $value in (
+  1: vars.$space-1,
+  2: vars.$space-2,
+  3: vars.$space-3,
+  4: vars.$space-4,
+  5: vars.$space-5,
+  6: vars.$space-6
+) {
+  .gap-#{$gap} { gap: $value; }
+}
+
+// Visibility utilities
+.sr-only {
+  @include mixins.sr-only;
+}
+
+// Print utilities
+@media print {
+  .d-print-none { display: none !important; }
+  .d-print-block { display: block !important; }
+  .d-print-inline { display: inline !important; }
+  .d-print-inline-block { display: inline-block !important; }
+}
+
+// Accessibility-focused utilities
+.focus-visible:focus-visible {
+  @include mixins.focus-ring;
+}
+
+.touch-target {
+  @include mixins.touch-target;
+}
+
+// High contrast utilities
+@include mixins.high-contrast {
+  .text-high-contrast {
+    color: vars.$high-contrast-text;
+    background-color: vars.$high-contrast-bg;
+  }
+
+  .border-high-contrast {
+    border-color: vars.$high-contrast-text;
+  }
+}
+
+// Dark mode utilities
+@include mixins.dark-mode {
+  .text-dark-mode {
+    color: vars.$dark-text;
+  }
+
+  .bg-dark-mode {
+    background-color: vars.$dark-background;
+  }
+}

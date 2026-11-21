@@ -1,0 +1,353 @@
+// CSS Custom Property Fallbacks for Older Browsers
+// Provides graceful degradation for browsers that don't support CSS variables
+
+@use 'sass:meta';
+@use 'variables' as vars;
+
+// ============================================================================
+// BROWSER COMPATIBILITY DETECTION
+// ============================================================================
+
+// Check if CSS custom properties are supported
+@supports not (--css: variables) {
+  // Fallbacks for browsers without custom property support
+  @include css-variable-fallbacks();
+}
+
+// ============================================================================
+// CSS CUSTOM PROPERTY FALLBACKS
+// ============================================================================
+
+@mixin css-variable-fallbacks() {
+  // Color fallbacks
+  .bg-primary {
+    background-color: vars.$primary-color;
+    background-color: var(--color-primary, #{vars.$primary-color});
+  }
+
+  .bg-secondary {
+    background-color: vars.$secondary-color;
+    background-color: var(--color-secondary, #{vars.$secondary-color});
+  }
+
+  .bg-accent {
+    background-color: vars.$accent-color;
+    background-color: var(--color-accent, #{vars.$accent-color});
+  }
+
+  .text-primary {
+    color: vars.$primary-color;
+    color: var(--color-primary, #{vars.$primary-color});
+  }
+
+  .text-secondary {
+    color: vars.$secondary-color;
+    color: var(--color-secondary, #{vars.$secondary-color});
+  }
+
+  .border-primary {
+    border-color: vars.$primary-color;
+    border-color: var(--color-primary, #{vars.$primary-color});
+  }
+
+  // Shadow fallbacks
+  .shadow-sm {
+    box-shadow: vars.$shadow-light;
+    box-shadow: var(--shadow-sm, #{vars.$shadow-light});
+  }
+
+  .shadow-md {
+    box-shadow: vars.$shadow;
+    box-shadow: var(--shadow-md, #{vars.$shadow});
+  }
+
+  .shadow-lg {
+    box-shadow: vars.$shadow-hover;
+    box-shadow: var(--shadow-lg, #{vars.$shadow-hover});
+  }
+
+  // Border radius fallbacks
+  .rounded-sm {
+    border-radius: vars.$border-radius-sm;
+    border-radius: var(--border-radius-sm, #{vars.$border-radius-sm});
+  }
+
+  .rounded-md {
+    border-radius: vars.$border-radius;
+    border-radius: var(--border-radius-md, #{vars.$border-radius});
+  }
+
+  .rounded-lg {
+    border-radius: vars.$border-radius-lg;
+    border-radius: var(--border-radius-lg, #{vars.$border-radius-lg});
+  }
+
+  // Transition fallbacks
+  .transition-fast {
+    transition: all vars.$transition-fast ease;
+    transition: all var(--transition-fast, #{vars.$transition-fast}) ease;
+  }
+
+  .transition-base {
+    transition: all vars.$transition-base ease;
+    transition: all var(--transition-base, #{vars.$transition-base}) ease;
+  }
+
+  .transition-slow {
+    transition: all vars.$transition-slow ease;
+    transition: all var(--transition-slow, #{vars.$transition-slow}) ease;
+  }
+}
+
+// ============================================================================
+// PROGRESSIVE ENHANCEMENT MIXINS
+// ============================================================================
+
+// Apply styles only if CSS custom properties are supported
+@mixin if-supports-custom-properties() {
+  @supports (--css: variables) {
+    @content;
+  }
+}
+
+// Apply fallbacks for older browsers
+@mixin progressive-enhancement($property, $fallback-value, $css-variable: null) {
+  #{$property}: $fallback-value;
+
+  @if $css-variable {
+    @include if-supports-custom-properties() {
+      #{$property}: var(#{$css-variable}, #{$fallback-value});
+    }
+  }
+}
+
+// Enhanced transition mixin with fallback support
+@mixin transition-enhanced($properties: all, $duration: null, $easing: null) {
+  $fallback-duration: if($duration, $duration, vars.$transition-base);
+  $fallback-easing: if($easing, $easing, ease);
+
+  transition: $properties $fallback-duration $fallback-easing;
+
+  @include if-supports-custom-properties() {
+    $css-duration: if($duration, $duration, 'var(--transition-base)');
+    $css-easing: if($easing, $easing, 'var(--transition-easing)');
+    transition: $properties #{$css-duration} #{$css-easing};
+  }
+}
+
+// Enhanced shadow mixin with fallback support
+@mixin shadow-enhanced($level: 'md') {
+  $fallback-shadow: if($level == 'sm', vars.$shadow-light,
+                   if($level == 'lg', vars.$shadow-hover, vars.$shadow));
+
+  box-shadow: $fallback-shadow;
+
+  @include if-supports-custom-properties() {
+    $css-shadow: if($level == 'sm', 'var(--shadow-sm)',
+                 if($level == 'lg', 'var(--shadow-lg)',
+                 'var(--shadow-md)'));
+    box-shadow: #{$css-shadow};
+  }
+}
+
+// ============================================================================
+// BROWSER-SPECIFIC HACKS AND PREFIXES
+// ============================================================================
+
+// Internet Explorer fallbacks (IE 11 and below)
+@mixin ie-fallback($property, $value, $css-variable: null) {
+  // IE doesn't support custom properties, so always use fallback
+  @if meta.type-of($value) == 'color' {
+    // For colors, provide a solid fallback
+    #{$property}: $value;
+  } @else {
+    #{$property}: $value;
+  }
+}
+
+// Edge 12-18 custom property polyfill support
+@mixin edge-polyfill-support() {
+  // Edge has partial support for custom properties
+  @supports (-ms-ime-align: auto) {
+    @content;
+  }
+}
+
+// ============================================================================
+// GRID LAYOUT FALLBACKS
+// ============================================================================
+
+@mixin grid-fallback($columns: null, $gap: null, $rows: null) {
+  // Fallback for older browsers without grid support
+  @supports not (display: grid) {
+    @if $columns {
+      @if meta.type-of($columns) == 'number' {
+        display: flex;
+        flex-wrap: wrap;
+
+        > * {
+          flex: 0 0 calc(100% / #{$columns});
+          @if $gap {
+            margin: $gap;
+          }
+        }
+      }
+    }
+  }
+
+  // Modern grid for supported browsers
+  @supports (display: grid) {
+    @if $columns {
+      display: grid;
+      grid-template-columns: $columns;
+    }
+    @if $gap {
+      gap: $gap;
+    }
+    @if $rows {
+      grid-template-rows: $rows;
+    }
+  }
+}
+
+// ============================================================================
+// FLEXBOX FALLBACKS
+// ============================================================================
+
+@mixin flexbox-fallback($justify: null, $align: null, $direction: null) {
+  // Fallback for very old browsers
+  @if $justify == 'space-between' {
+    display: table;
+    width: 100%;
+
+    > * {
+      display: table-cell;
+      @if $align {
+        vertical-align: $align;
+      }
+    }
+
+    &::before,
+    &::after {
+      display: table-cell;
+      width: 50%;
+      content: '';
+    }
+  } @else {
+    display: flex;
+    @if $justify {
+      justify-content: $justify;
+    }
+    @if $align {
+      align-items: $align;
+    }
+    @if $direction {
+      flex-direction: $direction;
+    }
+  }
+}
+
+// ============================================================================
+// FONT LOADING FALLBACKS
+// ============================================================================
+
+@mixin font-display-fallback($font-family, $fallback-font: null) {
+  $fallback: if($fallback-font, $fallback-font, vars.$font-family-sans);
+
+  // Fallback font stack
+  font-family: $fallback, $font-family;
+
+  // Use font-display: swap for better performance
+  @if str-index($font-family, 'Inter') {
+    font-display: swap;
+  }
+}
+
+// ============================================================================
+// MODERN CSS FEATURE DETECTION
+// ============================================================================
+
+// Check for container queries support
+@supports not (container-type: inline-size) {
+  .container-query-polyfill {
+    // Fallback behavior for container queries
+    @content;
+  }
+}
+
+// Check for aspect-ratio support
+@supports not (aspect-ratio: 1) {
+  .aspect-ratio-polyfill {
+    // Fallback for aspect-ratio using padding-bottom trick
+    &::before {
+      content: '';
+      display: block;
+      padding-bottom: calc(100% / var(--aspect-ratio, 1));
+    }
+  }
+}
+
+// ============================================================================
+// PRINT STYLES FALLBACKS
+// ============================================================================
+
+@media print {
+  // Ensure colors work in print
+  .bg-primary {
+    background-color: #{vars.$primary-color} !important;
+  }
+
+  .text-primary {
+    color: #{vars.$primary-color} !important;
+  }
+
+  // Remove shadows in print
+  .shadow-sm,
+  .shadow-md,
+  .shadow-lg {
+    box-shadow: none !important;
+  }
+
+  // Ensure sufficient contrast for text
+  .text-muted {
+    color: #{vars.$neutral-600} !important;
+  }
+}
+
+// ============================================================================
+// ACCESSIBILITY FALLBACKS
+// ============================================================================
+
+// High contrast mode fallbacks
+@media (prefers-contrast: high) {
+  .bg-primary {
+    background-color: #{vars.$high-contrast-text} !important;
+    color: #{vars.$high-contrast-bg} !important;
+  }
+
+  .border-primary {
+    border-color: #{vars.$high-contrast-text} !important;
+    border-width: 2px !important;
+  }
+
+  // Ensure focus rings are visible
+  .focus-ring:focus {
+    outline: 3px solid #{vars.$high-contrast-text} !important;
+    outline-offset: 2px !important;
+  }
+}
+
+// Reduced motion fallbacks
+@media (prefers-reduced-motion: reduce) {
+  .transition-fast,
+  .transition-base,
+  .transition-slow {
+    transition: none !important;
+  }
+
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}

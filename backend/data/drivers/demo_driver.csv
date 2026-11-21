@@ -1,0 +1,11 @@
+Route,Name,Father's name,Mobile,Class,Address,Fees
+I,Test Student B01,Shri Test Parent B01,9000001001,L.K.G.,Test Village B,
+I,Test Student B02,Shri Test Parent B02,9000001002,U.K.G.,Test Village C,
+I,Test Student B03,Shri Test Parent B03,9000001003,1,Test Village D,
+I,Test Student B04,Shri Test Parent B04,9000001004,2,Test Village A,
+I,Test Student B05,Shri Test Parent B05,,3,Test Village B,
+I,Test Student B06,Shri Test Parent B06,9000001006,4,Test Village C,
+II,Test Student B07,Shri Test Parent B07,9000001007,5,Test Village D,1500
+II,Test Student B08,Shri Test Parent B08,9000001008,P.G,Test Village A,
+II,Test Student B09,Shri Test Parent B09,9000001009,L.K.G.,Test Village B,
+II,Test Student B10,Shri Test Parent B10,,U.K.G.,Test Village C,

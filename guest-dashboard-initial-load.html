@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script type="module" src="/@vite/client"></script>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#6366f1">
+    <title>School Management System</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="styles.css">
+    <script src="src/js/icons.js" defer></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Skip Links for Keyboard Navigation -->
+        <a href="#main-content" class="skip-link sr-only">Skip to main content</a>
+        <a href="#sidebar-navigation" class="skip-link sr-only">Skip to navigation</a>
+        <a href="#page-title" class="skip-link sr-only">Skip to page title</a>
+
+        <!-- Authentication Loading Indicator (shown initially) -->
+        <div id="auth-loading" class="auth-loading" style="display: block;">
+            <div class="loading-spinner">
+                <icon-spinner size="32"></icon-spinner>
+                <p>Initializing...</p>
+            </div>
+        </div>
+
+        <!-- Authentication Error Display -->
+        <div id="auth-error" class="auth-error" style="display: none;"></div>
+
+        <!-- Login Page (shown when not authenticated) -->
+        <div id="login-page" class="page">
+            <div class="login-page-container">
+                <div class="login-header">
+                    <h1>Welcome to School Management System</h1>
+                    <p>Please sign in to continue</p>
+                </div>
+                <div class="login-form-container">
+                    <login-component id="loginComponent"></login-component>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App Container (shown when authenticated) -->
+        <div id="main-app" class="main-app" style="display: none;">
+        <!-- Modern Sidebar Navigation -->
+        <nav class="sidebar" id="sidebar-navigation" role="navigation" aria-label="Main navigation">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <icon-school size="28"></icon-school>
+                    <span>SMS</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebar-toggle">
+                    <icon-bars size="16"></icon-bars>
+                </button>
+            </div>
+
+            <ul class="sidebar-menu" role="menu">
+                 <li class="menu-item active" data-page="dashboard" role="menuitem" tabindex="0" aria-current="page">
+                     <icon-chart-line size="18" aria-hidden="true"></icon-chart-line>
+                     <span>Dashboard</span>
+                 </li>
+                 <li class="menu-item" data-page="transport" role="menuitem" tabindex="-1">
+                     <icon-bus size="18" aria-hidden="true"></icon-bus>
+                     <span>Transport</span>
+                 </li>
+                 <li class="menu-item" data-page="students" role="menuitem" tabindex="-1">
+                     <icon-users size="18" aria-hidden="true"></icon-users>
+                     <span>Students</span>
+                 </li>
+                 <li class="menu-item" data-page="reports" role="menuitem" tabindex="-1">
+                     <icon-chart-bar size="18" aria-hidden="true"></icon-chart-bar>
+                     <span>Reports</span>
+                 </li>
+                 <li class="menu-item" data-page="settings" role="menuitem" tabindex="-1">
+                     <icon-cog size="18" aria-hidden="true"></icon-cog>
+                     <span>Settings</span>
+                 </li>
+                 <li class="menu-item" data-page="chat" role="menuitem" tabindex="-1">
+                     <icon-robot size="18" aria-hidden="true"></icon-robot>
+                     <span>AI Chat</span>
+                 </li>
+             </ul>
+
+            <div class="sidebar-footer">
+                 <div class="user-info" id="user-info">
+                     <div class="user-avatar">
+                         <icon-user-circle size="24" aria-hidden="true"></icon-user-circle>
+                     </div>
+                     <div class="user-details">
+                         <div class="user-name" aria-live="polite">Loading...</div>
+                         <div class="user-role" aria-live="polite">Authenticating...</div>
+                     </div>
+                 </div>
+                 <button class="logout-btn" id="logout-btn" onclick="logout()" style="display: none;" aria-label="Logout">
+                     <icon-sign-out size="16" aria-hidden="true"></icon-sign-out>
+                 </button>
+             </div>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="main-content" id="main-content" role="main">
+            <!-- Modern Header -->
+            <header class="main-header" role="banner">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="sidebar-navigation">
+                        <icon-bars size="18"></icon-bars>
+                    </button>
+                    <h1 id="page-title">Dashboard</h1>
+                </div>
+                <div class="header-right">
+                    <div class="header-notifications">
+                        <button class="notification-btn" aria-label="Notifications">
+                            <icon-bell size="16"></icon-bell>
+                            <span class="notification-badge" aria-label="3 unread notifications">3</span>
+                        </button>
+                    </div>
+                    <div class="header-search">
+                        <label for="search-input" class="sr-only">Search</label>
+                        <icon-search size="14" aria-hidden="true"></icon-search>
+                        <input type="text" id="search-input" placeholder="Search..." aria-label="Search">
+                    </div>
+                </div>
+            </header>
+
+            <!-- Page Content Container -->
+            <div class="page-container">
+                <!-- Dashboard Page -->
+                <div id="dashboard-page" class="page active">
+                    <div class="welcome-section">
+                        <div class="welcome-content">
+                            <h2>Welcome to School Management System</h2>
+                            <p>Manage your school's transport, students, and operations with ease.</p>
+                        </div>
+                        <div class="welcome-stats">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <icon-users size="32"></icon-users>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-number" id="total-students-dash">0</div>
+                                    <div class="stat-label">Students</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <icon-bus size="32"></icon-bus>
+                                </div>
+                                <div class="stat-info">
+                                    <div class="stat-number" id="total-drivers-dash">0</div>
+                                    <div class="stat-label">Drivers</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid">
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Quick Actions</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="action-buttons">
+                                    <button class="action-btn primary" onclick="showPage('transport')">
+                                        <icon-plus size="16"></icon-plus>
+                                        Add Transport Route
+                                    </button>
+                                    <button class="action-btn secondary" onclick="showPage('students')">
+                                        <icon-user-plus size="16"></icon-user-plus>
+                                        Add Student
+                                    </button>
+                                    <button class="action-btn info">
+                                        <icon-file-alt size="16"></icon-file-alt>
+                                        Generate Report
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="dashboard-card">
+                            <div class="card-header">
+                                <h3>Recent Activity</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="activity-list">
+                                    <div class="activity-item">
+                                        <div class="activity-icon">
+                                            <icon-bus size="20"></icon-bus>
+                                        </div>
+                                        <div class="activity-content">
+                                            <div class="activity-title">New route added</div>
+                                            <div class="activity-time">2 hours ago</div>
+                                        </div>
+                                    </div>
+                                    <div class="activity-item">
+                                        <div class="activity-icon">
+                                            <icon-user-plus size="20"></icon-user-plus>
+                                        </div>
+                                        <div class="activity-content">
+                                            <div class="activity-title">5 students enrolled</div>
+                                            <div class="activity-time">1 day ago</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Transport Page -->
+                <div id="transport-page" class="page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <h2>Transport Management</h2>
+                            <p>Manage school transport routes and driver assignments</p>
+                        </div>
+                        <div class="page-header-actions">
+                            <button class="btn btn-primary" onclick="showAddDriverModal()">
+                                <icon-plus size="16"></icon-plus>
+                                Add Route
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="transport-controls">
+                        <div class="control-group">
+                            <label for="driver-select" class="control-label">
+                                <icon-route size="16"></icon-route>
+                                Select Transport Route:
+                            </label>
+                            <select id="driver-select" class="form-control">
+                                <option value="">Choose a transport route...</option>
+                            </select>
+                            <button class="btn btn-secondary" id="refresh-drivers-btn" onclick="refreshDrivers()">
+                                <icon-sync size="16"></icon-sync>
+                                Refresh Drivers
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="driver-info-grid">
+                        <driver-info id="driverInfo"></driver-info>
+
+                        <div class="driver-details-section">
+                            <h3>All Drivers</h3>
+                            <div class="table-container">
+                                <table id="drivers-table" class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Name</th>
+                                            <th>Route</th>
+                                            <th>Vehicle</th>
+                                            <th>Contact</th>
+                                            <th>Status</th>
+                                            <th>Students</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="drivers-table-body">
+                                        <tr>
+                                            <td colspan="6" class="loading-cell">
+                                                <icon-spinner size="20"></icon-spinner>
+                                                Loading drivers...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="table-section">
+                        <div class="table-header">
+                            <h3>Route Details</h3>
+                        </div>
+                        <div class="table-container">
+                            <table id="driver-table" class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Route</th>
+                                        <th>Student Name</th>
+                                        <th>Parent Name</th>
+                                        <th>Contact</th>
+                                        <th>Grade</th>
+                                        <th>Pickup Location</th>
+                                        <th>Transport Fee</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="driver-table-body">
+                                    <tr>
+                                        <td colspan="8" class="loading-cell">
+                                            <icon-spinner size="20"></icon-spinner>
+                                            Loading transport data...
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Students Page -->
+                <div id="students-page" class="page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <h2>Student Management</h2>
+                            <p>Manage student information and records</p>
+                        </div>
+                        <div class="page-header-actions">
+                            <button class="btn btn-primary">
+                                <icon-plus size="16"></icon-plus>
+                                Add Student
+                            </button>
+                        </div>
+                    </div>
+
+                    <student-table id="studentTable"></student-table>
+                    <student-profile-card id="studentProfile" style="display: none;"></student-profile-card>
+                </div>
+
+                <!-- Reports Page -->
+                <div id="reports-page" class="page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <h2>Reports & Analytics</h2>
+                            <p>Generate comprehensive reports and view analytics</p>
+                        </div>
+                        <div class="page-header-actions">
+                            <button class="btn btn-primary" onclick="generateAllReports()">
+                                <icon-sync size="16"></icon-sync>
+                                Refresh All Reports
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="summary-cards">
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <icon-users size="32"></icon-users>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-number" id="report-total-students">0</div>
+                                <div class="summary-label">Total Students</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <icon-bus size="32"></icon-bus>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-number" id="report-total-drivers">0</div>
+                                <div class="summary-label">Active Drivers</div>
+                            </div>
+                        </div>
+                        <div class="summary-card">
+                            <div class="summary-icon">
+                                <icon-dollar-sign size="32"></icon-dollar-sign>
+                            </div>
+                            <div class="summary-content">
+                                <div class="summary-number" id="report-total-revenue">$0</div>
+                                <div class="summary-label">Total Revenue</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="reports-container">
+                        <!-- Student Distribution Report -->
+                        <div class="report-section">
+                            <div class="report-section-header">
+                                <h3><icon-chart-pie size="20"></icon-chart-pie> Student Distribution by Driver</h3>
+                            </div>
+                            <div class="report-content">
+                                <div class="chart-container" id="student-distribution-chart-container">
+                                    <chart-component id="student-distribution-chart"></chart-component>
+                                </div>
+                                <div class="report-table-container">
+                                    <table class="report-table" id="driver-student-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Driver Name</th>
+                                                <th>Student Count</th>
+                                                <th>Revenue</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="driver-student-tbody">
+                                            <tr>
+                                                <td colspan="3" class="loading-cell">
+                                                    <icon-spinner size="20"></icon-spinner>
+                                                    Loading driver statistics...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Revenue Analysis Report -->
+                        <div class="report-section">
+                            <div class="report-section-header">
+                                <h3><icon-chart-line size="20"></icon-chart-line> Revenue Analysis</h3>
+                            </div>
+                            <div class="report-content">
+                                <div class="revenue-breakdown">
+                                    <div class="revenue-chart" id="revenue-by-driver-chart">
+                                        <chart-component id="revenue-driver-chart"></chart-component>
+                                    </div>
+                                    <div class="revenue-chart" id="revenue-by-class-chart">
+                                        <chart-component id="revenue-class-chart"></chart-component>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Driver-Student Statistics Report -->
+                        <div class="report-section">
+                            <div class="report-section-header">
+                                <h3><icon-chart-bar size="20"></icon-chart-bar> Driver-Student Statistics</h3>
+                            </div>
+                            <div class="report-content">
+                                <div class="summary-cards" id="driver-student-stats-cards">
+                                    <div class="summary-card">
+                                        <div class="summary-icon">
+                                            <icon-users size="32"></icon-users>
+                                        </div>
+                                        <div class="summary-content">
+                                            <div class="summary-number" id="total-drivers-stats">0</div>
+                                            <div class="summary-label">Total Drivers</div>
+                                        </div>
+                                    </div>
+                                    <div class="summary-card">
+                                        <div class="summary-icon">
+                                            <icon-user-graduate size="32"></icon-user-graduate>
+                                        </div>
+                                        <div class="summary-content">
+                                            <div class="summary-number" id="total-students-stats">0</div>
+                                            <div class="summary-label">Total Students</div>
+                                        </div>
+                                    </div>
+                                    <div class="summary-card">
+                                        <div class="summary-icon">
+                                            <icon-calculator size="32"></icon-calculator>
+                                        </div>
+                                        <div class="summary-content">
+                                            <div class="summary-number" id="avg-students-per-driver">0</div>
+                                            <div class="summary-label">Avg Students/Driver</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="driver-stats-details">
+                                    <h4>Driver Statistics</h4>
+                                    <table class="report-table" id="driver-stats-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Driver Name</th>
+                                                <th>Student Count</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="driver-stats-tbody">
+                                            <tr>
+                                                <td colspan="2" class="loading-cell">
+                                                    <icon-spinner size="20"></icon-spinner>
+                                                    Loading driver statistics...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Detailed Reports -->
+                        <div class="report-section">
+                            <div class="report-section-header">
+                                <h3><i class="fas fa-file-alt"></i> Detailed Reports</h3>
+                            </div>
+                            <div class="report-actions">
+                                <button class="btn btn-outline" onclick="exportStudentReport()">
+                                    <icon-download size="16"></icon-download>
+                                    Export Student Report
+                                </button>
+                                <button class="btn btn-outline" onclick="exportRevenueReport()">
+                                    <icon-download size="16"></icon-download>
+                                    Export Revenue Report
+                                </button>
+                                <button class="btn btn-outline" onclick="exportDriverReport()">
+                                    <icon-download size="16"></icon-download>
+                                    Export Driver Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Page -->
+                <div id="settings-page" class="page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <h2>Settings</h2>
+                            <p>Configure system preferences and settings</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-content">
+                        <div class="settings-section">
+                            <h3>General Settings</h3>
+                            <div class="settings-group">
+                                <label class="setting-item">
+                                    <span>School Name</span>
+                                    <input type="text" value="School Management System">
+                                </label>
+                                <label class="setting-item">
+                                    <span>Academic Year</span>
+                                    <input type="text" value="2024-2025">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>Transport Settings</h3>
+                            <div class="settings-group">
+                                <label class="setting-item">
+                                    <span>Default Route Fee</span>
+                                    <input type="number" value="500">
+                                </label>
+                                <label class="setting-item">
+                                    <span>Enable Notifications</span>
+                                    <input type="checkbox" checked>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Page -->
+                <div id="chat-page" class="page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <h2><icon-robot size="24"></icon-robot> AI Assistant</h2>
+                            <p>Get help and guidance for the School Management System</p>
+                        </div>
+                    </div>
+
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chat-messages">
+                            <div class="chat-message bot-message">
+                                <div class="message-avatar">
+                                    <icon-robot size="20"></icon-robot>
+                                </div>
+                                <div class="message-content">
+                                    <p>Hello! I'm your AI assistant for the School Management System. How can I help you today?</p>
+                                    <small class="message-time">Just now</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chat-input-area">
+                            <input type="text" id="chat-input" placeholder="Type your message..." class="chat-input">
+                            <button id="send-btn" class="chat-send-btn">
+                                <icon-paper-plane size="16"></icon-paper-plane>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Toast Notifications -->
+        <div id="toast-container" class="toast-container"></div>
+
+        </div> <!-- End main-app -->
+
+    </div>
+
+    <script type="module" src="src/ts/index.ts?t=1761796679528"></script>
+</body>
+</html>

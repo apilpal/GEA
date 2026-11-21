@@ -1,0 +1,35 @@
+// Base imports - forward variables globally and use mixins with namespace
+@forward 'src/scss/base/_variables';
+@use 'src/scss/base/_mixins';
+@use 'src/scss/base/_base';
+@use 'src/scss/base/_themes';
+@use 'src/scss/base/_theme-mixins';
+@use 'src/scss/base/_design-tokens.json';
+@use 'src/scss/base/_component-theming';
+@use 'src/scss/base/_css-fallbacks';
+
+// Layout imports
+@use 'src/scss/layout/_app';
+
+// Utilities imports
+@use 'src/scss/utilities/_buttons';
+@use 'src/scss/utilities/_forms';
+@use 'src/scss/utilities/_tables';
+@use 'src/scss/utilities/_icons' as utilities-icons;
+@use 'src/scss/utilities/_responsive';
+@use 'src/scss/utilities/_enhanced-utilities';
+
+// Pages imports
+@use 'src/scss/pages/_dashboard';
+@use 'src/scss/pages/_chart';
+@use 'src/scss/pages/_student-table';
+@use 'src/scss/pages/_student-profile-card' as pages-student-profile-card;
+@use 'src/scss/pages/_chat';
+@use 'src/scss/pages/_login';
+@use 'src/scss/pages/_driver-info' as pages-driver-info;
+
+// Component imports
+@use 'src/scss/components/_chart-component';
+@use 'src/scss/components/_driver-info' as components-driver-info;
+@use 'src/scss/components/_icons' as icons;
+@use 'src/scss/components/_student-profile-card' as components-student-profile-card;

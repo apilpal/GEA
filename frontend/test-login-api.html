@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Component API Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="src/js/icons.js" defer></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Login Page (should be visible when not authenticated) -->
+        <div id="login-page" class="page active">
+            <div class="login-page-container">
+                <div class="login-header">
+                    <h1>Welcome to School Management System</h1>
+                    <p>Please sign in to continue</p>
+                </div>
+                <div class="login-form-container">
+                    <login-component id="loginComponent"></login-component>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App Container (hidden when not authenticated) -->
+        <div id="main-app" class="main-app" style="display: none;">
+            <p>Main app content (should be hidden)</p>
+        </div>
+    </div>
+
+    <script type="module" src="src/ts/index.ts"></script>
+    
+    <script>
+        // Test login API functionality
+        async function testLoginAPI() {
+            console.log('🔗 TESTING LOGIN API CONNECTIVITY');
+            console.log('================================');
+            
+            try {
+                // Test API connectivity first
+                const healthResponse = await fetch('/api/health');
+                console.log('✅ API Health Check:', await healthResponse.json());
+                
+                // Test login API endpoint
+                const loginResponse = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        username_or_email: 'test',
+                        password: 'test'
+                    })
+                });
+                
+                const loginResult = await loginResponse.json();
+                console.log('✅ Login API Response:', loginResult);
+                console.log('✅ Status Code:', loginResponse.status);
+                
+                if (loginResponse.status === 400) {
+                    console.log('✅ Login API is working correctly (rejecting invalid credentials)');
+                }
+                
+            } catch (error) {
+                console.error('❌ Login API Error:', error);
+            }
+            
+            console.log('');
+            console.log('🎯 API TEST SUMMARY');
+            console.log('==================');
+            console.log('If you see successful API responses above, the proxy is working!');
+            console.log('The login component should now be able to make API calls.');
+        }
+
+        // Test DOM structure
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 LOGIN COMPONENT COMPREHENSIVE TEST');
+            console.log('====================================');
+            
+            const loginPage = document.getElementById('login-page');
+            const loginComponent = document.querySelector('login-component');
+            const mainApp = document.getElementById('main-app');
+            
+            console.log('Login page found:', !!loginPage);
+            console.log('Login component found:', !!loginComponent);
+            console.log('Main app found:', !!mainApp);
+            
+            if (loginPage) {
+                const styles = window.getComputedStyle(loginPage);
+                console.log('Login page display:', styles.display);
+                console.log('Login page opacity:', styles.opacity);
+                console.log('Login page has active class:', loginPage.classList.contains('active'));
+            }
+            
+            if (mainApp) {
+                console.log('Main app display:', mainApp.style.display);
+            }
+            
+            // Test API after DOM is ready
+            setTimeout(testLoginAPI, 1000);
+            
+            console.log('');
+            console.log('✅ If you can see the login form above AND API responses in console,');
+            console.log('   both the visibility fix AND API connectivity are working!');
+        });
+    </script>
+</body>
+</html>

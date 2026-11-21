@@ -1,0 +1,452 @@
+// Student Profile Card Component Styles
+// Styles specific to the custom student-profile-card element
+@use "sass:color";
+@use "../base/_variables" as vars;
+
+// Mobile-first approach: Base styles optimized for small screens
+student-profile-card {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  margin: 0 8px;
+  --card-primary: #6366f1;
+  --card-secondary: #8b5cf6;
+  --card-accent: #ec4899;
+  --card-success: #10b981;
+  --card-warning: #f59e0b;
+  --card-danger: #ef4444;
+  --card-background: #ffffff;
+  --card-border: #e9ecef;
+  --card-text: #333;
+  --card-muted: #666;
+  --card-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --min-touch-target: 44px; // Minimum touch target size for accessibility
+}
+
+student-profile-card .profile-card {
+  background: var(--card-background);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  transition: var(--card-transition);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// Mobile-first header: Compact layout for small screens
+student-profile-card .profile-header {
+  background: linear-gradient(135deg, var(--card-primary) 0%, var(--card-secondary) 50%, var(--card-accent) 100%);
+  color: white;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="white" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="white" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    opacity: 0.2;
+  }
+}
+
+// Mobile-optimized avatar: Smaller size for compact mobile layout
+student-profile-card .student-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  font-weight: bold;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1;
+  transition: var(--card-transition);
+
+  // Touch-friendly hover state
+  &:hover, &:focus {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+}
+
+// Mobile-optimized name section: Centered for small screens
+student-profile-card .student-name-section {
+  position: relative;
+  z-index: 1;
+
+  h1 {
+    margin: 0 0 4px 0;
+    color: white;
+    font-size: 1.4em;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.3px;
+    line-height: 1.2;
+  }
+
+  .student-route {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 0.9em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    font-weight: 500;
+  }
+}
+
+// Mobile-first: Single column layout for small screens
+student-profile-card .profile-details-grid {
+  display: grid;
+  grid-template-columns: 1fr; // Single column on mobile
+  gap: 16px;
+  padding: 16px;
+}
+
+// Mobile-first: Optimized for touch and readability on small screens
+student-profile-card .detail-card {
+  background: linear-gradient(135deg, #f8f9fa 0%, rgba(255, 255, 255, 0.8) 100%);
+  border-radius: 8px;
+  padding: 12px;
+  border-left: 4px solid var(--card-primary);
+  transition: var(--card-transition);
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, transparent 0%, rgba(255, 255, 255, 0.1) 100%);
+    border-radius: 50%;
+    transform: translate(20px, -20px);
+  }
+
+  // Enhanced touch interactions: larger touch targets, subtle hover states for touch devices
+  &:active {
+    transform: scale(0.98);
+    transition-duration: 0.1s;
+  }
+
+  // Reduced hover effects for touch devices, focus for accessibility
+  &:hover, &:focus-within {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-left-color: color.adjust(vars.$primary-color, $lightness: -10%);
+
+    &::before {
+      transform: translate(15px, -15px);
+    }
+  }
+
+  h2 {
+    margin: 0 0 12px 0;
+    color: var(--card-text);
+    font-size: 1.1em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    border-bottom: 2px solid rgba(99, 102, 241, 0.2);
+    padding-bottom: 6px;
+
+    i {
+      color: var(--card-primary);
+      font-size: 1em;
+    }
+  }
+
+  dl {
+    margin: 0;
+    display: grid;
+    gap: 8px;
+  }
+
+  dl div {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  dt {
+    font-weight: 600;
+    color: var(--card-text);
+    margin: 0;
+    font-size: 0.9em;
+  }
+
+  dd {
+    margin: 0;
+    color: var(--card-muted);
+    word-break: break-word;
+    font-size: 0.9em;
+    line-height: 1.4;
+
+    a {
+      color: var(--card-primary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: var(--card-transition);
+      border-radius: 4px;
+      padding: 4px 6px;
+      margin: -4px -6px;
+      display: inline-block;
+      min-height: var(--min-touch-target);
+      min-width: var(--min-touch-target);
+
+      &:hover, &:focus {
+        background-color: rgba(99, 102, 241, 0.1);
+        text-decoration: underline;
+        outline: 2px solid var(--card-primary);
+        outline-offset: 2px;
+      }
+    }
+  }
+
+  // Color variants for different sections
+  &.basic-info {
+    border-left-color: var(--card-success);
+    background: linear-gradient(135deg, lighten(#10b981, 45%) 0%, rgba(255, 255, 255, 0.8) 100%);
+
+    h3 {
+      border-bottom-color: rgba(16, 185, 129, 0.2);
+    }
+  }
+
+  &.contact-info {
+    border-left-color: var(--card-primary);
+    background: linear-gradient(135deg, lighten(#6366f1, 45%) 0%, rgba(255, 255, 255, 0.8) 100%);
+
+    h3 {
+      border-bottom-color: rgba(99, 102, 241, 0.2);
+    }
+  }
+
+  &.location-info {
+    border-left-color: var(--card-warning);
+    background: linear-gradient(135deg, lighten(#f59e0b, 45%) 0%, rgba(255, 255, 255, 0.8) 100%);
+
+    h3 {
+      border-bottom-color: rgba(245, 158, 11, 0.2);
+    }
+  }
+}
+
+// Loading state
+student-profile-card .profile-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 30px;
+  color: #6c757d;
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid var(--card-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+
+  h4 {
+    margin: 0 0 10px 0;
+    color: var(--card-text);
+  }
+
+  p {
+    margin: 0;
+    text-align: center;
+    font-size: 0.9em;
+  }
+}
+
+// Error state
+student-profile-card .profile-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 30px;
+  color: #ef4444;
+  text-align: center;
+
+  i {
+    font-size: 4em;
+    opacity: 0.5;
+    margin-bottom: 20px;
+  }
+
+  h4 {
+    margin: 0 0 10px 0;
+    color: var(--card-text);
+  }
+
+  p {
+    margin: 0 0 20px 0;
+    font-size: 0.9em;
+    color: #6c757d;
+  }
+
+  .retry-btn {
+    padding: 10px 20px;
+    background: var(--card-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: var(--card-transition);
+
+    &:hover {
+      background: color.adjust(#6366f1, $lightness: -10%);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// Progressive enhancement: Breakpoints for larger screens
+@media (min-width: 576px) {
+  // Small tablets and larger phones in landscape
+  student-profile-card .profile-details-grid {
+    grid-template-columns: repeat(2, 1fr); // Two columns for medium screens
+    gap: 18px;
+    padding: 18px;
+  }
+
+  student-profile-card .detail-card {
+    padding: 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  // Tablets and small desktops
+  student-profile-card {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  student-profile-card .profile-header {
+    padding: 24px;
+    flex-direction: row;
+    text-align: left;
+    gap: 16px;
+  }
+
+  student-profile-card .student-avatar {
+    width: 70px;
+    height: 70px;
+    font-size: 1.8em;
+  }
+
+  student-profile-card .student-name-section h1 {
+    font-size: 1.8em;
+  }
+
+  student-profile-card .profile-details-grid {
+    padding: 24px;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  student-profile-card .detail-card {
+    padding: 16px;
+  }
+}
+
+@media (min-width: 992px) {
+  // Large desktops
+  student-profile-card {
+    max-width: 800px;
+  }
+
+  student-profile-card .profile-header {
+    padding: 32px;
+    gap: 24px;
+  }
+
+  student-profile-card .student-avatar {
+    width: 80px;
+    height: 80px;
+    font-size: 2em;
+  }
+
+  student-profile-card .student-name-section h1 {
+    font-size: 2.2em;
+  }
+
+  student-profile-card .profile-details-grid {
+    padding: 32px;
+  }
+
+  student-profile-card .detail-card {
+    padding: 20px;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  student-profile-card {
+    --card-background: #1f2937;
+    --card-text: #f3f4f6;
+    --card-muted: #9ca3af;
+    --card-border: #374151;
+  }
+
+  student-profile-card .detail-card {
+    background: linear-gradient(135deg, #374151 0%, rgba(31, 41, 55, 0.8) 100%);
+  }
+}
+
+// Print styles
+@media print {
+  student-profile-card .profile-card {
+    box-shadow: none;
+    border: 1px solid #000;
+    break-inside: avoid;
+  }
+
+  student-profile-card .profile-header {
+    background: #f0f0f0 !important;
+    color: #000 !important;
+
+    &::before {
+      display: none;
+    }
+  }
+}
+
+// Animation keyframes
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

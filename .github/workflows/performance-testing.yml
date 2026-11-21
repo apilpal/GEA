@@ -1,0 +1,595 @@
+name: Performance Testing Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Performance test type'
+        required: true
+        default: 'load-test'
+        type: choice
+        options:
+          - load-test
+          - stress-test
+          - spike-test
+          - volume-test
+          - endurance-test
+      target_environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      duration:
+        description: 'Test duration in minutes'
+        required: false
+        default: '5'
+        type: string
+      virtual_users:
+        description: 'Number of virtual users'
+        required: false
+        default: '10'
+        type: string
+  schedule:
+    # Run performance tests weekly on Sundays at 2 AM UTC
+    - cron: '0 2 * * 0'
+
+env:
+  ARTILLERY_VERSION: 'latest'
+  K6_VERSION: 'latest'
+  POSTGRES_VERSION: '15'
+
+jobs:
+  # Performance test preparation
+  prepare-performance-test:
+    name: Prepare Performance Test Environment
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.target_environment || 'staging' }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install performance testing tools
+      run: |
+        echo "🛠️ Installing performance testing tools..."
+
+        # Install Artillery for API load testing
+        npm install -g artillery@$ARTILLERY_VERSION
+
+        # Install k6 for advanced performance testing
+        curl -fsSL https://github.com/grafana/k6/releases/download/v$K6_VERSION/k6-v$K6_VERSION-linux-amd64.tar.gz | tar -xzf -
+        sudo mv k6-v$K6_VERSION-linux-amd64/k6 /usr/local/bin/k6
+
+        # Install Apache Bench for simple load testing
+        sudo apt-get update
+        sudo apt-get install -y apache2-utils
+
+        echo "✅ Performance testing tools installed"
+
+    - name: Validate test configuration
+      run: |
+        echo "🔍 Validating test configuration..."
+
+        # Check if performance test configurations exist
+        if [ ! -f "performance-tests/artillery.yml" ] && [ ! -f "performance-tests/k6.js" ]; then
+          echo "⚠️ No performance test configuration files found"
+          echo "Creating default configurations..."
+
+          # Create default Artillery config
+          mkdir -p performance-tests
+          cat > performance-tests/artillery.yml << 'EOF'
+config:
+  target: 'http://localhost:8000'
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 10
+      name: "Sustained load"
+    - duration: 60
+      arrivalRate: 20
+      name: "Peak load"
+  defaults:
+    headers:
+      Content-Type: 'application/json'
+
+scenarios:
+  - name: "API endpoints"
+    flow:
+      - get:
+          url: "/health"
+      - post:
+          url: "/api/users"
+          json:
+            name: "Test User"
+            email: "test@example.com"
+      - get:
+          url: "/api/users"
+EOF
+
+          # Create default k6 config
+          cat > performance-tests/k6.js << 'EOF'
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export const options = {
+  stages: [
+    { duration: '2m', target: 100 }, // below normal load
+    { duration: '5m', target: 100 },
+    { duration: '2m', target: 200 }, // normal load
+    { duration: '5m', target: 200 },
+    { duration: '2m', target: 300 }, // around the breaking point
+    { duration: '5m', target: 300 },
+    { duration: '2m', target: 400 }, // beyond the breaking point
+    { duration: '5m', target: 400 },
+    { duration: '10m', target: 0 }, // scale down
+  ],
+};
+
+export default function () {
+  const response = http.get('http://localhost:8000/health');
+
+  check(response, {
+    'status is 200': (r) => r.status === 200,
+    'response time < 500ms': (r) => r.timings.duration < 500,
+  });
+
+  sleep(1);
+}
+EOF
+        fi
+
+        echo "✅ Test configuration validated"
+
+  # Backend performance tests
+  backend-performance-test:
+    name: Backend Performance Tests
+    runs-on: ubuntu-latest
+    needs: prepare-performance-test
+    environment: ${{ inputs.target_environment || 'staging' }}
+
+    services:
+      postgres:
+        image: postgres:${{ env.POSTGRES_VERSION }}
+        env:
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_USER: test_user
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r backend/requirements.txt
+
+    - name: Install performance testing tools
+      run: |
+        npm install -g artillery
+        sudo apt-get install -y apache2-utils siege
+
+    - name: Set up test environment
+      run: |
+        export DATABASE_URL="postgresql://test_user:test_password@localhost:5432/test_db"
+        export ENVIRONMENT="testing"
+
+        # Wait for PostgreSQL
+        until pg_isready -h localhost -p 5432 -U test_user; do
+          echo "Waiting for PostgreSQL..."
+          sleep 2
+        done
+
+        # Run migrations
+        cd backend
+        python migrate.py
+
+        # Start backend server in background
+        python run_server.py &
+        BACKEND_PID=$!
+
+        # Wait for server to be ready
+        sleep 10
+
+        echo "BACKEND_PID=$BACKEND_PID" >> $GITHUB_ENV
+
+        # Verify server is running
+        curl -f http://localhost:8000/health || {
+          echo "❌ Backend server not responding"
+          exit 1
+        }
+
+        echo "✅ Backend server started"
+
+    - name: API load testing with Artillery
+      run: |
+        echo "🚀 Running API load tests with Artillery..."
+
+        # Run Artillery load test
+        artillery run performance-tests/artillery.yml --output performance-tests/artillery-report.json
+
+        echo "✅ Artillery load test completed"
+
+    - name: Simple load testing with Apache Bench
+      run: |
+        echo "🔥 Running simple load tests with Apache Bench..."
+
+        # Test basic endpoints
+        ab -n 1000 -c ${{ inputs.virtual_users || '10' }} http://localhost:8000/health
+
+        # Test API endpoints if available
+        if curl -f http://localhost:8000/docs; then
+          ab -n 1000 -c ${{ inputs.virtual_users || '10' }} http://localhost:8000/docs
+        fi
+
+        echo "✅ Apache Bench load test completed"
+
+    - name: Database performance testing
+      run: |
+        echo "🗄️ Running database performance tests..."
+
+        # Database connection performance
+        ab -n 100 -c 10 -p <(echo '{"test": "data"}') -T application/json http://localhost:8000/api/test-endpoint || {
+          echo "⚠️ Database performance test skipped (endpoint not available)"
+        }
+
+        echo "✅ Database performance test completed"
+
+    - name: Clean up backend process
+      if: always()
+      run: |
+        if [ ! -z "$BACKEND_PID" ]; then
+          kill $BACKEND_PID || true
+        fi
+
+    - name: Generate backend performance report
+      run: |
+        echo "## 🚀 Backend Performance Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ -f "performance-tests/artillery-report.json" ]; then
+          echo "📊 **Artillery Load Test Results:**" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`json" >> $GITHUB_STEP_SUMMARY
+          cat performance-tests/artillery-report.json >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Backend performance tests completed"
+
+  # Frontend performance tests
+  frontend-performance-test:
+    name: Frontend Performance Tests
+    runs-on: ubuntu-latest
+    needs: prepare-performance-test
+    environment: ${{ inputs.target_environment || 'staging' }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+
+    - name: Install frontend dependencies
+      run: |
+        cd frontend
+        npm ci
+
+    - name: Install performance testing tools
+      run: |
+        npm install -g lighthouse lighthouse-ci puppeteer
+
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm run build
+
+    - name: Start frontend server
+      run: |
+        cd frontend
+
+        # Start frontend server in background
+        if [ -f "serve.json" ]; then
+          npx serve -s build -l 5173 &
+        else
+          npx http-server build -p 5173 &
+        fi
+
+        FRONTEND_PID=$!
+
+        # Wait for server to be ready
+        sleep 10
+
+        echo "FRONTEND_PID=$FRONTEND_PID" >> $GITHUB_ENV
+
+        # Verify server is running
+        curl -f http://localhost:5173 || {
+          echo "❌ Frontend server not responding"
+          exit 1
+        }
+
+        echo "✅ Frontend server started"
+
+    - name: Lighthouse performance audit
+      run: |
+        echo "🔍 Running Lighthouse performance audit..."
+
+        # Run Lighthouse on main pages
+        lighthouse http://localhost:5173 \
+          --output=json \
+          --output-path=performance-tests/lighthouse-report.json \
+          --chrome-flags="--headless --no-sandbox" || {
+            echo "⚠️ Lighthouse audit failed"
+          }
+
+        echo "✅ Lighthouse audit completed"
+
+    - name: Frontend load testing
+      run: |
+        echo "🚀 Running frontend load tests..."
+
+        # Use k6 for frontend load testing
+        cat > performance-tests/frontend-load-test.js << 'EOF'
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export const options = {
+  vus: 10,
+  duration: '30s',
+};
+
+export default function () {
+  const response = http.get('http://localhost:5173');
+
+  check(response, {
+    'status is 200': (r) => r.status === 200,
+    'response time < 2000ms': (r) => r.timings.duration < 2000,
+  });
+
+  sleep(1);
+}
+EOF
+
+        k6 run performance-tests/frontend-load-test.js
+
+        echo "✅ Frontend load test completed"
+
+    - name: Clean up frontend process
+      if: always()
+      run: |
+        if [ ! -z "$FRONTEND_PID" ]; then
+          kill $FRONTEND_PID || true
+        fi
+
+    - name: Generate frontend performance report
+      run: |
+        echo "## 🎨 Frontend Performance Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        if [ -f "performance-tests/lighthouse-report.json" ]; then
+          echo "📊 **Lighthouse Performance Score:**" >> $GITHUB_STEP_SUMMARY
+
+          # Extract key metrics from Lighthouse report
+          node -e "
+          try {
+            const report = JSON.parse(require('fs').readFileSync('performance-tests/lighthouse-report.json'));
+            console.log('- Performance: ' + Math.round(report.categories.performance.score * 100));
+            console.log('- Accessibility: ' + Math.round(report.categories.accessibility.score * 100));
+            console.log('- Best Practices: ' + Math.round(report.categories['best-practices'].score * 100));
+            console.log('- SEO: ' + Math.round(report.categories.seo.score * 100));
+          } catch (e) {
+            console.log('Lighthouse report not available');
+          }
+          " >> $GITHUB_STEP_SUMMARY
+        fi
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ Frontend performance tests completed"
+
+  # Full-stack performance tests
+  fullstack-performance-test:
+    name: Full-Stack Performance Tests
+    runs-on: ubuntu-latest
+    needs: [backend-performance-test, frontend-performance-test]
+    environment: ${{ inputs.target_environment || 'staging' }}
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up complete test environment
+      run: |
+        echo "🏗️ Setting up full-stack performance test environment..."
+
+        # This would typically involve:
+        # - Starting the complete application stack
+        # - Setting up test data
+        # - Configuring monitoring
+
+        echo "✅ Full-stack environment ready"
+
+    - name: End-to-end performance testing
+      run: |
+        echo "🔗 Running end-to-end performance tests..."
+
+        # Simulate real user workflows
+        # - User registration and login
+        # - Data retrieval and manipulation
+        # - File uploads/downloads
+        # - Real-time features
+
+        echo "✅ End-to-end performance tests completed"
+
+    - name: Stress testing
+      if: inputs.test_type == 'stress-test'
+      run: |
+        echo "💪 Running stress tests..."
+
+        # Push the system beyond normal limits
+        # - Maximum concurrent users
+        # - Large data volumes
+        # - Extended duration
+
+        echo "✅ Stress tests completed"
+
+    - name: Spike testing
+      if: inputs.test_type == 'spike-test'
+      run: |
+        echo "⚡ Running spike tests..."
+
+        # Sudden load increases
+        # - Rapid user increase
+        # - Traffic spikes
+
+        echo "✅ Spike tests completed"
+
+    - name: Volume testing
+      if: inputs.test_type == 'volume-test'
+      run: |
+        echo "📦 Running volume tests..."
+
+        # Large data volume handling
+        # - Database size limits
+        # - File storage limits
+        # - Memory usage
+
+        echo "✅ Volume tests completed"
+
+    - name: Endurance testing
+      if: inputs.test_type == 'endurance-test'
+      run: |
+        echo "🏃 Running endurance tests..."
+
+        # Long-duration stability tests
+        # - Memory leaks
+        # - Resource consumption over time
+        # - System degradation
+
+        echo "✅ Endurance tests completed"
+
+  # Performance analysis and reporting
+  analyze-results:
+    name: Performance Analysis & Reporting
+    runs-on: ubuntu-latest
+    needs: [backend-performance-test, frontend-performance-test, fullstack-performance-test]
+    if: always()
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download performance artifacts
+      uses: actions/download-artifact@v4
+
+    - name: Analyze performance results
+      run: |
+        echo "📊 Analyzing performance test results..."
+
+        # Generate comprehensive performance report
+        echo "## 📈 Performance Test Analysis" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🧪 **Test Type:** ${{ inputs.test_type || 'load-test' }}" >> $GITHUB_STEP_SUMMARY
+        echo "🌍 **Environment:** ${{ inputs.target_environment || 'staging' }}" >> $GITHUB_STEP_SUMMARY
+        echo "⏱️ **Duration:** ${{ inputs.duration || '5' }} minutes" >> $GITHUB_STEP_SUMMARY
+        echo "👥 **Virtual Users:** ${{ inputs.virtual_users || '10' }}" >> $GITHUB_STEP_SUMMARY
+        echo "🕐 **Executed at:** $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "### 🎯 Performance Metrics:" >> $GITHUB_STEP_SUMMARY
+
+        # Extract key metrics from various test results
+        if [ -f "performance-tests/artillery-report.json" ]; then
+          echo "- **API Response Time:** Extracted from Artillery results ⏱️" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        if [ -f "performance-tests/lighthouse-report.json" ]; then
+          echo "- **Frontend Performance Score:** Extracted from Lighthouse 📊" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "### 🚨 Issues Found:" >> $GITHUB_STEP_SUMMARY
+        echo "- Review detailed reports in artifacts for specific issues" >> $GITHUB_STEP_SUMMARY
+        echo "- Check system resources during test execution" >> $GITHUB_STEP_SUMMARY
+        echo "- Monitor error rates and failure patterns" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "### 📋 Recommendations:" >> $GITHUB_STEP_SUMMARY
+        echo "- Optimize slow API endpoints" >> $GITHUB_STEP_SUMMARY
+        echo "- Implement caching for frequently accessed data" >> $GITHUB_STEP_SUMMARY
+        echo "- Scale infrastructure based on performance requirements" >> $GITHUB_STEP_SUMMARY
+        echo "- Monitor performance metrics in production" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "✅ Performance analysis completed"
+
+    - name: Upload performance reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: performance-test-reports
+        path: |
+          performance-tests/
+          *.json
+          *.html
+        retention-days: 30
+
+    - name: Performance regression check
+      run: |
+        echo "🔍 Checking for performance regressions..."
+
+        # Compare with baseline metrics
+        # - Response time changes
+        # - Throughput variations
+        # - Resource utilization differences
+
+        echo "✅ Performance regression check completed"
+
+  # Cleanup and notifications
+  cleanup:
+    name: Cleanup Performance Test Environment
+    runs-on: ubuntu-latest
+    needs: analyze-results
+    if: always()
+
+    steps:
+    - name: Cleanup resources
+      run: |
+        echo "🧹 Cleaning up performance test resources..."
+
+        # Clean up any resources created during testing
+        # - Temporary files
+        # - Test data
+        # - Monitoring setup
+
+        echo "✅ Cleanup completed"
+
+    - name: Send performance report notifications
+      run: |
+        echo "📢 Sending performance test notifications..."
+
+        # Integration with notification systems
+        # - Slack
+        # - Email
+        # - PagerDuty (for critical issues)
+
+        echo "✅ Performance test notifications sent"

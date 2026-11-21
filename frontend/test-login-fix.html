@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Component Fix Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="src/js/icons.js" defer></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Login Page (should be visible when not authenticated) -->
+        <div id="login-page" class="page active">
+            <div class="login-page-container">
+                <div class="login-header">
+                    <h1>Welcome to School Management System</h1>
+                    <p>Please sign in to continue</p>
+                </div>
+                <div class="login-form-container">
+                    <login-component id="loginComponent"></login-component>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App Container (hidden when not authenticated) -->
+        <div id="main-app" class="main-app" style="display: none;">
+            <p>Main app content (should be hidden)</p>
+        </div>
+    </div>
+
+    <script type="module" src="src/ts/index.ts"></script>
+    
+    <script>
+        // Simple test to verify login component is working
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🧪 LOGIN COMPONENT FIX TEST');
+            console.log('============================');
+            
+            const loginPage = document.getElementById('login-page');
+            const loginComponent = document.querySelector('login-component');
+            const mainApp = document.getElementById('main-app');
+            
+            console.log('Login page found:', !!loginPage);
+            console.log('Login component found:', !!loginComponent);
+            console.log('Main app found:', !!mainApp);
+            
+            if (loginPage) {
+                const styles = window.getComputedStyle(loginPage);
+                console.log('Login page display:', styles.display);
+                console.log('Login page opacity:', styles.opacity);
+                console.log('Login page has active class:', loginPage.classList.contains('active'));
+            }
+            
+            if (mainApp) {
+                console.log('Main app display:', mainApp.style.display);
+            }
+            
+            console.log('');
+            console.log('✅ If you can see the login form above, the fix is working!');
+            console.log('❌ If the page is blank, there may still be an issue.');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+ // Global accessibility styles
+@use "./_variables" as vars;
+@use "./_mixins" as mixins;
+
+// Skip links for keyboard navigation
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: vars.$high-contrast-bg;
+  color: vars.$high-contrast-text;
+  padding: vars.$space-2;
+  text-decoration: none;
+  z-index: 10000;
+  border-radius: 0 0 vars.$border-radius-sm vars.$border-radius-sm;
+  font-weight: 600;
+  @include mixins.transition-fast;
+
+  &:focus {
+    top: 0;
+    @include mixins.focus-ring;
+  }
+}
+
+// Screen reader only content
+.sr-only {
+  @include mixins.sr-only;
+}
+
+// Enhanced focus indicators
+*:focus-visible {
+  @include mixins.focus-ring;
+}
+
+// Remove default focus for mouse users but keep for keyboard
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+// Enhanced mobile focus indicators
+@media (max-width: 768px) {
+  *:focus-visible {
+    outline: vars.$focus-ring-width solid vars.$focus-color;
+    outline-offset: vars.$space-1;
+  }
+}
+
+// High contrast mode support
+@include mixins.high-contrast {
+  .sidebar {
+    border: 2px solid vars.$high-contrast-bg;
+  }
+
+  .menu-item {
+    border: 1px solid vars.$high-contrast-bg;
+
+    &:hover, &.active {
+      border-color: vars.$warning-color;
+    }
+  }
+
+  // Enhanced contrast for text
+  body {
+    background-color: vars.$high-contrast-bg;
+    color: vars.$high-contrast-text;
+  }
+
+  // Ensure buttons have sufficient contrast
+  button, .btn, [role="button"] {
+    border: 2px solid vars.$high-contrast-text;
+
+    &:focus-visible {
+      outline: 3px solid vars.$focus-color;
+      outline-offset: 2px;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: vars.$reduced-motion-duration !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: vars.$reduced-motion-duration !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+// Dark mode support
+@include mixins.dark-mode {
+  body {
+    background-color: vars.$dark-background;
+    color: vars.$dark-text;
+  }
+
+  // Enhanced dark mode focus indicators
+  *:focus-visible {
+    outline-color: vars.$dark-primary;
+  }
+}
+
+// Minimum touch target enforcement
+button,
+.btn,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+.action-btn,
+.transport-btn {
+  @include mixins.touch-target;
+}
+
+// Enhanced link styles for accessibility
+a {
+  @include mixins.transition-safe(color);
+
+  &:focus-visible {
+    @include mixins.focus-ring;
+    text-decoration: underline;
+  }
+
+  // Remove focus ring for mouse interactions
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+// Form accessibility enhancements
+input,
+textarea,
+select {
+  &:focus-visible {
+    @include mixins.focus-ring;
+  }
+
+  &:invalid:not(:focus) {
+    border-color: vars.$danger-color;
+  }
+}
+
+// ARIA live region styles (invisible but important for screen readers)
+[aria-live],
+[aria-live="polite"],
+[aria-live="assertive"] {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+// Color scheme aware scrollbar
+@media (prefers-color-scheme: light) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: vars.$background-color;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: vars.$border-color;
+    border-radius: vars.$border-radius-sm;
+
+    &:hover {
+      background: vars.$text-muted;
+    }
+  }
+}
+
+@include mixins.dark-mode {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: vars.$dark-background;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: vars.$dark-border;
+    border-radius: vars.$border-radius-sm;
+
+    &:hover {
+      background: vars.$dark-text-muted;
+    }
+  }
+}
+
+// Print styles for accessibility
+@media print {
+  .skip-link,
+  *:focus-visible {
+    display: none !important;
+  }
+
+  // Ensure sufficient contrast in print
+  * {
+    color: vars.$high-contrast-text !important;
+    background: vars.$high-contrast-bg !important;
+    box-shadow: none !important;
+  }
+}

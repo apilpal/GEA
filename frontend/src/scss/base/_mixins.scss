@@ -1,0 +1,387 @@
+// Mixins
+@use "./_variables" as vars;
+
+// Enhanced gradient mixin
+@mixin gradient-bg($color1, $color2, $color3: null) {
+  @if $color3 {
+    background: linear-gradient(135deg, $color1 0%, $color2 50%, $color3 100%);
+  } @else {
+    background: linear-gradient(135deg, $color1 0%, $color2 100%);
+  }
+}
+
+// Card shadow mixins
+@mixin card-shadow {
+  box-shadow: vars.$shadow;
+  border-radius: vars.$border-radius;
+}
+
+@mixin card-shadow-light {
+  box-shadow: vars.$shadow-light;
+  border-radius: vars.$border-radius-sm;
+}
+
+@mixin card-shadow-hover {
+  box-shadow: vars.$shadow-hover;
+  border-radius: vars.$border-radius;
+}
+
+// Enhanced transition mixins
+@mixin transition-all {
+  transition: all vars.$transition-base ease;
+}
+
+@mixin transition-fast {
+  transition: all vars.$transition-fast ease;
+}
+
+@mixin transition-slow {
+  transition: all vars.$transition-slow ease;
+}
+
+@mixin transition-smooth {
+  transition: all vars.$transition-base cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+// Reduced motion support
+@mixin transition-safe($property: all, $duration: 0.3s) {
+  transition: $property $duration ease;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: $property vars.$reduced-motion-duration ease;
+  }
+}
+
+// Flexbox mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Accessibility mixins
+@mixin focus-ring {
+  outline: vars.$focus-ring-width solid vars.$focus-ring-color;
+  outline-offset: 2px;
+}
+
+@mixin focus-visible {
+  &:focus-visible {
+    @include focus-ring;
+  }
+}
+
+@mixin sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Touch target mixin for accessibility
+@mixin touch-target($min-size: vars.$min-touch-target) {
+  min-width: vars.$min-touch-target;
+  min-height: vars.$min-touch-target;
+}
+
+// Responsive breakpoint mixins (mobile-first)
+@mixin mobile {
+  @media (min-width: vars.$mobile) {
+    @content;
+  }
+}
+
+@mixin mobile-landscape {
+  @media (min-width: vars.$mobile-landscape) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: vars.$tablet) {
+    @content;
+  }
+}
+
+@mixin tablet-landscape {
+  @media (min-width: vars.$tablet-landscape) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: vars.$desktop) {
+    @content;
+  }
+}
+
+@mixin desktop-large {
+  @media (min-width: vars.$desktop-large) {
+    @content;
+  }
+}
+
+// High contrast mode mixin
+@mixin high-contrast {
+  @media (prefers-contrast: high) {
+    @content;
+  }
+}
+
+// Dark mode mixin
+@mixin dark-mode {
+  @media (prefers-color-scheme: dark) {
+    @content;
+  }
+}
+
+// Grid mixins for responsive layouts
+@mixin grid-responsive($columns-mobile: 1, $columns-tablet: 2, $columns-desktop: 3, $gap: vars.$space-4) {
+  display: grid;
+  gap: $gap;
+  grid-template-columns: repeat($columns-mobile, 1fr);
+
+  @include tablet {
+    grid-template-columns: repeat($columns-tablet, 1fr);
+  }
+
+  @include desktop {
+    grid-template-columns: repeat($columns-desktop, 1fr);
+  }
+}
+
+// Typography mixins
+@mixin text-responsive($mobile-size: vars.$font-size-base, $tablet-size: vars.$font-size-lg, $desktop-size: vars.$font-size-xl) {
+  font-size: vars.$font-size-base;
+
+  @include tablet {
+    font-size: vars.$font-size-lg;
+  }
+
+  @include desktop {
+    font-size: vars.$font-size-xl;
+  }
+}
+
+// Container query mixin (for component-based responsive design)
+@mixin container-query($min-width, $max-width: null) {
+  @container (min-width: $min-width) {
+    @if $max-width {
+      @container (max-width: $max-width) {
+        @content;
+      }
+    } @else {
+      @content;
+    }
+  }
+}
+
+// ============================================================================
+// CSS LOGICAL PROPERTIES MIXINS (for internationalization)
+// ============================================================================
+
+// Logical margin mixins
+@mixin margin-inline($start: null, $end: null) {
+  @if $start and $end {
+    margin-inline-start: $start;
+    margin-inline-end: $end;
+  } @else if $start {
+    margin-inline-start: $start;
+    margin-inline-end: $start;
+  }
+}
+
+@mixin margin-block($start: null, $end: null) {
+  @if $start and $end {
+    margin-block-start: $start;
+    margin-block-end: $end;
+  } @else if $start {
+    margin-block-start: $start;
+    margin-block-end: $start;
+  }
+}
+
+// Logical padding mixins
+@mixin padding-inline($start: null, $end: null) {
+  @if $start and $end {
+    padding-inline-start: $start;
+    padding-inline-end: $end;
+  } @else if $start {
+    padding-inline-start: $start;
+    padding-inline-end: $start;
+  }
+}
+
+@mixin padding-block($start: null, $end: null) {
+  @if $start and $end {
+    padding-block-start: $start;
+    padding-block-end: $end;
+  } @else if $start {
+    padding-block-start: $start;
+    padding-block-end: $start;
+  }
+}
+
+// Logical border mixins
+@mixin border-inline($width: 1px, $style: solid, $color: null) {
+  @if $color {
+    border-inline-start: $width $style $color;
+    border-inline-end: $width $style $color;
+  } @else {
+    border-inline-start: $width $style;
+    border-inline-end: $width $style;
+  }
+}
+
+@mixin border-block($width: 1px, $style: solid, $color: null) {
+  @if $color {
+    border-block-start: $width $style $color;
+    border-block-end: $width $style $color;
+  } @else {
+    border-block-start: $width $style;
+    border-block-end: $width $style;
+  }
+}
+
+@mixin border-inline-start($width: 1px, $style: solid, $color: null) {
+  @if $color {
+    border-inline-start: $width $style $color;
+  } @else {
+    border-inline-start: $width $style;
+  }
+}
+
+@mixin border-inline-end($width: 1px, $style: solid, $color: null) {
+  @if $color {
+    border-inline-end: $width $style $color;
+  } @else {
+    border-inline-end: $width $style;
+  }
+}
+
+// Logical positioning mixins
+@mixin inset-inline($start: null, $end: null) {
+  @if $start and $end {
+    inset-inline-start: $start;
+    inset-inline-end: $end;
+  } @else if $start {
+    inset-inline-start: $start;
+    inset-inline-end: $start;
+  }
+}
+
+@mixin inset-block($start: null, $end: null) {
+  @if $start and $end {
+    inset-block-start: $start;
+    inset-block-end: $end;
+  } @else if $start {
+    inset-block-start: $start;
+    inset-block-end: $start;
+  }
+}
+
+// Text alignment for different writing modes
+@mixin text-align-logical($alignment: start) {
+  @if $alignment == 'start' {
+    text-align: start;
+  } @else if $alignment == 'end' {
+    text-align: end;
+  } @else {
+    text-align: $alignment;
+  }
+}
+
+// Float logical (for bidirectional layouts)
+@mixin float-logical($direction: inline-start) {
+  @if $direction == 'inline-start' {
+    float: inline-start;
+  } @else if $direction == 'inline-end' {
+    float: inline-end;
+  } @else {
+    float: $direction;
+  }
+}
+
+// ============================================================================
+// INTERNATIONALIZATION AND RTL SUPPORT MIXINS
+// ============================================================================
+
+// RTL (Right-to-Left) support mixin
+@mixin rtl-support {
+  [dir="rtl"] & {
+    @content;
+  }
+}
+
+// Writing mode utilities
+@mixin writing-mode($mode: horizontal-tb) {
+  writing-mode: $mode;
+
+  @if $mode == 'vertical-rl' or $mode == 'vertical-lr' {
+    @include rtl-support {
+      writing-mode: vertical-rl;
+    }
+  }
+}
+
+// Text orientation for vertical writing modes
+@mixin text-orientation($orientation: mixed) {
+  text-orientation: $orientation;
+}
+
+// ============================================================================
+// ADVANCED RESPONSIVE MIXINS
+// ============================================================================
+
+// Responsive container mixin with logical properties
+@mixin container-logical($max-width: null, $padding: null) {
+  @if $max-width {
+    max-inline-size: $max-width;
+  }
+  @if $padding {
+    padding-inline: $padding;
+  }
+  margin-inline: auto;
+}
+
+// Logical flexbox utilities
+@mixin flex-logical($justify: null, $align: null, $direction: null) {
+  @if $direction {
+    flex-direction: $direction;
+  }
+  @if $justify {
+    justify-content: $justify;
+  }
+  @if $align {
+    align-items: $align;
+  }
+}
+
+// Logical grid utilities
+@mixin grid-logical($columns: null, $gap: null, $auto-flow: null) {
+  @if $columns {
+    grid-template-columns: $columns;
+  }
+  @if $gap {
+    gap: $gap;
+  }
+  @if $auto-flow {
+    grid-auto-flow: $auto-flow;
+  }
+}

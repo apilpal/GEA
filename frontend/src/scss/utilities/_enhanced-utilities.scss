@@ -1,0 +1,387 @@
+// Enhanced Utility Classes with Theme Integration
+// Comprehensive utility system that works with the theming system
+
+@use 'sass:map';
+@use '../base/variables' as vars;
+@use '../base/mixins' as mixins;
+@use '../base/themes' as themes;
+
+// ============================================================================
+// THEME-AWARE UTILITY CLASSES
+// ============================================================================
+
+// Color utilities with theme support and fallbacks
+.text-primary { @include mixins.progressive-enhancement(color, vars.$primary-color, '--color-primary'); }
+.text-secondary { @include mixins.progressive-enhancement(color, vars.$secondary-color, '--color-secondary'); }
+.text-accent { @include mixins.progressive-enhancement(color, vars.$accent-color, '--color-accent'); }
+.text-success { @include mixins.progressive-enhancement(color, vars.$success-color, '--color-success'); }
+.text-warning { @include mixins.progressive-enhancement(color, vars.$warning-color, '--color-warning'); }
+.text-danger { @include mixins.progressive-enhancement(color, vars.$danger-color, '--color-danger'); }
+.text-info { @include mixins.progressive-enhancement(color, vars.$info-color, '--color-info'); }
+.text-muted { @include mixins.progressive-enhancement(color, vars.$text-muted, '--color-text-muted'); }
+
+.bg-primary { @include mixins.progressive-enhancement(background-color, vars.$primary-color, '--color-primary'); }
+.bg-secondary { @include mixins.progressive-enhancement(background-color, vars.$secondary-color, '--color-secondary'); }
+.bg-accent { @include mixins.progressive-enhancement(background-color, vars.$accent-color, '--color-accent'); }
+.bg-success { @include mixins.progressive-enhancement(background-color, vars.$success-color, '--color-success'); }
+.bg-warning { @include mixins.progressive-enhancement(background-color, vars.$warning-color, '--color-warning'); }
+.bg-danger { @include mixins.progressive-enhancement(background-color, vars.$danger-color, '--color-danger'); }
+.bg-info { @include mixins.progressive-enhancement(background-color, vars.$info-color, '--color-info'); }
+.bg-surface { @include mixins.progressive-enhancement(background-color, #ffffff, '--color-surface'); }
+.bg-surface-elevated { @include mixins.progressive-enhancement(background-color, #ffffff, '--color-surface-elevated'); }
+
+// Border utilities with theme support
+.border-primary { @include mixins.progressive-enhancement(border-color, vars.$primary-color, '--color-primary'); }
+.border-secondary { @include mixins.progressive-enhancement(border-color, vars.$secondary-color, '--color-secondary'); }
+.border-accent { @include mixins.progressive-enhancement(border-color, vars.$accent-color, '--color-accent'); }
+.border-success { @include mixins.progressive-enhancement(border-color, vars.$success-color, '--color-success'); }
+.border-warning { @include mixins.progressive-enhancement(border-color, vars.$warning-color, '--color-warning'); }
+.border-danger { @include mixins.progressive-enhancement(border-color, vars.$danger-color, '--color-danger'); }
+.border-info { @include mixins.progressive-enhancement(border-color, vars.$info-color, '--color-info'); }
+.border-default { @include mixins.progressive-enhancement(border-color, vars.$border-color, '--color-border'); }
+
+// Shadow utilities with theme support
+.shadow-sm { @include mixins.shadow-enhanced('sm'); }
+.shadow-md { @include mixins.shadow-enhanced('md'); }
+.shadow-lg { @include mixins.shadow-enhanced('lg'); }
+.shadow-xl { @include mixins.shadow-enhanced('xl'); }
+.shadow-none { box-shadow: none; }
+
+// ============================================================================
+// SPACING UTILITIES WITH LOGICAL PROPERTIES
+// ============================================================================
+
+// Margin utilities with logical properties support
+.m-0 { margin: 0; }
+.m-1 { margin: vars.$space-1; }
+.m-2 { margin: vars.$space-2; }
+.m-3 { margin: vars.$space-3; }
+.m-4 { margin: vars.$space-4; }
+.m-5 { margin: vars.$space-5; }
+.m-6 { margin: vars.$space-6; }
+.m-8 { margin: vars.$space-8; }
+.m-10 { margin: vars.$space-10; }
+.m-12 { margin: vars.$space-12; }
+.m-16 { margin: vars.$space-16; }
+
+// Logical margin utilities for internationalization
+.mis-1 { @include mixins.margin-inline(vars.$space-1); }
+.mis-2 { @include mixins.margin-inline(vars.$space-2); }
+.mis-3 { @include mixins.margin-inline(vars.$space-3); }
+.mis-4 { @include mixins.margin-inline(vars.$space-4); }
+
+.mbs-1 { @include mixins.margin-block(vars.$space-1); }
+.mbs-2 { @include mixins.margin-block(vars.$space-2); }
+.mbs-3 { @include mixins.margin-block(vars.$space-3); }
+.mbs-4 { @include mixins.margin-block(vars.$space-4); }
+
+// Padding utilities with logical properties
+.p-0 { padding: 0; }
+.p-1 { padding: vars.$space-1; }
+.p-2 { padding: vars.$space-2; }
+.p-3 { padding: vars.$space-3; }
+.p-4 { padding: vars.$space-4; }
+.p-5 { padding: vars.$space-5; }
+.p-6 { padding: vars.$space-6; }
+.p-8 { padding: vars.$space-8; }
+
+// Logical padding utilities
+.pis-1 { @include mixins.padding-inline(vars.$space-1); }
+.pis-2 { @include mixins.padding-inline(vars.$space-2); }
+.pis-3 { @include mixins.padding-inline(vars.$space-3); }
+.pis-4 { @include mixins.padding-inline(vars.$space-4); }
+
+.pbs-1 { @include mixins.padding-block(vars.$space-1); }
+.pbs-2 { @include mixins.padding-block(vars.$space-2); }
+.pbs-3 { @include mixins.padding-block(vars.$space-3); }
+.pbs-4 { @include mixins.padding-block(vars.$space-4); }
+
+// ============================================================================
+// TYPOGRAPHY UTILITIES
+// ============================================================================
+
+// Font size utilities
+.text-xs { font-size: vars.$font-size-xs; }
+.text-sm { font-size: vars.$font-size-sm; }
+.text-base { font-size: vars.$font-size-base; }
+.text-lg { font-size: vars.$font-size-lg; }
+.text-xl { font-size: vars.$font-size-xl; }
+.text-2xl { font-size: vars.$font-size-2xl; }
+.text-3xl { font-size: vars.$font-size-3xl; }
+.text-4xl { font-size: vars.$font-size-4xl; }
+
+// Font weight utilities
+.font-light { font-weight: vars.$font-weight-light; }
+.font-normal { font-weight: vars.$font-weight-normal; }
+.font-medium { font-weight: vars.$font-weight-medium; }
+.font-semibold { font-weight: vars.$font-weight-semibold; }
+.font-bold { font-weight: vars.$font-weight-bold; }
+
+// Line height utilities
+.leading-tight { line-height: vars.$line-height-tight; }
+.leading-snug { line-height: vars.$line-height-snug; }
+.leading-normal { line-height: vars.$line-height-normal; }
+.leading-relaxed { line-height: vars.$line-height-relaxed; }
+.leading-loose { line-height: vars.$line-height-loose; }
+
+// Text alignment with logical properties support
+.text-start { @include mixins.text-align-logical('start'); }
+.text-end { @include mixins.text-align-logical('end'); }
+.text-center { text-align: center; }
+
+// ============================================================================
+// LAYOUT UTILITIES
+// ============================================================================
+
+// Display utilities
+.block { display: block; }
+.inline-block { display: inline-block; }
+.inline { display: inline; }
+.flex { display: flex; }
+.inline-flex { display: inline-flex; }
+.grid { display: grid; }
+.hidden { display: none; }
+
+// Flexbox utilities with logical properties support
+.flex-row { @include mixins.flex-logical($direction: row); }
+.flex-col { @include mixins.flex-logical($direction: column); }
+.flex-wrap { flex-wrap: wrap; }
+
+.justify-start { justify-content: flex-start; }
+.justify-center { justify-content: center; }
+.justify-end { justify-content: flex-end; }
+.justify-between { justify-content: space-between; }
+.justify-around { justify-content: space-around; }
+
+.items-start { align-items: flex-start; }
+.items-center { align-items: center; }
+.items-end { align-items: flex-end; }
+.items-stretch { align-items: stretch; }
+
+// Grid utilities with fallbacks
+.grid-cols-1 { @include mixins.grid-fallback(1, null); }
+.grid-cols-2 { @include mixins.grid-fallback(2, null); }
+.grid-cols-3 { @include mixins.grid-fallback(3, null); }
+.grid-cols-4 { @include mixins.grid-fallback(4, null); }
+
+.gap-1 { gap: vars.$space-1; }
+.gap-2 { gap: vars.$space-2; }
+.gap-3 { gap: vars.$space-3; }
+.gap-4 { gap: vars.$space-4; }
+.gap-6 { gap: vars.$space-6; }
+.gap-8 { gap: vars.$space-8; }
+
+// ============================================================================
+// POSITIONING UTILITIES
+// ============================================================================
+
+.relative { position: relative; }
+.absolute { position: absolute; }
+.fixed { position: fixed; }
+.sticky { position: sticky; }
+
+// Inset utilities with logical properties
+.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+.inset-auto { top: auto; right: auto; bottom: auto; left: auto; }
+
+// Logical inset utilities
+.inset-bs-0 { @include mixins.inset-block(0); }
+.inset-bs-auto { @include mixins.inset-block(auto); }
+.inset-is-0 { @include mixins.inset-inline(0); }
+.inset-is-auto { @include mixins.inset-inline(auto); }
+
+// ============================================================================
+// RESPONSIVE UTILITIES
+// ============================================================================
+
+// Responsive display utilities
+.sm\:block { @media (min-width: vars.$tablet) { display: block; } }
+.sm\:hidden { @media (min-width: vars.$tablet) { display: none; } }
+.sm\:flex { @media (min-width: vars.$tablet) { display: flex; } }
+.sm\:grid { @media (min-width: vars.$tablet) { display: grid; } }
+
+.md\:block { @media (min-width: vars.$desktop) { display: block; } }
+.md\:hidden { @media (min-width: vars.$desktop) { display: none; } }
+.md\:flex { @media (min-width: vars.$desktop) { display: flex; } }
+.md\:grid { @media (min-width: vars.$desktop) { display: grid; } }
+
+// Responsive text utilities
+.sm\:text-sm { @media (min-width: vars.$tablet) { font-size: vars.$font-size-sm; } }
+.sm\:text-base { @media (min-width: vars.$tablet) { font-size: vars.$font-size-base; } }
+.sm\:text-lg { @media (min-width: vars.$tablet) { font-size: vars.$font-size-lg; } }
+
+.md\:text-base { @media (min-width: vars.$desktop) { font-size: vars.$font-size-base; } }
+.md\:text-lg { @media (min-width: vars.$desktop) { font-size: vars.$font-size-lg; } }
+.md\:text-xl { @media (min-width: vars.$desktop) { font-size: vars.$font-size-xl; } }
+
+// ============================================================================
+// INTERACTION UTILITIES
+// ============================================================================
+
+// Transition utilities with enhanced support
+.transition-fast { @include mixins.transition-enhanced($duration: vars.$transition-fast); }
+.transition-base { @include mixins.transition-enhanced($duration: vars.$transition-base); }
+.transition-slow { @include mixins.transition-enhanced($duration: vars.$transition-slow); }
+
+.transition-colors { @include mixins.transition-enhanced(color, vars.$transition-base); }
+.transition-transform { @include mixins.transition-enhanced(transform, vars.$transition-base); }
+.transition-opacity { @include mixins.transition-enhanced(opacity, vars.$transition-base); }
+
+// Transform utilities
+.transform { transform: translateZ(0); }
+.transform-none { transform: none; }
+
+.translate-x-0 { transform: translateX(0); }
+.translate-y-0 { transform: translateY(0); }
+.-translate-x-1 { transform: translateX(-vars.$space-1); }
+.-translate-y-1 { transform: translateY(-vars.$space-1); }
+
+.scale-95 { transform: scale(0.95); }
+.scale-100 { transform: scale(1); }
+.scale-105 { transform: scale(1.05); }
+
+// ============================================================================
+// ACCESSIBILITY UTILITIES
+// ============================================================================
+
+// Screen reader utilities
+.sr-only { @include mixins.sr-only(); }
+
+// Focus utilities
+.focus\:outline-none:focus { outline: none; }
+.focus\:ring:focus { @include mixins.focus-ring(); }
+.focus\:ring-inset:focus { @include mixins.focus-ring(); outline: none; }
+
+// Reduced motion utilities
+@media (prefers-reduced-motion: reduce) {
+  .motion-reduce\:transition-none { transition: none !important; }
+  .motion-reduce\:animate-none { animation: none !important; }
+}
+
+// ============================================================================
+// THEME-SPECIFIC UTILITIES
+// ============================================================================
+
+// Dark mode utilities
+@media (prefers-color-scheme: dark) {
+  .dark\:bg-dark { background-color: vars.$dark-background; }
+  .dark\:text-light { color: vars.$dark-text; }
+  .dark\:border-dark { border-color: vars.$dark-border; }
+}
+
+// High contrast utilities
+@media (prefers-contrast: high) {
+  .contrast\:border-2 { border-width: 2px; }
+  .contrast\:text-black { color: #000000; }
+  .contrast\:bg-white { background-color: #ffffff; }
+}
+
+// ============================================================================
+// COMPONENT UTILITY MIXINS
+// ============================================================================
+
+// Generate utility classes for a color palette
+@mixin generate-color-utilities($name, $color-map) {
+  @each $shade, $color in $color-map {
+    .text-#{$name}-#{$shade} {
+      color: $color;
+    }
+    .bg-#{$name}-#{$shade} {
+      background-color: $color;
+    }
+    .border-#{$name}-#{$shade} {
+      border-color: $color;
+    }
+  }
+}
+
+// Generate spacing utilities for a specific axis
+@mixin generate-axis-utilities($property, $abbreviation, $values) {
+  @each $name, $value in $values {
+    .#{$abbreviation}#{$name} { #{$property}: $value; }
+    .#{$abbreviation}s#{$name} {
+      @include mixins.padding-inline($value);
+    }
+    .#{$abbreviation}bs#{$name} {
+      @include mixins.padding-block($value);
+    }
+  }
+}
+
+// ============================================================================
+// RESPONSIVE UTILITY GENERATION
+// ============================================================================
+
+// Responsive text color utilities
+@each $color in (primary, secondary, accent, success, warning, danger, info) {
+  .text-#{$color} {
+    @extend .text-#{$color};
+  }
+
+  @media (min-width: vars.$tablet) {
+    .sm\:text-#{$color} {
+      color: var(--color-#{$color}, #{map.get(vars.$color-map, $color)});
+    }
+  }
+
+  @media (min-width: vars.$desktop) {
+    .md\:text-#{$color} {
+      color: var(--color-#{$color}, #{map.get(vars.$color-map, $color)});
+    }
+  }
+}
+
+// ============================================================================
+// PRINT UTILITIES
+// ============================================================================
+
+@media print {
+  .print\:hidden { display: none; }
+  .print\:block { display: block; }
+
+  // Ensure sufficient contrast in print
+  .print\:text-black { color: #000000 !important; }
+  .print\:bg-white { background: #ffffff !important; }
+
+  // Remove decorative elements in print
+  .print\:shadow-none { box-shadow: none !important; }
+}
+
+// ============================================================================
+// UTILITY CLASS ORGANIZATION
+// ============================================================================
+
+// Utility class categories for better organization
+.utility-layout {
+  @extend .block, .inline-block, .inline, .flex, .inline-flex, .grid, .hidden;
+}
+
+.utility-spacing {
+  @extend .m-0, .m-1, .m-2, .m-3, .m-4, .p-0, .p-1, .p-2, .p-3, .p-4;
+}
+
+.utility-typography {
+  @extend .text-xs, .text-sm, .text-base, .text-lg, .font-light, .font-normal, .font-medium;
+}
+
+.utility-colors {
+  @extend .text-primary, .bg-primary, .border-primary, .text-muted;
+}
+
+.utility-interactions {
+  @extend .transition-fast, .transform, .focus\:ring;
+}
+
+// Include utility class categories
+@include generate-color-utilities('neutral', (
+  50: vars.$neutral-50,
+  100: vars.$neutral-100,
+  200: vars.$neutral-200,
+  300: vars.$neutral-300,
+  400: vars.$neutral-400,
+  500: vars.$neutral-500,
+  600: vars.$neutral-600,
+  700: vars.$neutral-700,
+  800: vars.$neutral-800,
+  900: vars.$neutral-900
+));

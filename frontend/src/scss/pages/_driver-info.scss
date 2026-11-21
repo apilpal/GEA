@@ -1,0 +1,391 @@
+// Driver Info Component
+@use "sass:color";
+@use "../base/variables" as vars;
+driver-info {
+  display: block;
+  width: 100%;
+  --driver-primary: #{vars.$primary-color};
+  --driver-secondary: #{vars.$secondary-color};
+  --driver-success: #{vars.$success-color};
+  --driver-warning: #{vars.$warning-color};
+  --driver-danger: #{vars.$danger-color};
+  --driver-info: #{vars.$info-color};
+  --driver-background: #{vars.$card-background};
+  --driver-border: #{vars.$border-color};
+  --driver-text: #{vars.$text-color};
+  --driver-muted: #6c757d;
+  --driver-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+driver-info .driver-info-container {
+  background: var(--driver-background);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+driver-info .driver-header {
+  background: linear-gradient(135deg, var(--driver-primary) 0%, var(--driver-secondary) 100%);
+  color: white;
+  padding: 25px 30px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="pattern" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="10" cy="10" r="1" fill="white" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23pattern)"/></svg>');
+    opacity: 0.3;
+  }
+}
+
+driver-info .driver-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8em;
+  font-weight: bold;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 1;
+  transition: var(--driver-transition);
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+driver-info .driver-details {
+  flex: 1;
+  position: relative;
+  z-index: 1;
+
+  .driver-name {
+    margin: 0 0 5px 0;
+    font-size: 1.8em;
+    font-weight: 700;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.5px;
+  }
+
+  .driver-route {
+    margin: 0 0 8px 0;
+    opacity: 0.9;
+    font-size: 1em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+    font-weight: 500;
+  }
+
+  .driver-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 0.9em;
+    opacity: 0.8;
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+
+      i {
+        font-size: 1.1em;
+      }
+    }
+  }
+}
+
+driver-info .driver-stats {
+  padding: 25px 30px;
+  background: #f8f9fa;
+  border-bottom: 1px solid var(--driver-border);
+}
+
+driver-info .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+}
+
+driver-info .stat-item {
+  text-align: center;
+  padding: 15px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: var(--driver-transition);
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 10px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2em;
+    color: white;
+    position: relative;
+
+    &.students {
+      background: linear-gradient(135deg, var(--driver-success) 0%, color.adjust(vars.$success-color, $lightness: -10%) 100%);
+    }
+
+    &.revenue {
+      background: linear-gradient(135deg, var(--driver-primary) 0%, var(--driver-secondary) 100%);
+    }
+
+    &.route {
+      background: linear-gradient(135deg, var(--driver-info) 0%, color.adjust(vars.$info-color, $lightness: -10%) 100%);
+    }
+
+    &.status {
+      background: linear-gradient(135deg, var(--driver-warning) 0%, color.adjust(vars.$warning-color, $lightness: -10%) 100%);
+    }
+  }
+
+  .stat-value {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--driver-text);
+    margin-bottom: 2px;
+  }
+
+  .stat-label {
+    font-size: 0.85em;
+    color: var(--driver-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+}
+
+driver-info .driver-actions {
+  padding: 20px 30px;
+  background: var(--driver-background);
+  border-top: 1px solid var(--driver-border);
+}
+
+driver-info .actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+driver-info .action-btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--driver-transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+  &.edit-btn {
+    background: linear-gradient(135deg, var(--driver-warning) 0%, color.adjust(#f59e0b, $lightness: -10%) 100%);
+    color: white;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(245, 158, 11, 0.3);
+      background: linear-gradient(135deg, color.adjust(vars.$warning-color, $lightness: -10%) 0%, color.adjust(vars.$warning-color, $lightness: -20%) 100%);
+    }
+  }
+
+  &.add-btn {
+    background: linear-gradient(135deg, var(--driver-success) 0%, color.adjust(#10b981, $lightness: -10%) 100%);
+    color: white;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(16, 185, 129, 0.3);
+      background: linear-gradient(135deg, color.adjust(vars.$success-color, $lightness: -10%) 0%, color.adjust(vars.$success-color, $lightness: -20%) 100%);
+    }
+  }
+
+  i {
+    font-size: 1em;
+  }
+}
+
+// Loading state
+driver-info .driver-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 30px;
+  color: var(--driver-muted);
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid var(--driver-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+  }
+
+  h4 {
+    margin: 0 0 10px 0;
+    color: var(--driver-text);
+  }
+
+  p {
+    margin: 0;
+    text-align: center;
+    font-size: 0.9em;
+  }
+}
+
+// Error state
+driver-info .driver-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 30px;
+  color: var(--driver-danger);
+  text-align: center;
+
+  i {
+    font-size: 4em;
+    opacity: 0.5;
+    margin-bottom: 20px;
+  }
+
+  h4 {
+    margin: 0 0 10px 0;
+    color: var(--driver-text);
+  }
+
+  p {
+    margin: 0 0 20px 0;
+    font-size: 0.9em;
+    color: var(--driver-muted);
+  }
+
+  .retry-btn {
+    padding: 10px 20px;
+    background: var(--driver-primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9em;
+    font-weight: 600;
+    transition: var(--driver-transition);
+
+    &:hover {
+      background: color.adjust(vars.$primary-color, $lightness: -10%);
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  driver-info .driver-header {
+    padding: 20px;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  driver-info .driver-avatar {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5em;
+  }
+
+  driver-info .driver-details {
+    text-align: center;
+
+    .driver-name {
+      font-size: 1.5em;
+    }
+
+    .driver-meta {
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+  }
+
+  driver-info .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+  }
+
+  driver-info .actions-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  driver-info .action-btn {
+    padding: 14px;
+    font-size: 1em;
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  driver-info {
+    --driver-background: #1f2937;
+    --driver-text: #f3f4f6;
+    --driver-muted: #9ca3af;
+    --driver-border: #374151;
+  }
+
+  driver-info .driver-stats {
+    background: #374151;
+  }
+
+  driver-info .stat-item {
+    background: #374151;
+  }
+}
+
+// Print styles
+@media print {
+  driver-info .driver-actions {
+    display: none !important;
+  }
+
+  driver-info .driver-info-container {
+    box-shadow: none;
+    border: 1px solid #000;
+    break-inside: avoid;
+  }
+}
+
+// Animation keyframes
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

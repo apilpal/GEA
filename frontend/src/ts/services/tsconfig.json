@@ -1,0 +1,15 @@
+{
+  "extends": "../../../tsconfig.build.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "../../../dist/services",
+    "noEmit": false
+  },
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}

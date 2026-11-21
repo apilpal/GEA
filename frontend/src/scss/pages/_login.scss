@@ -1,0 +1,90 @@
+// Login Page Styles
+
+#login-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+
+    &.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    // Override default .page styles when active
+    &.active.page {
+        display: flex;
+        animation: fadeIn 0.3s ease;
+    }
+
+    .login-page-container {
+        width: 100%;
+        max-width: 400px;
+        background: var(--surface-color, #ffffff);
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        overflow: hidden;
+
+        .login-header {
+            text-align: center;
+            padding: 2rem 2rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+
+            h1 {
+                margin: 0 0 0.5rem 0;
+                font-size: 1.75rem;
+                font-weight: 600;
+            }
+
+            p {
+                margin: 0;
+                opacity: 0.9;
+                font-size: 0.95rem;
+            }
+        }
+
+        .login-form-container {
+            padding: 2rem;
+        }
+    }
+
+    // Mobile responsiveness
+    @media (max-width: 480px) {
+        .login-page-container {
+            margin: 1rem;
+            max-width: calc(100% - 2rem);
+
+            .login-header {
+                padding: 1.5rem 1.5rem 1rem;
+
+                h1 {
+                    font-size: 1.5rem;
+                }
+            }
+
+            .login-form-container {
+                padding: 1.5rem;
+            }
+        }
+    }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+    #login-page {
+        .login-page-container {
+            background: var(--surface-color, #1a1a1a);
+            color: var(--text-color, #ffffff);
+        }
+    }
+}

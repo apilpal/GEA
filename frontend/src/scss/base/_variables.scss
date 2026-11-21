@@ -1,0 +1,300 @@
+// Variables
+$primary-color: #6366f1;
+$secondary-color: #8b5cf6;
+$accent-color: #ec4899;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$info-color: #3b82f6;
+
+$background-color: #f5f7fa;
+$card-background: #ffffff;
+$text-color: #333;
+$text-muted: #666;
+$border-color: #e9ecef;
+
+$shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+$shadow-light: 0 2px 8px rgba(0, 0, 0, 0.06);
+$shadow-hover: 0 8px 32px rgba(0, 0, 0, 0.15);
+$border-radius: 12px;
+$border-radius-sm: 8px;
+$border-radius-lg: 16px;
+
+// Enhanced accessibility colors
+$focus-color: #007bff;
+$focus-ring-width: 3px;
+$focus-ring-color: rgba(99, 102, 241, 0.3);
+
+// Responsive breakpoints (mobile-first)
+$mobile: 320px;
+$mobile-landscape: 480px;
+$tablet: 768px;
+$tablet-landscape: 992px;
+$desktop: 1200px;
+$desktop-large: 1440px;
+
+// Typography scale
+$font-size-xs: 0.75rem; // 12px
+$font-size-sm: 0.875rem; // 14px
+$font-size-base: 1rem; // 16px
+$font-size-lg: 1.125rem; // 18px
+$font-size-xl: 1.25rem; // 20px
+$font-size-2xl: 1.5rem; // 24px
+$font-size-3xl: 1.875rem; // 30px
+$font-size-4xl: 2.25rem; // 36px
+
+// Spacing scale
+$space-1: 0.25rem; // 4px
+$space-2: 0.5rem; // 8px
+$space-3: 0.75rem; // 12px
+$space-4: 1rem; // 16px
+$space-5: 1.25rem; // 20px
+$space-6: 1.5rem; // 24px
+$space-8: 2rem; // 32px
+$space-10: 2.5rem; // 40px
+$space-12: 3rem; // 48px
+$space-16: 4rem; // 64px
+
+// Minimum touch target size
+$min-touch-target: 44px;
+
+// Animation durations
+$transition-fast: 0.15s;
+$transition-base: 0.3s;
+$transition-slow: 0.5s;
+
+// Enhanced color variables for accessibility
+$high-contrast-text: #000000;
+$high-contrast-bg: #ffffff;
+$reduced-motion-duration: 0.01ms;
+
+// Dark mode colors
+$dark-primary: #818cf8;
+$dark-secondary: #a78bfa;
+$dark-accent: #f472b6;
+$dark-background: #1f2937;
+$dark-card-bg: #374151;
+$dark-text: #f3f4f6;
+$dark-text-muted: #9ca3af;
+$dark-border: #4b5563;
+
+// ============================================================================
+// ENHANCED SEMANTIC DESIGN TOKENS
+// ============================================================================
+
+// Component-specific tokens
+$component-border-width: 1px;
+$component-padding-sm: $space-2 $space-3;
+$component-padding-md: $space-3 $space-4;
+$component-padding-lg: $space-4 $space-6;
+
+// Interactive states
+$state-hover-opacity: 0.8;
+$state-focus-opacity: 0.9;
+$state-active-opacity: 0.7;
+$state-disabled-opacity: 0.5;
+
+// Animation and motion
+$animation-duration-xs: 0.1s;
+$animation-duration-sm: 0.2s;
+$animation-duration-md: 0.3s;
+$animation-duration-lg: 0.4s;
+$animation-duration-xl: 0.6s;
+
+// Easing functions
+$animation-easing-linear: linear;
+$animation-easing-ease: ease;
+$animation-easing-ease-in: ease-in;
+$animation-easing-ease-out: ease-out;
+$animation-easing-ease-in-out: ease-in-out;
+$animation-easing-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+// ============================================================================
+// TYPOGRAPHY TOKENS
+// ============================================================================
+
+// Font families
+$font-family-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+$font-family-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Source Code Pro', monospace;
+$font-family-display: 'Inter', 'Segoe UI', system-ui, sans-serif;
+
+// Font weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+// Line heights
+$line-height-tight: 1.25;
+$line-height-snug: 1.375;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.625;
+$line-height-loose: 2;
+
+// ============================================================================
+// LAYOUT TOKENS
+// ============================================================================
+
+// Container sizes
+$container-xs: 20rem;    // 320px
+$container-sm: 24rem;    // 384px
+$container-md: 28rem;    // 448px
+$container-lg: 32rem;    // 512px
+$container-xl: 36rem;    // 576px
+$container-2xl: 42rem;   // 672px
+$container-3xl: 48rem;   // 768px
+$container-4xl: 56rem;   // 896px
+$container-5xl: 64rem;   // 1024px
+$container-6xl: 72rem;   // 1152px
+$container-7xl: 80rem;   // 1280px
+
+// Z-index scale
+$z-dropdown: 1000;
+$z-sticky: 1020;
+$z-fixed: 1030;
+$z-modal-backdrop: 1040;
+$z-modal: 1050;
+$z-popover: 1060;
+$z-tooltip: 1070;
+$z-toast: 1080;
+
+// ============================================================================
+// SEMANTIC TOKENS FOR UI COMPONENTS
+// ============================================================================
+
+// Button tokens
+$button-height-sm: 2rem;     // 32px
+$button-height-md: 2.5rem;   // 40px
+$button-height-lg: 3rem;     // 48px
+$button-border-radius: $border-radius;
+$button-font-weight: $font-weight-medium;
+
+// Form tokens
+$form-input-height: 2.5rem;   // 40px
+$form-input-padding: $space-2 $space-3;
+$form-input-border-width: 1px;
+$form-input-border-radius: $border-radius;
+$form-label-font-size: $font-size-sm;
+$form-label-font-weight: $font-weight-medium;
+
+// Card tokens
+$card-padding: $space-4;
+$card-border-radius: $border-radius;
+$card-header-padding: $space-4 $space-4 $space-2;
+$card-body-padding: $space-4;
+$card-footer-padding: $space-2 $space-4 $space-4;
+
+// Table tokens
+$table-border-width: 1px;
+$table-cell-padding: $space-3;
+$table-header-font-weight: $font-weight-semibold;
+
+// Navigation tokens
+$nav-height: 4rem;           // 64px
+$nav-item-padding: $space-2 $space-4;
+$nav-border-width: 1px;
+
+// ============================================================================
+// RESPONSIVE BREAKPOINT TOKENS
+// ============================================================================
+
+// Breakpoint values (for use in media queries)
+$breakpoint-xs: 320px;
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// Container max-widths for each breakpoint
+$container-max-width-xs: 100%;
+$container-max-width-sm: 640px;
+$container-max-width-md: 768px;
+$container-max-width-lg: 1024px;
+$container-max-width-xl: 1280px;
+$container-max-width-2xl: 1536px;
+
+// ============================================================================
+// ADVANCED THEMING TOKENS
+// ============================================================================
+
+// Neutral color scale (for backgrounds, borders, text)
+$neutral-50: #f9fafb;
+$neutral-100: #f3f4f6;
+$neutral-200: #e5e7eb;
+$neutral-300: #d1d5db;
+$neutral-400: #9ca3af;
+$neutral-500: #6b7280;
+$neutral-600: #4b5563;
+$neutral-700: #374151;
+$neutral-800: #1f2937;
+$neutral-900: #111827;
+
+// Status color variations
+$success-50: #ecfdf5;
+$success-100: #d1fae5;
+$success-500: #10b981;
+$success-600: #059669;
+$success-700: #047857;
+
+$warning-50: #fffbeb;
+$warning-100: #fef3c7;
+$warning-500: #f59e0b;
+$warning-600: #d97706;
+$warning-700: #b45309;
+
+$danger-50: #fef2f2;
+$danger-100: #fee2e2;
+$danger-500: #ef4444;
+$danger-600: #dc2626;
+$danger-700: #b91c1c;
+
+$info-50: #eff6ff;
+$info-100: #dbeafe;
+$info-500: #3b82f6;
+$info-600: #2563eb;
+$info-700: #1d4ed8;
+
+// ============================================================================
+// CSS LOGICAL PROPERTIES SUPPORT
+// ============================================================================
+
+// Block flow direction (for internationalization)
+$block-start: top;
+$block-end: bottom;
+$inline-start: left;
+$inline-end: right;
+
+// In RTL languages, these would be reversed
+$inline-start-rtl: right;
+$inline-end-rtl: left;
+
+// ============================================================================
+// COMPONENT TOKENS (for advanced theming)
+// ============================================================================
+
+// Alert component tokens
+$alert-padding: $space-4;
+$alert-border-radius: $border-radius;
+$alert-border-width: 1px;
+$alert-icon-size: 1.25rem;
+
+// Badge component tokens
+$badge-padding: $space-1 $space-2;
+$badge-border-radius: 9999px;
+$badge-font-size: $font-size-sm;
+$badge-font-weight: $font-weight-medium;
+
+// Modal component tokens
+$modal-backdrop-opacity: 0.5;
+$modal-border-radius: $border-radius-lg;
+$modal-padding: $space-6;
+$modal-max-width: 32rem;
+
+// Tooltip component tokens
+$tooltip-padding: $space-2 $space-3;
+$tooltip-border-radius: $border-radius-sm;
+$tooltip-font-size: $font-size-sm;
+$tooltip-max-width: 12rem;
+$tooltip-arrow-size: 0.25rem;

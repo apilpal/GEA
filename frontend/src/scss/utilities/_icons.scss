@@ -1,0 +1,203 @@
+// Custom Icon Components Styles
+// This file contains styles specific to custom icon components
+@use "../base/_variables" as vars;
+
+// Icon base styles
+:host {
+  display: inline-block;
+  vertical-align: middle;
+  --icon-primary: #{vars.$primary-color};
+  --icon-secondary: #{vars.$secondary-color};
+  --icon-accent: #{vars.$accent-color};
+  --icon-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: var(--icon-transition);
+}
+
+:host(:hover) {
+  transform: scale(1.05);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.15));
+}
+
+:host(:active) {
+  transform: scale(0.95);
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+  stroke: currentColor;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+// Icon variants
+.icon-school {
+  color: var(--icon-primary);
+}
+
+.icon-robot {
+  color: var(--icon-accent);
+}
+
+.icon-bus {
+  color: var(--icon-secondary);
+}
+
+.icon-users {
+  color: var(--icon-primary);
+}
+
+.icon-chart-bar {
+  color: var(--icon-secondary);
+}
+
+.icon-chart-line {
+  color: var(--icon-primary);
+}
+
+.icon-cog {
+  color: var(--icon-accent);
+}
+
+.icon-user-circle {
+  color: var(--icon-primary);
+}
+
+.icon-sign-out {
+  color: var(--icon-secondary);
+}
+
+.icon-bars {
+  color: var(--icon-accent);
+}
+
+.icon-bell {
+  color: var(--icon-primary);
+}
+
+.icon-search {
+  color: var(--icon-secondary);
+}
+
+.icon-plus {
+  color: var(--icon-accent);
+}
+
+.icon-user-plus {
+  color: var(--icon-primary);
+}
+
+.icon-file-alt {
+  color: var(--icon-secondary);
+}
+
+.icon-times {
+  color: var(--icon-accent);
+}
+
+.icon-paper-plane {
+  color: var(--icon-primary);
+}
+
+.icon-route {
+  color: var(--icon-secondary);
+}
+
+.icon-spinner {
+  color: var(--icon-accent);
+  animation: spin 1s linear infinite;
+}
+
+.icon-dollar-sign {
+  color: var(--icon-primary);
+}
+
+.icon-sync {
+  color: var(--icon-secondary);
+}
+
+.icon-download {
+  color: var(--icon-accent);
+}
+
+.icon-chart-pie {
+  color: var(--icon-primary);
+}
+
+// Animations
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// Size variants
+:host([size="16"]) {
+  width: 16px;
+  height: 16px;
+}
+
+:host([size="20"]) {
+  width: 20px;
+  height: 20px;
+}
+
+:host([size="24"]) {
+  width: 24px;
+  height: 24px;
+}
+
+:host([size="28"]) {
+  width: 28px;
+  height: 28px;
+}
+
+:host([size="32"]) {
+  width: 32px;
+  height: 32px;
+}
+
+:host([size="40"]) {
+  width: 40px;
+  height: 40px;
+}
+
+// Color variants
+:host([color="primary"]) {
+  color: var(--icon-primary);
+}
+
+:host([color="secondary"]) {
+  color: var(--icon-secondary);
+}
+
+:host([color="accent"]) {
+  color: var(--icon-accent);
+}
+
+:host([color="success"]) {
+  color: #{vars.$success-color};
+}
+
+:host([color="warning"]) {
+  color: #{vars.$warning-color};
+}
+
+:host([color="danger"]) {
+  color: #{vars.$danger-color};
+}
+
+:host([color="info"]) {
+  color: #{vars.$info-color};
+}
+
+// Accessibility
+:host([aria-hidden="true"]) {
+  display: none;
+}
+
+// Focus styles for interactive icons
+:host(:focus) {
+  outline: 2px solid var(--icon-primary);
+  outline-offset: 2px;
+  border-radius: 2px;
+}

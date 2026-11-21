@@ -1,0 +1,65 @@
+# Coverage configuration file for additional coverage settings
+
+[run]
+source = backend/src
+branch = True
+parallel = True
+sigterm = True
+omit =
+    */tests/*
+    */test_*
+    */conftest.py
+    */migrations/*
+    */alembic/*
+    */__pycache__/*
+    */.venv/*
+    */venv/*
+    */env/*
+    */.tox/*
+    */.pytest_cache/*
+    */htmlcov/*
+    */.coverage.*
+    */coverage.xml
+    */build/*
+    */dist/*
+    backend/src/core/models/__init__.py
+    backend/src/services/__init__.py
+    backend/src/api/__init__.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    class .*\bProtocol\):
+    @(abc\.)?abstractmethod
+    def .*test_.*\(
+    def .*Test.*\(
+    @pytest\.(fixture|mark|parametrize)
+    def .*_test.*\(
+
+# Show missing lines in output
+show_missing = True
+
+# Skip covered files that are 100% covered
+skip_covered = False
+
+# Coverage report precision
+precision = 2
+
+[html]
+directory = htmlcov
+title = Backend Test Coverage Report
+show_contexts = True
+
+[xml]
+output = coverage.xml
+
+[json]
+output = coverage.json
+pretty_print = True

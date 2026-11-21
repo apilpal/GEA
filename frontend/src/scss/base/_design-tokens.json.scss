@@ -1,0 +1,315 @@
+// Design Tokens JSON Export System
+// This file exports SCSS variables as JSON for use in other systems
+// Import this file to generate JSON design tokens alongside CSS compilation
+
+@use 'sass:meta';
+@use 'variables' as vars;
+
+// ============================================================================
+// DESIGN TOKEN JSON EXPORT
+// ============================================================================
+
+// Color tokens
+$design-tokens: (
+  // Brand colors
+  'color': (
+    'primary': #{vars.$primary-color},
+    'secondary': #{vars.$secondary-color},
+    'accent': #{vars.$accent-color},
+    'success': #{vars.$success-color},
+    'warning': #{vars.$warning-color},
+    'danger': #{vars.$danger-color},
+    'info': #{vars.$info-color}
+  ),
+
+  // Neutral colors
+  'neutral': (
+    '50': #{vars.$neutral-50},
+    '100': #{vars.$neutral-100},
+    '200': #{vars.$neutral-200},
+    '300': #{vars.$neutral-300},
+    '400': #{vars.$neutral-400},
+    '500': #{vars.$neutral-500},
+    '600': #{vars.$neutral-600},
+    '700': #{vars.$neutral-700},
+    '800': #{vars.$neutral-800},
+    '900': #{vars.$neutral-900}
+  ),
+
+  // Background colors
+  'background': (
+    'primary': #{vars.$background-color},
+    'card': #{vars.$card-background}
+  ),
+
+  // Text colors
+  'text': (
+    'primary': #{vars.$text-color},
+    'muted': #{vars.$text-muted},
+    'inverse': #ffffff
+  ),
+
+  // Border colors
+  'border': (
+    'primary': #{vars.$border-color},
+    'radius': #{vars.$border-radius}
+  ),
+
+  // Spacing scale
+  'spacing': (
+    '1': #{vars.$space-1},
+    '2': #{vars.$space-2},
+    '3': #{vars.$space-3},
+    '4': #{vars.$space-4},
+    '5': #{vars.$space-5},
+    '6': #{vars.$space-6},
+    '8': #{vars.$space-8},
+    '10': #{vars.$space-10},
+    '12': #{vars.$space-12},
+    '16': #{vars.$space-16}
+  ),
+
+  // Typography scale
+  'typography': (
+    'font-family': (
+      'sans': '#{vars.$font-family-sans}',
+      'mono': '#{vars.$font-family-mono}',
+      'display': '#{vars.$font-family-display}'
+    ),
+    'font-size': (
+      'xs': #{vars.$font-size-xs},
+      'sm': #{vars.$font-size-sm},
+      'base': #{vars.$font-size-base},
+      'lg': #{vars.$font-size-lg},
+      'xl': #{vars.$font-size-xl},
+      '2xl': #{vars.$font-size-2xl},
+      '3xl': #{vars.$font-size-3xl},
+      '4xl': #{vars.$font-size-4xl}
+    ),
+    'font-weight': (
+      'light': vars.$font-weight-light,
+      'normal': vars.$font-weight-normal,
+      'medium': vars.$font-weight-medium,
+      'semibold': vars.$font-weight-semibold,
+      'bold': vars.$font-weight-bold
+    ),
+    'line-height': (
+      'tight': vars.$line-height-tight,
+      'snug': vars.$line-height-snug,
+      'normal': vars.$line-height-normal,
+      'relaxed': vars.$line-height-relaxed,
+      'loose': vars.$line-height-loose
+    )
+  ),
+
+  // Breakpoints
+  'breakpoint': (
+    'xs': #{vars.$breakpoint-xs},
+    'sm': #{vars.$breakpoint-sm},
+    'md': #{vars.$breakpoint-md},
+    'lg': #{vars.$breakpoint-lg},
+    'xl': #{vars.$breakpoint-xl},
+    '2xl': #{vars.$breakpoint-2xl}
+  ),
+
+  // Container sizes
+  'container': (
+    'max-width': (
+      'xs': #{vars.$container-xs},
+      'sm': #{vars.$container-sm},
+      'md': #{vars.$container-md},
+      'lg': #{vars.$container-lg},
+      'xl': #{vars.$container-xl},
+      '2xl': #{vars.$container-2xl},
+      '3xl': #{vars.$container-3xl},
+      '4xl': #{vars.$container-4xl},
+      '5xl': #{vars.$container-5xl},
+      '6xl': #{vars.$container-6xl},
+      '7xl': #{vars.$container-7xl}
+    )
+  ),
+
+  // Component tokens
+  'component': (
+    'border-width': #{vars.$component-border-width},
+    'button': (
+      'height': (
+        'sm': #{vars.$button-height-sm},
+        'md': #{vars.$button-height-md},
+        'lg': #{vars.$button-height-lg}
+      ),
+      'border-radius': #{vars.$button-border-radius},
+      'font-weight': vars.$button-font-weight
+    ),
+    'form': (
+      'input-height': #{vars.$form-input-height},
+      'input-padding': #{vars.$form-input-padding},
+      'border-width': #{vars.$form-input-border-width},
+      'border-radius': #{vars.$form-input-border-radius}
+    ),
+    'card': (
+      'padding': #{vars.$card-padding},
+      'border-radius': #{vars.$card-border-radius}
+    )
+  ),
+
+  // Animation tokens
+  'animation': (
+    'duration': (
+      'xs': #{vars.$animation-duration-xs},
+      'sm': #{vars.$animation-duration-sm},
+      'md': #{vars.$animation-duration-md},
+      'lg': #{vars.$animation-duration-lg},
+      'xl': #{vars.$animation-duration-xl}
+    ),
+    'easing': (
+      'linear': '#{vars.$animation-easing-linear}',
+      'ease': '#{vars.$animation-easing-ease}',
+      'ease-in': '#{vars.$animation-easing-ease-in}',
+      'ease-out': '#{vars.$animation-easing-ease-out}',
+      'ease-in-out': '#{vars.$animation-easing-ease-in-out}',
+      'bounce': '#{vars.$animation-easing-bounce}'
+    )
+  ),
+
+  // Shadow tokens
+  'shadow': (
+    'sm': #{vars.$shadow-light},
+    'md': #{vars.$shadow},
+    'lg': #{vars.$shadow-hover}
+  ),
+
+  // Z-index scale
+  'z-index': (
+    'dropdown': vars.$z-dropdown,
+    'sticky': vars.$z-sticky,
+    'fixed': vars.$z-fixed,
+    'modal-backdrop': vars.$z-modal-backdrop,
+    'modal': vars.$z-modal,
+    'popover': vars.$z-popover,
+    'tooltip': vars.$z-tooltip,
+    'toast': vars.$z-toast
+  )
+);
+
+// ============================================================================
+// JSON EXPORT FUNCTIONALITY
+// ============================================================================
+
+// Function to convert SCSS map to JSON (for build-time processing)
+@function design-tokens-to-json($tokens) {
+  $json: '{';
+
+  @each $category, $values in $tokens {
+    $json: $json + '"#{$category}": {';
+
+    @if meta.type-of($values) == 'map' {
+      @each $key, $value in $values {
+        @if meta.type-of($values) == 'map' and meta.type-of($value) == 'map' {
+          $json: $json + '"#{$key}": {';
+          @each $subkey, $subvalue in $value {
+            $json: $json + '"#{$subkey}": "#{$subvalue}",';
+          }
+          $json: str-slice($json, 1, -1) + '},'; // Remove last comma and close
+        } @else {
+          $json: $json + '"#{$key}": "#{$value}",';
+        }
+      }
+    }
+
+    $json: str-slice($json, 1, -1) + '},'; // Remove last comma and close
+  }
+
+  $json: str-slice($json, 1, -1) + '}'; // Remove last comma and close main object
+  @return $json;
+}
+
+// Export design tokens as CSS custom property for JavaScript access
+:root {
+  --design-tokens: '#{design-tokens-to-json($design-tokens)}';
+}
+
+// ============================================================================
+// DARK THEME TOKENS
+// ============================================================================
+
+$dark-theme-tokens: (
+  'color': (
+    'primary': #{vars.$dark-primary},
+    'secondary': #{vars.$dark-secondary},
+    'accent': #{vars.$dark-accent},
+    'success': #{vars.$success-500},
+    'warning': #{vars.$warning-500},
+    'danger': #{vars.$danger-500},
+    'info': #{vars.$info-500}
+  ),
+
+  'background': (
+    'primary': #{vars.$dark-background},
+    'card': #{vars.$dark-card-bg}
+  ),
+
+  'text': (
+    'primary': #{vars.$dark-text},
+    'muted': #{vars.$dark-text-muted},
+    'inverse': #{vars.$dark-text}
+  ),
+
+  'border': (
+    'primary': #{vars.$dark-border}
+  )
+);
+
+[data-theme="dark"] {
+  --design-tokens-dark: '#{design-tokens-to-json($dark-theme-tokens)}';
+}
+
+// ============================================================================
+// COMPONENT-LEVEL THEME TOKENS
+// ============================================================================
+
+$component-tokens: (
+  'alert': (
+    'padding': #{vars.$alert-padding},
+    'border-radius': #{vars.$alert-border-radius},
+    'border-width': #{vars.$alert-border-width},
+    'icon-size': #{vars.$alert-icon-size}
+  ),
+
+  'badge': (
+    'padding': #{vars.$badge-padding},
+    'border-radius': #{vars.$badge-border-radius},
+    'font-size': #{vars.$badge-font-size},
+    'font-weight': vars.$badge-font-weight
+  ),
+
+  'button': (
+    'height': (
+      'sm': #{vars.$button-height-sm},
+      'md': #{vars.$button-height-md},
+      'lg': #{vars.$button-height-lg}
+    ),
+    'padding': vars.$component-padding-sm,
+    'border-radius': #{vars.$button-border-radius}
+  ),
+
+  'modal': (
+    'backdrop-opacity': vars.$modal-backdrop-opacity,
+    'border-radius': #{vars.$modal-border-radius},
+    'padding': #{vars.$modal-padding},
+    'max-width': #{vars.$modal-max-width}
+  ),
+
+  'tooltip': (
+    'padding': #{vars.$tooltip-padding},
+    'border-radius': #{vars.$tooltip-border-radius},
+    'font-size': #{vars.$tooltip-font-size},
+    'max-width': #{vars.$tooltip-max-width},
+    'arrow-size': #{vars.$tooltip-arrow-size}
+  )
+);
+
+// Export component tokens
+:root {
+  --component-tokens: '#{design-tokens-to-json($component-tokens)}';
+}

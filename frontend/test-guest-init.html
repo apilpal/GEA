@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Authentication Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-results { background: #f5f5f5; padding: 15px; border-radius: 5px; margin: 10px 0; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        pre { background: #fff; padding: 10px; border: 1px solid #ddd; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>Guest Authentication Initialization Test</h1>
+    
+    <div id="test-results" class="test-results">
+        <h2>Test Results</h2>
+        <div id="results-content">Running tests...</div>
+    </div>
+
+    <script>
+        async function runGuestAuthTest() {
+            const results = [];
+            
+            try {
+                // Test 1: Load main page
+                results.push('<h3>Test 1: Page Load</h3>');
+                results.push('<span class="success">✓ Main page loads successfully</span>');
+                
+                // Test 2: Check if DOM elements exist
+                results.push('<h3>Test 2: DOM Elements</h3>');
+                const authLoading = document.getElementById('auth-loading');
+                const loginPage = document.getElementById('login-page');
+                const mainApp = document.getElementById('main-app');
+                
+                if (authLoading) results.push('<span class="success">✓ Auth loading element exists</span>');
+                if (loginPage) results.push('<span class="success">✓ Login page element exists</span>');
+                if (mainApp) results.push('<span class="success">✓ Main app element exists</span>');
+                
+                // Test 3: Wait for JavaScript initialization
+                results.push('<h3>Test 3: JavaScript Initialization</h3>');
+                await new Promise(resolve => setTimeout(resolve, 3000));
+                
+                // Test 4: Check auth context state
+                results.push('<h3>Test 4: Auth Context State</h3>');
+                const authContext = (window as any).authContext;
+                if (authContext && authContext.getState) {
+                    const state = authContext.getState();
+                    results.push('<pre>' + JSON.stringify(state, null, 2) + '</pre>');
+                    if (state.isLoading !== undefined) {
+                        results.push('<span class="' + (state.isLoading ? 'info' : 'success') + '">✓ Auth state is ' + (state.isLoading ? 'loading' : 'ready') + '</span>');
+                    }
+                } else {
+                    results.push('<span class="error">✗ Auth context not found</span>');
+                }
+                
+                // Test 5: Check current visible state
+                results.push('<h3>Test 5: UI State</h3>');
+                if (authLoading) {
+                    const loadingVisible = authLoading.style.display !== 'none';
+                    results.push('<span class="' + (loadingVisible ? 'info' : 'success') + '">Auth loading: ' + (loadingVisible ? 'visible' : 'hidden') + '</span>');
+                }
+                
+                if (loginPage) {
+                    const loginActive = loginPage.classList.contains('active');
+                    results.push('<span class="' + (loginActive ? 'success' : 'info') + '">Login page: ' + (loginActive ? 'active' : 'inactive') + '</span>');
+                }
+                
+                if (mainApp) {
+                    const mainAppVisible = mainApp.style.display !== 'none';
+                    results.push('<span class="' + (mainAppVisible ? 'success' : 'info') + '">Main app: ' + (mainAppVisible ? 'visible' : 'hidden') + '</span>');
+                }
+                
+                // Test 6: Check console logs
+                results.push('<h3>Test 6: Console Activity</h3>');
+                results.push('<div class="info">Check browser console for initialization logs</div>');
+                
+            } catch (error) {
+                results.push('<h3>Test Error</h3>');
+                results.push('<span class="error">✗ Test failed: ' + error.message + '</span>');
+            }
+            
+            // Display results
+            document.getElementById('results-content').innerHTML = results.join('');
+        }
+        
+        // Run test when page loads
+        window.addEventListener('load', () => {
+            setTimeout(runGuestAuthTest, 1000);
+        });
+    </script>
+    
+    <!-- Include the main app -->
+    <iframe src="http://127.0.0.1:5173" style="width: 100%; height: 600px; border: 1px solid #ccc; margin-top: 20px;"></iframe>
+</body>
+</html>

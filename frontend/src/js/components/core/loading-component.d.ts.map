@@ -1,0 +1,1 @@
+{"version":3,"file":"loading-component.d.ts","sourceRoot":"","sources":["../../../ts/components/core/loading-component.ts"],"names":[],"mappings":"AAMA,qBAAa,gBAAiB,SAAQ,WAAW;IAC7C,OAAO,CAAC,MAAM,CAAa;gBAEf,OAAO,GAAE,MAAqB;IAsD1C,UAAU,CAAC,OAAO,EAAE,MAAM,GAAG,IAAI;IAUjC,UAAU,CAAC,OAAO,EAAE,OAAO,GAAG,IAAI;IAOlC,MAAM,IAAI,IAAI;CAKjB"}

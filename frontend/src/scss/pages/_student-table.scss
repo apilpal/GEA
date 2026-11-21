@@ -1,0 +1,421 @@
+// Student Table Component
+@use "sass:color";
+@use "../base/variables" as vars;
+student-table {
+  display: block;
+  width: 100%;
+  --table-primary: #{vars.$primary-color};
+  --table-secondary: #{vars.$secondary-color};
+  --table-success: #{vars.$success-color};
+  --table-warning: #{vars.$warning-color};
+  --table-danger: #{vars.$danger-color};
+  --table-info: #{vars.$info-color};
+  --table-background: #{vars.$card-background};
+  --table-border: #{vars.$border-color};
+  --table-text: #{vars.$text-color};
+  --table-transition: all 0.3s ease;
+}
+
+student-table .table-container {
+  width: 100%;
+  overflow-x: auto;
+  background: var(--table-background);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+student-table .table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 0;
+
+  h2 {
+    margin: 0;
+    color: var(--table-text);
+    font-size: 1.8em;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--table-primary) 0%, var(--table-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: -0.5px;
+  }
+}
+
+student-table .search-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+
+  &::before {
+    content: '🔍';
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+    pointer-events: none;
+    font-size: 1em;
+  }
+}
+
+student-table .search-input {
+  padding: 12px 45px 12px 15px;
+  border: 2px solid #e1e5e9;
+  border-radius: 25px;
+  font-size: 1em;
+  width: 300px;
+  transition: var(--table-transition);
+  background-color: #fff;
+  color: var(--table-text);
+
+  &:focus {
+    outline: none;
+    border-color: var(--table-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    transform: scale(1.02);
+  }
+
+  &::placeholder {
+    color: #6c757d;
+  }
+}
+
+student-table .add-student-btn {
+  background: linear-gradient(135deg, var(--table-success) 0%, color.adjust(vars.$success-color, $lightness: -10%) 100%);
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: var(--table-transition);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+    background: linear-gradient(135deg, color.adjust(vars.$success-color, $lightness: -10%) 0%, color.adjust(vars.$success-color, $lightness: -20%) 100%);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+student-table .student-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--table-background);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  font-size: 14px;
+
+  th {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 16px 20px;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    color: #495057;
+    position: relative;
+  }
+
+  .sortable-header {
+    cursor: pointer;
+    position: relative;
+    transition: var(--table-transition);
+    user-select: none;
+
+    &:hover {
+      background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+      color: var(--table-primary);
+    }
+
+    &::after {
+      content: '↕';
+      margin-left: 5px;
+      color: var(--table-primary);
+      opacity: 0.7;
+      transition: var(--table-transition);
+    }
+
+    &.sort-asc::after {
+      content: '↑';
+      opacity: 1;
+    }
+
+    &.sort-desc::after {
+      content: '↓';
+      opacity: 1;
+    }
+  }
+
+  td {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--table-border);
+    color: var(--table-text);
+    transition: var(--table-transition);
+  }
+
+  .student-row {
+    transition: var(--table-transition);
+    cursor: pointer;
+
+    &:hover {
+      background-color: #f8f9fa;
+      transform: scale(1.01);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    &:nth-child(even) {
+      background-color: #f8f9fa;
+
+      &:hover {
+        background-color: #e9ecef;
+      }
+    }
+
+    &.student-row:hover {
+      background-color: #e8f5e8;
+      border-left: 4px solid var(--table-success);
+    }
+  }
+
+  .status-indicator {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8em;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: inline-block;
+    min-width: 70px;
+    text-align: center;
+
+    &.active {
+      background: linear-gradient(135deg, lighten(#10b981, 30%) 0%, lighten(#10b981, 20%) 100%);
+      color: color.adjust(#10b981, $lightness: -30%);
+      border: 1px solid lighten(#10b981, 20%);
+    }
+
+    &.inactive {
+      background: linear-gradient(135deg, lighten(#ef4444, 30%) 0%, lighten(#ef4444, 20%) 100%);
+      color: color.adjust(#ef4444, $lightness: -20%);
+      border: 1px solid lighten(#ef4444, 20%);
+    }
+  }
+
+  .actions-cell {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 6px;
+    transition: var(--table-transition);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    position: relative;
+
+    &:hover {
+      transform: scale(1.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    &.edit-btn {
+      color: var(--table-warning);
+
+      &:hover {
+        background: linear-gradient(135deg, lighten(#f59e0b, 40%) 0%, lighten(#f59e0b, 30%) 100%);
+      }
+    }
+
+    &.delete-btn {
+      color: var(--table-danger);
+
+      &:hover {
+        background: linear-gradient(135deg, lighten(#ef4444, 40%) 0%, lighten(#ef4444, 30%) 100%);
+      }
+    }
+
+    &.view-btn {
+      color: var(--table-info);
+
+      &:hover {
+        background: linear-gradient(135deg, lighten(#3b82f6, 40%) 0%, lighten(#3b82f6, 30%) 100%);
+      }
+    }
+  }
+}
+
+// Loading state
+student-table .table-loading {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid #e5e7eb;
+    border-top: 3px solid var(--table-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 15px;
+  }
+
+  span {
+    font-size: 0.9em;
+    font-weight: 500;
+  }
+}
+
+// Empty state
+student-table .table-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+
+  i {
+    font-size: 3em;
+    opacity: 0.3;
+    margin-bottom: 15px;
+    display: block;
+  }
+
+  h4 {
+    margin: 0 0 10px 0;
+    color: var(--table-text);
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.9em;
+  }
+}
+
+// Responsive table
+@media (max-width: 768px) {
+  student-table .table-header {
+    flex-direction: column;
+    align-items: stretch;
+
+    h2 {
+      font-size: 1.5em;
+      text-align: center;
+    }
+  }
+
+  student-table .search-input {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  student-table .add-student-btn {
+    width: 100%;
+    margin-top: 15px;
+    justify-content: center;
+  }
+
+  student-table .student-table {
+    font-size: 12px;
+
+    th, td {
+      padding: 8px 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80px;
+    }
+
+    th {
+      font-size: 11px;
+      padding: 10px 5px;
+    }
+  }
+
+  student-table .actions-cell {
+    flex-direction: column;
+    gap: 2px;
+
+    .action-btn {
+      padding: 6px;
+      width: 28px;
+      height: 28px;
+    }
+  }
+
+  student-table .status-indicator {
+    font-size: 0.7em;
+    padding: 3px 6px;
+    min-width: 60px;
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  student-table {
+    --table-background: #1f2937;
+    --table-border: #374151;
+    --table-text: #f3f4f6;
+  }
+
+  student-table .student-table th {
+    background: #374151;
+    color: #f3f4f6;
+  }
+
+  student-table .student-row:hover {
+    background-color: #374151;
+  }
+}
+
+// Print styles
+@media print {
+  student-table .actions-cell,
+  student-table .search-container,
+  student-table .add-student-btn {
+    display: none !important;
+  }
+
+  student-table .student-table {
+    box-shadow: none;
+    border: 1px solid #000;
+  }
+
+  student-table .student-row:hover {
+    background: transparent !important;
+    transform: none !important;
+  }
+}
+
+// Animation keyframes
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

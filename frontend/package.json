@@ -1,0 +1,53 @@
+{
+  "name": "aitest-frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/ts/index.ts",
+  "scripts": {
+    "build": "npx vite build && tsc",
+    "build:scss": "npx vite build --mode development",
+    "watch:scss": "npx vite",
+    "test": "npx jest --watchAll=false",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --watchAll=false --coverage",
+    "test:integration": "jest --watchAll=false __tests__/integration/",
+    "test:performance": "jest --watchAll=false --testPathPattern=performance",
+    "test:report": "node -e \"import('./src/test-reporters.ts').then(m => m.TestReporter).then(r => new r.TestReporter().generateAndSaveReport())\"",
+    "test:coverage:enforce": "node -e \"import('./src/test-reporters.ts').then(m => m.CoverageThresholdEnforcer).then(e => new e.CoverageThresholdEnforcer().enforceThresholds())\"",
+    "test:analyze": "node -e \"import('./src/test-reporters.ts').then(m => Promise.all([m.CoverageAnalyzer, m.TestPerformanceAnalyzer]).then(([ca, tpa]) => Promise.all([new ca().analyzeCoverage(), new tpa().analyzePerformance()]).then(([coverage, perf]) => { console.log('Coverage:', coverage); console.log('Performance:', perf); })))\"",
+    "mock-api": "node mock-server.js",
+    "dev": "npx vite",
+    "preview": "npx vite preview",
+    "build:prod": "npx vite build --mode production",
+    "build:dev": "npx vite build --mode development",
+    "serve": "npx vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@jest/globals": "^30.2.0",
+    "@types/jest": "^30.0.0",
+    "@types/jest-environment-puppeteer": "^5.0.0",
+    "canvas": "^3.2.1",
+    "cssnano": "^7.1.2",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
+    "jest-junit": "^16.0.0",
+    "jest-puppeteer": "^11.0.0",
+    "postcss-preset-env": "^11.2.0",
+    "sass": "^1.97.2",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.9.3"
+  },
+  "types": [
+    "jest"
+  ],
+  "dependencies": {
+    "jest-environment-puppeteer": "^11.0.0",
+    "puppeteer": "^24.39.1",
+    "puppeteer-core": "^24.35.0",
+    "vite": "^7.3.0"
+  }
+}

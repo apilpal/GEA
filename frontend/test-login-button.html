@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Button Click Test</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="src/js/icons.js" defer></script>
+</head>
+<body>
+    <div id="app">
+        <!-- Login Page (should be visible when not authenticated) -->
+        <div id="login-page" class="page active">
+            <div class="login-page-container">
+                <div class="login-header">
+                    <h1>Welcome to School Management System</h1>
+                    <p>Please sign in to continue</p>
+                </div>
+                <div class="login-form-container">
+                    <login-component id="loginComponent"></login-component>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main App Container (hidden when not authenticated) -->
+        <div id="main-app" class="main-app" style="display: none;">
+            <p>Main app content (should be hidden)</p>
+        </div>
+    </div>
+
+    <script type="module" src="src/ts/index.ts"></script>
+    
+    <script>
+        // Comprehensive login button test
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🔘 LOGIN BUTTON CLICK TEST');
+            console.log('===========================');
+            
+            const loginComponent = document.querySelector('login-component');
+            if (!loginComponent) {
+                console.error('❌ Login component not found');
+                return;
+            }
+
+            // Monitor URL changes
+            let initialURL = window.location.href;
+            const urlCheckInterval = setInterval(() => {
+                if (window.location.href !== initialURL) {
+                    console.log('🔗 URL Changed:', initialURL, '→', window.location.href);
+                    initialURL = window.location.href;
+                }
+            }, 100);
+
+            // Monitor authentication state changes
+            if (window.authContext) {
+                const initialAuthState = window.authContext.getState();
+                console.log('🔐 Initial Auth State:', JSON.stringify(initialAuthState, null, 2));
+                
+                // Subscribe to auth state changes
+                const unsubscribe = window.authContext.subscribe((newState) => {
+                    console.log('🔐 Auth State Changed:', JSON.stringify(newState, null, 2));
+                    
+                    if (newState.isAuthenticated && !initialAuthState.isAuthenticated) {
+                        console.log('✅ User successfully authenticated!');
+                    }
+                });
+            }
+
+            // Monitor network requests
+            const originalFetch = window.fetch;
+            window.fetch = async function(...args) {
+                const [url, options] = args;
+                console.log('🌐 Network Request:', options?.method || 'GET', url);
+                
+                if (options?.body) {
+                    try {
+                        const body = JSON.parse(options.body);
+                        console.log('📦 Request Payload:', JSON.stringify(body, null, 2));
+                    } catch (e) {
+                        console.log('📦 Request Body:', options.body);
+                    }
+                }
+                
+                const response = await originalFetch(...args);
+                console.log('📡 Response Status:', response.status, response.statusText);
+                
+                // Log response for login requests
+                if (url.includes('/auth/login')) {
+                    try {
+                        const responseData = await response.clone().json();
+                        console.log('🔑 Login Response:', JSON.stringify(responseData, null, 2));
+                    } catch (e) {
+                        console.log('🔑 Login Response: (non-JSON)', await response.clone().text());
+                    }
+                }
+                
+                return response;
+            };
+
+            // Monitor form submission
+            setTimeout(() => {
+                const loginComponentElement = document.querySelector('login-component');
+                if (loginComponentElement && loginComponentElement.shadowRoot) {
+                    const form = loginComponentElement.shadowRoot.querySelector('.login-form');
+                    const submitBtn = loginComponentElement.shadowRoot.querySelector('#submit-btn');
+                    const usernameInput = loginComponentElement.shadowRoot.querySelector('#username');
+                    const passwordInput = loginComponentElement.shadowRoot.querySelector('#password');
+                    
+                    console.log('📝 Form Elements Found:');
+                    console.log('  - Form:', !!form);
+                    console.log('  - Submit Button:', !!submitBtn);
+                    console.log('  - Username Input:', !!usernameInput);
+                    console.log('  - Password Input:', !!passwordInput);
+                    
+                    if (submitBtn) {
+                        console.log('🎯 Submit button is clickable:', !submitBtn.disabled);
+                        console.log('📋 Submit button text:', submitBtn.textContent.trim());
+                    }
+
+                    // Add visual indicator for testing
+                    if (submitBtn) {
+                        submitBtn.style.background = 'linear-gradient(45deg, #007bff, #0056b3)';
+                        submitBtn.style.animation = 'pulse 2s infinite';
+                        
+                        // Add CSS for pulse animation
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            @keyframes pulse {
+                                0% { transform: scale(1); }
+                                50% { transform: scale(1.05); }
+                                100% { transform: scale(1); }
+                            }
+                        `;
+                        document.head.appendChild(style);
+                    }
+
+                    console.log('');
+                    console.log('🧪 TEST INSTRUCTIONS:');
+                    console.log('====================');
+                    console.log('1. Fill in username and password fields');
+                    console.log('2. Click the pulsing blue "Sign In" button');
+                    console.log('3. Watch console for:');
+                    console.log('   - Network requests being made');
+                    console.log('   - Request payload (username/password)');
+                    console.log('   - Response from server');
+                    console.log('   - URL changes');
+                    console.log('   - Authentication state changes');
+                    console.log('4. Page should navigate to dashboard on success');
+                    
+                } else {
+                    console.error('❌ Could not access login component shadow DOM');
+                    console.log('💡 This might indicate the component is not rendering properly');
+                }
+            }, 2000);
+
+            // Cleanup after 5 minutes
+            setTimeout(() => {
+                clearInterval(urlCheckInterval);
+                window.fetch = originalFetch;
+                console.log('🧹 Test monitoring stopped');
+            }, 517300);
+        });
+    </script>
+</body>
+</html>

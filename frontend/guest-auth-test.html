@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Auth Test</title>
+</head>
+<body>
+    <h1>Guest Authentication Test</h1>
+    <button onclick="testGuestAuth()">Test Guest Authentication</button>
+    <div id="result"></div>
+
+    <script>
+        async function testGuestAuth() {
+            const resultDiv = document.getElementById('result');
+            
+            try {
+                console.log('🚀 Testing guest authentication...');
+                resultDiv.innerHTML = 'Testing guest authentication...';
+                
+                // Test guest authentication
+                const authResponse = await fetch('/api/auth/guest', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+                
+                console.log('Auth response status:', authResponse.status);
+                console.log('Auth response ok:', authResponse.ok);
+                
+                if (!authResponse.ok) {
+                    throw new Error(`Guest auth failed: ${authResponse.status}`);
+                }
+                
+                const authData = await authResponse.json();
+                console.log('✅ Guest auth successful:', authData);
+                
+                // Extract the access token for the next request
+                const accessToken = authData.access_token;
+                
+                // Test dashboard API with the guest token
+                const dashboardResponse = await fetch('/api/dashboard/public/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    credentials: 'include'
+                });
+                
+                console.log('Dashboard response status:', dashboardResponse.status);
+                console.log('Dashboard response ok:', dashboardResponse.ok);
+                
+                if (!dashboardResponse.ok) {
+                    throw new Error(`Dashboard API failed: ${dashboardResponse.status}`);
+                }
+                
+                const dashboardData = await dashboardResponse.json();
+                console.log('✅ Dashboard data received:', dashboardData);
+                
+                // Display success
+                resultDiv.innerHTML = `
+                    <div style="color: green; padding: 20px; border: 1px solid green; margin-top: 20px;">
+                        <h3>✅ Success!</h3>
+                        <p><strong>Guest User:</strong> ${authData.user.username}</p>
+                        <p><strong>Dashboard Data:</strong></p>
+                        <ul>
+                            <li>Students: ${dashboardData.total_students}</li>
+                            <li>Drivers: ${dashboardData.total_drivers}</li>
+                            <li>Revenue: $${dashboardData.total_revenue}</li>
+                        </ul>
+                        <p><em>Backend is working correctly. Frontend needs to handle this flow.</em></p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('❌ Test failed:', error);
+                resultDiv.innerHTML = `
+                    <div style="color: red; padding: 20px; border: 1px solid red; margin-top: 20px;">
+                        <h3>❌ Test Failed</h3>
+                        <p>Error: ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

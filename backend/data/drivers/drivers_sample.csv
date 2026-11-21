@@ -1,0 +1,5 @@
+name,route,status,vehicle_number,contact_number,license_number,experience_years,notes
+John Doe,Route 1,active,ABC123,+1234567890,DL123456,5,Sample driver note
+Jane Smith,Route 2,inactive,DEF456,+0987654321,DL789012,10,Another sample note
+Bob Johnson,Route 3,active,GHI789,+1122334455,DL345678,8,Experienced driver
+Alice Brown,Route 1,suspended,JKL012,+1555666777,DL901234,3,New driver

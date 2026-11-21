@@ -1,0 +1,18 @@
+{
+  "extends": "../../../tsconfig.build.json",
+  "compilerOptions": {
+    "composite": true,
+    "outDir": "../../../dist/store",
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false
+  },
+  "include": [
+    "**/*.ts"
+  ],
+  "exclude": [
+    "**/*.test.ts",
+    "**/*.spec.ts"
+  ]
+}

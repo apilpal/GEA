@@ -1,0 +1,29 @@
+Starting user creation test...
+Current user count: 11
+✅ User created: dev_user
+🆔 ID: 12
+📧 Email: dev@example.com
+👑 Role: UserRole.ADMIN
+❌ Error: List argument must consist only of tuples or dictionaries
+Traceback: Traceback (most recent call last):
+  File "/home/7615890397_0/Dev/AITest/backend/test_user_creation.py", line 44, in test_user_creation
+    result = await db.execute(text("SELECT * FROM users WHERE username = ?"), ("dev_user",))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/7615890397_0/Dev/AITest/.venv/lib/python3.12/site-packages/sqlalchemy/ext/asyncio/session.py", line 455, in execute
+    result = await greenlet_spawn(
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/7615890397_0/Dev/AITest/.venv/lib/python3.12/site-packages/sqlalchemy/util/_concurrency_py3k.py", line 179, in greenlet_spawn
+    result = context.switch(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/7615890397_0/Dev/AITest/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2308, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/7615890397_0/Dev/AITest/.venv/lib/python3.12/site-packages/sqlalchemy/orm/session.py", line 2199, in _execute_internal
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "/home/7615890397_0/Dev/AITest/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1410, in execute
+    distilled_parameters = _distill_params_20(parameters)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "lib/sqlalchemy/cyextension/util.pyx", line 26, in sqlalchemy.cyextension.util._distill_params_20
+  File "lib/sqlalchemy/cyextension/util.pyx", line 17, in sqlalchemy.cyextension.util._check_item
+sqlalchemy.exc.ArgumentError: List argument must consist only of tuples or dictionaries

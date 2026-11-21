@@ -1,0 +1,393 @@
+// Advanced Component Theming System
+// Provides sophisticated theming capabilities for individual components
+
+@use 'sass:map';
+@use 'sass:color';
+@use 'variables' as vars;
+@use 'mixins' as mixins;
+
+// ============================================================================
+// COMPONENT THEMING ARCHITECTURE
+// ============================================================================
+
+// Component theme configuration map
+$component-themes: (
+  'button': (
+    'primary': (
+      'background': vars.$primary-color,
+      'color': #ffffff,
+      'border': vars.$primary-color,
+      'hover': (
+        'background': color.adjust(vars.$primary-color, $lightness: -10%),
+        'border': color.adjust(vars.$primary-color, $lightness: -10%)
+      ),
+      'active': (
+        'background': color.adjust(vars.$primary-color, $lightness: -15%),
+        'border': color.adjust(vars.$primary-color, $lightness: -15%)
+      )
+    ),
+    'secondary': (
+      'background': transparent,
+      'color': vars.$primary-color,
+      'border': vars.$primary-color,
+      'hover': (
+        'background': vars.$primary-color,
+        'color': #ffffff
+      ),
+      'active': (
+        'background': color.adjust(vars.$primary-color, $lightness: -10%),
+        'color': #ffffff
+      )
+    ),
+    'success': (
+      'background': vars.$success-color,
+      'color': #ffffff,
+      'border': vars.$success-color,
+      'hover': (
+        'background': color.adjust(vars.$success-color, $lightness: -10%)
+      )
+    )
+  ),
+
+  'card': (
+    'default': (
+      'background': #ffffff,
+      'border': vars.$border-color,
+      'shadow': vars.$shadow-light,
+      'padding': vars.$card-padding,
+      'radius': vars.$border-radius
+    ),
+    'elevated': (
+      'background': #ffffff,
+      'border': vars.$border-color,
+      'shadow': vars.$shadow,
+      'padding': vars.$card-padding,
+      'radius': vars.$border-radius
+    ),
+    'flat': (
+      'background': #ffffff,
+      'border': none,
+      'shadow': none,
+      'padding': vars.$card-padding,
+      'radius': vars.$border-radius
+    )
+  ),
+
+  'alert': (
+    'info': (
+      'background': color.adjust(vars.$info-color, $alpha: -0.9),
+      'border': vars.$info-color,
+      'color': vars.$info-color,
+      'icon': vars.$info-color
+    ),
+    'success': (
+      'background': color.adjust(vars.$success-color, $alpha: -0.9),
+      'border': vars.$success-color,
+      'color': vars.$success-color,
+      'icon': vars.$success-color
+    ),
+    'warning': (
+      'background': color.adjust(vars.$warning-color, $alpha: -0.9),
+      'border': vars.$warning-color,
+      'color': vars.$warning-color,
+      'icon': vars.$warning-color
+    ),
+    'danger': (
+      'background': color.adjust(vars.$danger-color, $alpha: -0.9),
+      'border': vars.$danger-color,
+      'color': vars.$danger-color,
+      'icon': vars.$danger-color
+    )
+  )
+);
+
+// ============================================================================
+// COMPONENT THEMING MIXINS
+// ============================================================================
+
+// Generate component variants from theme configuration
+@mixin themed-component($component-name, $variant: 'default') {
+  $component-config: map.get($component-themes, $component-name);
+  $variant-config: map.get($component-config, $variant);
+
+  @if $variant-config {
+    @each $property, $value in $variant-config {
+      @if meta.type-of($value) == 'map' {
+        // Handle nested properties (like hover states)
+        @each $state, $state-values in $value {
+          &:hover {
+            @each $state-prop, $state-val in $state-values {
+              #{$state-prop}: $state-val;
+            }
+          }
+        }
+      } @else {
+        #{$property}: $value;
+      }
+    }
+  } @else {
+    @warn 'Theme variant "#{$variant}" not found for component "#{$component-name}"';
+  }
+}
+
+// Button component theming
+@mixin button-theme($variant: 'primary', $size: 'md') {
+  $theme: map.get(map.get($component-themes, 'button'), $variant);
+
+  @if $theme {
+    @include mixins.transition-safe();
+
+    @each $property, $value in $theme {
+      @if $property == 'hover' or $property == 'active' {
+        // Skip hover/active for now, handled by separate mixins
+      } @else {
+        #{$property}: $value;
+      }
+    }
+
+    // Size variants
+    @if $size == 'sm' {
+      padding: vars.$space-2 vars.$space-3;
+      height: vars.$button-height-sm;
+      font-size: vars.$font-size-sm;
+    } @else if $size == 'lg' {
+      padding: vars.$space-3 vars.$space-6;
+      height: vars.$button-height-lg;
+      font-size: vars.$font-size-lg;
+    } @else {
+      padding: vars.$space-2 vars.$space-4;
+      height: vars.$button-height-md;
+    }
+
+    // Hover states
+    $hover-theme: map.get($theme, 'hover');
+    @if $hover-theme {
+      &:hover {
+        @each $property, $value in $hover-theme {
+          #{$property}: $value;
+        }
+        @include mixins.transition-safe();
+      }
+    }
+
+    // Active states
+    $active-theme: map.get($theme, 'active');
+    @if $active-theme {
+      &:active {
+        @each $property, $value in $active-theme {
+          #{$property}: $value;
+        }
+        transform: scale(0.98);
+      }
+    }
+
+    // Focus states
+    &:focus-visible {
+      @include mixins.focus-ring;
+    }
+
+    // Disabled states
+    &:disabled {
+      opacity: vars.$state-disabled-opacity;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+  } @else {
+    @warn 'Button theme variant "#{$variant}" not found';
+  }
+}
+
+// Card component theming
+@mixin card-theme($variant: 'default') {
+  $theme: map.get(map.get($component-themes, 'card'), $variant);
+
+  @if $theme {
+    @each $property, $value in $theme {
+      #{$property}: $value;
+    }
+
+    @include mixins.transition-safe();
+
+    &:hover {
+      @if $variant == 'elevated' {
+        transform: translateY(-2px);
+        box-shadow: vars.$shadow-hover;
+      }
+    }
+  } @else {
+    @warn 'Card theme variant "#{$variant}" not found';
+  }
+}
+
+// Alert component theming
+@mixin alert-theme($variant: 'info') {
+  $theme: map.get(map.get($component-themes, 'alert'), $variant);
+
+  @if $theme {
+    @each $property, $value in $theme {
+      @if $property == 'icon' {
+        .alert-icon {
+          color: $value;
+        }
+      } @else {
+        #{$property}: $value;
+      }
+    }
+
+    @include mixins.transition-safe();
+  } @else {
+    @warn 'Alert theme variant "#{$variant}" not found';
+  }
+}
+
+// ============================================================================
+// DYNAMIC THEME GENERATION
+// ============================================================================
+
+// Generate CSS custom properties for JavaScript theme manipulation
+@mixin generate-theme-properties($component: null) {
+  @if $component {
+    $component-config: map.get($component-themes, $component);
+
+    @each $variant, $properties in $component-config {
+      .theme-#{$component}-#{$variant} {
+        @each $property, $value in $properties {
+          @if meta.type-of($value) != 'map' {
+            --theme-#{$component}-#{$variant}-#{$property}: #{$value};
+          }
+        }
+      }
+    }
+  } @else {
+    // Generate properties for all components
+    @each $component-name, $component-config in $component-themes {
+      @include generate-theme-properties($component-name);
+    }
+  }
+}
+
+// ============================================================================
+// THEME CONTEXT SYSTEM
+// ============================================================================
+
+// Theme context mixin for scoped theming
+@mixin theme-context($theme-config) {
+  $original-primary: vars.$primary-color;
+  $original-secondary: vars.$secondary-color;
+  $original-accent: vars.$accent-color;
+
+  // Apply theme overrides
+  @if map.has-key($theme-config, 'primary') {
+    $primary-color: map.get($theme-config, 'primary') !global;
+  }
+  @if map.has-key($theme-config, 'secondary') {
+    $secondary-color: map.get($theme-config, 'secondary') !global;
+  }
+  @if map.has-key($theme-config, 'accent') {
+    $accent-color: map.get($theme-config, 'accent') !global;
+  }
+
+  @content;
+
+  // Restore original values
+  $primary-color: $original-primary !global;
+  $secondary-color: $original-secondary !global;
+  $accent-color: $original-accent !global;
+}
+
+// ============================================================================
+// RESPONSIVE COMPONENT THEMING
+// ============================================================================
+
+// Responsive component variants
+@mixin responsive-component-theme($component-name, $base-variant: 'default', $responsive-variants: null) {
+  @include themed-component($component-name, $base-variant);
+
+  @if $responsive-variants {
+    @each $breakpoint, $variant in $responsive-variants {
+      @if $breakpoint == 'tablet' {
+        @include mixins.tablet {
+          @include themed-component($component-name, $variant);
+        }
+      } @else if $breakpoint == 'desktop' {
+        @include mixins.desktop {
+          @include themed-component($component-name, $variant);
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// THEME UTILITY CLASSES
+// ============================================================================
+
+// Generate utility classes for quick theming
+@mixin generate-theme-utilities {
+  // Button theme utilities
+  @each $variant, $config in map.get($component-themes, 'button') {
+    .btn-#{$variant} {
+      @include button-theme($variant);
+    }
+
+    .btn-#{$variant}-sm {
+      @include button-theme($variant, 'sm');
+    }
+
+    .btn-#{$variant}-lg {
+      @include button-theme($variant, 'lg');
+    }
+  }
+
+  // Card theme utilities
+  @each $variant, $config in map.get($component-themes, 'card') {
+    .card-#{$variant} {
+      @include card-theme($variant);
+    }
+  }
+
+  // Alert theme utilities
+  @each $variant, $config in map.get($component-themes, 'alert') {
+    .alert-#{$variant} {
+      @include alert-theme($variant);
+    }
+  }
+}
+
+// ============================================================================
+// DARK MODE COMPONENT THEMING
+// ============================================================================
+
+// Dark mode adaptations for components
+@mixin dark-mode-component($component-name, $light-variant: 'default', $dark-variant: null) {
+  @include themed-component($component-name, $light-variant);
+
+  @if $dark-variant {
+    @include mixins.dark-mode {
+      @include themed-component($component-name, $dark-variant);
+    }
+  } @else {
+    // Auto-adapt colors for dark mode
+    @include mixins.dark-mode {
+      @if $component-name == 'button' {
+        @if $light-variant == 'secondary' {
+          background: transparent;
+          color: vars.$dark-primary;
+          border-color: vars.$dark-primary;
+
+          &:hover {
+            background: vars.$dark-primary;
+            color: vars.$dark-text;
+          }
+        }
+      } @else if $component-name == 'card' {
+        background: vars.$dark-card-bg;
+        border-color: vars.$dark-border;
+        color: vars.$dark-text;
+      }
+    }
+  }
+}
+
+// Generate all theme properties for CSS custom property support
+@include generate-theme-properties();

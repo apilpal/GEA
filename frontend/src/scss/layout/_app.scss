@@ -1,0 +1,389 @@
+// App layout
+@use "../base/_variables" as vars;
+@use "../base/_mixins" as mixins;
+
+// Auth state visibility classes
+.auth-loading-visible { display: flex !important; }
+.auth-loading-hidden { display: none !important; }
+.main-app-visible { display: block !important; }
+.main-app-hidden { display: none !important; }
+.login-page-visible { display: flex !important; opacity: 1 !important; visibility: visible !important; }
+.login-page-hidden { display: none !important; opacity: 0 !important; visibility: hidden !important; }
+
+// Smooth transitions for state changes
+#auth-loading,
+#main-app,
+#login-page {
+  transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+#app {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+
+  // When login is active, switch to block layout to avoid flex issues
+  &.login-active {
+    display: block;
+  }
+}
+
+// Sidebar styles
+.sidebar {
+  width: 260px;
+  @include mixins.gradient-bg(vars.$primary-color, vars.$secondary-color, vars.$accent-color);
+  color: white;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  @include mixins.transition-all;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+
+  &.collapsed {
+    transform: translateX(-260px);
+  }
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.5em;
+  font-weight: bold;
+
+  i {
+    font-size: 1.8em;
+  }
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 20px 0;
+}
+
+.menu-item {
+  margin-bottom: 5px;
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  cursor: pointer;
+  @include mixins.transition-all;
+  border-left: 4px solid transparent;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-left-color: rgba(255, 255, 255, 0.5);
+  }
+
+  &.active {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-left-color: white;
+  }
+
+  i {
+    font-size: 1.2em;
+    width: 20px;
+  }
+
+  span {
+    font-weight: 500;
+  }
+}
+
+.sidebar-footer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.user-avatar i {
+  font-size: 2em;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: bold;
+  font-size: 0.9em;
+}
+
+.user-role {
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+
+.logout-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2em;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+// Main content
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  @include mixins.transition-all;
+
+  &.expanded {
+    margin-left: 0;
+  }
+}
+
+// Header
+.main-header {
+  background: vars.$card-background;
+  padding: 0 30px;
+  height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.mobile-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  color: #666;
+  cursor: pointer;
+  padding: 10px;
+}
+
+// Mobile responsive behavior
+@media (max-width: 768px) {
+  .mobile-menu-btn {
+    display: block;
+  }
+
+  .sidebar {
+    transform: translateX(-260px);
+
+    &.collapsed {
+      transform: translateX(-260px);
+    }
+  }
+
+  .main-content {
+    margin-left: 0;
+
+    &.expanded {
+      margin-left: 0;
+    }
+  }
+
+  // Show sidebar as overlay on mobile when active
+  .sidebar:not(.collapsed) {
+    transform: translateX(0);
+    z-index: 1001;
+  }
+
+  // Add backdrop for mobile sidebar
+  .sidebar::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .sidebar:not(.collapsed)::before {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  // Improve mobile spacing and touch targets
+  .page-container {
+    padding: 20px 15px;
+  }
+
+  .main-header {
+    padding: 0 15px;
+    height: 60px;
+  }
+
+  .header-search input {
+    width: 200px;
+  }
+
+  // Better mobile table handling
+  .table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .data-table {
+    min-width: 600px;
+  }
+
+  // Improve mobile button sizes
+  .btn, .action-btn, .notification-btn {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  // Better mobile form controls
+  .form-control, input[type="text"], select {
+    height: 44px;
+    font-size: 16px; // Prevent zoom on iOS
+  }
+}
+
+#page-title {
+  font-size: 1.8em;
+  font-weight: 600;
+  color: vars.$text-color;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.header-notifications {
+  position: relative;
+}
+
+.notification-btn {
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  color: #666;
+  cursor: pointer;
+  padding: 10px;
+  position: relative;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background: vars.$danger-color;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 0.7em;
+  font-weight: bold;
+}
+
+.header-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  i {
+    position: absolute;
+    left: 12px;
+    color: #999;
+  }
+
+  input {
+    padding: 10px 40px 10px 35px;
+    border: 1px solid #ddd;
+    border-radius: 25px;
+    font-size: 0.9em;
+    width: 250px;
+    @include mixins.transition-all;
+  
+    &:focus {
+      outline: none;
+      border-color: vars.$primary-color;
+    }
+  }
+}
+
+// Page container
+.page-container {
+  padding: 30px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.page {
+   display: none;
+   animation: fadeIn 0.3s ease;
+
+   &.active {
+     display: block;
+   }
+
+   &#login-page.active {
+     display: flex; /* Use flex for proper centering */
+     animation: fadeIn 0.3s ease;
+   }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
