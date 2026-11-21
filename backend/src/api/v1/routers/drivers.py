@@ -33,7 +33,7 @@ from src.core.models import (
 )
 
 # Import services
-from src.utils.auth_utils import get_current_active_user_from_any_source
+from src.utils.auth_utils import get_current_active_user_from_any_source, require_admin
 from src.services.driver_service import DriverService
 
 router = APIRouter(prefix="/drivers", tags=["drivers"])
@@ -80,7 +80,7 @@ async def get_driver_data(driver_name: str) -> dict:
     """
     return DriverService.get_driver_csv_data(driver_name)
 
-@router.post("/", response_model=Driver)
+@router.post("/", response_model=Driver, dependencies=[Depends(require_admin)])
 async def create_driver(driver: CreateDriverRequest, db: AsyncSession = Depends(get_db)) -> Driver:
     """Create a new driver record in the database.
 
@@ -100,7 +100,7 @@ async def create_driver(driver: CreateDriverRequest, db: AsyncSession = Depends(
     """
     return await DriverService.create_driver(db, driver)
 
-@router.put("/{driver_name}")
+@router.put("/{driver_name}", dependencies=[Depends(require_admin)])
 async def update_driver(driver_name: str, driver_update: UpdateDriverRequest, db: AsyncSession = Depends(get_db)) -> Driver:
     """Update an existing driver record with new information.
 

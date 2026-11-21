@@ -56,6 +56,13 @@ export class ProfileComponent extends BaseComponent {
     }
 
     /**
+     * Required by BaseComponent; this component renders through render().
+     */
+    protected performRender(): void {
+        this.render();
+    }
+
+    /**
      * Render the profile display and edit form HTML and CSS into the shadow DOM.
      * Includes styled profile display, form fields, error display, and loading states.
      */
@@ -347,16 +354,6 @@ export class ProfileComponent extends BaseComponent {
 
         const formatDate = (dateStr?: string): string => {
             if (!dateStr) return 'N/A';
-    /**
-     * Display profile information in the profile info section.
-     * @param profile - The user profile data to display.
-     */
-    private displayProfile(profile: UserProfile): void {
-        const displayDiv = this.$('#profile-display') as HTMLElement;
-        if (!displayDiv) return;
-
-        const formatDate = (dateStr?: string): string => {
-            if (!dateStr) return 'N/A';
             return new Date(dateStr).toLocaleDateString();
         };
 
@@ -425,29 +422,6 @@ export class ProfileComponent extends BaseComponent {
             }
         `;
         this.shadow.appendChild(style);
-    }
-            return new Date(dateStr).toLocaleDateString();
-        };
-
-        displayDiv.innerHTML = `
-            <span class="info-label">Username:</span>
-            <span class="info-value">${profile.username}</span>
-
-            <span class="info-label">Email:</span>
-            <span class="info-value">${profile.email}</span>
-
-            <span class="info-label">Role:</span>
-            <span class="info-value read-only">${profile.role.toUpperCase()}</span>
-
-            <span class="info-label">Status:</span>
-            <span class="info-value read-only">${profile.is_active ? 'Active' : 'Inactive'}</span>
-
-            <span class="info-label">Member Since:</span>
-            <span class="info-value">${formatDate(profile.created_at)}</span>
-
-            <span class="info-label">Last Updated:</span>
-            <span class="info-value">${formatDate(profile.updated_at)}</span>
-        `;
     }
 
     /**

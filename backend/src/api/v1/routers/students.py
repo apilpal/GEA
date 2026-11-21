@@ -38,6 +38,7 @@ from src.core.models import (
 
 # Import services
 from src.services.student_service import StudentService
+from src.utils.auth_utils import require_admin, require_teacher_or_admin
 
 limiter = Limiter(key_func=get_remote_address)
 
@@ -91,7 +92,7 @@ async def get_student_profile(student_id: int, db: AsyncSession = Depends(get_db
     """
     return await StudentService.get_student_by_id(db, student_id)
 
-@router.post("/", response_model=Student)
+@router.post("/", response_model=Student, dependencies=[Depends(require_teacher_or_admin)])
 @limiter.limit("30/minute")
 async def create_student(request: Request, student: CreateStudentRequest, db: AsyncSession = Depends(get_db)) -> Student:
     """Create a new student record in the database.
@@ -115,7 +116,7 @@ async def create_student(request: Request, student: CreateStudentRequest, db: As
     """
     return await StudentService.create_student(db, student)
 
-@router.put("/{student_id}", response_model=Student)
+@router.put("/{student_id}", response_model=Student, dependencies=[Depends(require_teacher_or_admin)])
 async def update_student(student_id: int, student_update: UpdateStudentRequest, db: AsyncSession = Depends(get_db)) -> Student:
     """Update an existing student record with new information.
 
@@ -136,7 +137,7 @@ async def update_student(student_id: int, student_update: UpdateStudentRequest, 
     """
     return await StudentService.update_student(db, student_id, student_update)
 
-@router.delete("/{student_id}")
+@router.delete("/{student_id}", dependencies=[Depends(require_admin)])
 async def delete_student(student_id: int, db: AsyncSession = Depends(get_db)) -> dict:
     """Delete a student record from the database.
 

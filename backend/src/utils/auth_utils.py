@@ -420,7 +420,7 @@ def check_permissions(required_roles: list[UserRole]):
     Example:
         app.get("/admin-only", dependencies=[Depends(require_admin)])
     """
-    async def permission_checker(current_user: User = Depends(get_current_active_user)):
+    async def permission_checker(current_user: User = Depends(get_current_active_user_from_any_source)):
         if current_user.role not in required_roles:
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
@@ -455,7 +455,13 @@ def is_token_blacklisted(token: str) -> bool:
 # Permission dependencies for common role combinations
 require_admin = check_permissions([UserRole.ADMIN])
 require_teacher_or_admin = check_permissions([UserRole.ADMIN, UserRole.TEACHER])
-require_any_authenticated = check_permissions([UserRole.ADMIN, UserRole.TEACHER, UserRole.DRIVER, UserRole.STUDENT])
+require_any_authenticated = check_permissions(list(UserRole))
+
+# School staff can read school-wide data (students, drivers, reports).
+# Students and parents are intentionally excluded: they will get their own
+# restricted views later and must not be able to list every student.
+STAFF_ROLES = [UserRole.ADMIN, UserRole.TEACHER, UserRole.ACCOUNTANT, UserRole.DRIVER]
+require_staff = check_permissions(STAFF_ROLES)
 
 async def get_current_user_optional(
     credentials: HTTPAuthorizationCredentials = Depends(security),

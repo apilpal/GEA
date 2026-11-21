@@ -70,8 +70,10 @@ class UserRole(str, Enum):
     """
     ADMIN = "admin"
     TEACHER = "teacher"
+    ACCOUNTANT = "accountant"
     DRIVER = "driver"
     STUDENT = "student"
+    PARENT = "parent"
 
 class ContactInfo(BaseModel):
     """Contact information for a person including multiple contact numbers.

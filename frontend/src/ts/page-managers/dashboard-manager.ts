@@ -10,42 +10,14 @@ import { authService } from '@/ts/services/auth-service';
  */
 export async function updateDashboardStats(): Promise<void> {
     try {
-        const isGuestUser = authService.isGuestUser();
+        // Data endpoints require login; skip quietly when logged out.
         const isAuthenticated = await authService.isAuthenticated();
-
-        if (isAuthenticated && !isGuestUser) {
-            // For authenticated regular users, use the standard reports endpoint
-            console.log('[DASHBOARD] Updating stats for authenticated user');
-            const summaryResponse = await apiService.get('/reports/summary');
-            if (summaryResponse.data) {
-                const summary = summaryResponse.data as any;
-                updateDashboardElements(summary, false, false);
-            }
-        } else if (isGuestUser) {
-            // For guest users, use the guest dashboard endpoint
-            console.log('[DASHBOARD] Updating stats for guest user');
-            const guestResponse = await authService.getGuestDashboardData();
-
-            if (guestResponse.data && guestResponse.data.summary) {
-                const summary = guestResponse.data.summary as any;
-                updateDashboardElements(summary, true, false);
-            }
-        } else {
-            // For unauthenticated users, show dashboard with login prompt
-            console.log('[DASHBOARD] Updating dashboard for unauthenticated user');
-            // Use public stats if available, otherwise show empty data
-            try {
-                const publicResponse = await apiService.get('/dashboard/public/stats');
-                if (publicResponse.data) {
-                    const summary = publicResponse.data as any;
-                    updateDashboardElements(summary, false, true);
-                } else {
-                    updateDashboardElements({}, false, true);
-                }
-            } catch (error) {
-                console.log('[DASHBOARD] Public stats not available, showing empty dashboard');
-                updateDashboardElements({}, false, true);
-            }
+        if (!isAuthenticated) {
+            return;
+        }
+        const summaryResponse = await apiService.get('/reports/summary');
+        if (summaryResponse.data) {
+            updateDashboardElements(summaryResponse.data as any, false, false);
         }
     } catch (error) {
         console.error('Failed to update dashboard stats:', error);
@@ -341,50 +313,6 @@ function showGuestFeatureModal(): void {
     }
 
     console.log('[DASHBOARD] Guest features modal displayed');
-}
-
-/**
- * Initialize guest dashboard functionality if user is a guest.
- * Also integrates with the GuestDashboardComponent for enhanced guest experience.
- */
-export async function initializeGuestDashboard(): Promise<void> {
-    const isGuestUser = authService.isGuestUser();
-
-    if (isGuestUser) {
-        console.log('[DASHBOARD] Initializing guest dashboard');
-
-        // Ensure guest user session is still valid
-        if (authService.isGuestSessionExpired()) {
-            console.log('[DASHBOARD] Guest session expired, creating new session');
-            await authService.createGuestUser();
-        }
-
-        // Update dashboard with guest data
-        await updateDashboardStats();
-
-        // Initialize GuestDashboardComponent for enhanced guest experience
-        try {
-            const { guestDashboardComponent } = await import('../components/auth/guest-dashboard-component');
-            await guestDashboardComponent.initialize();
-            console.log('[DASHBOARD] GuestDashboardComponent initialized');
-        } catch (error) {
-            console.error('[DASHBOARD] Failed to initialize GuestDashboardComponent:', error);
-        }
-
-        // Set up periodic guest session refresh
-        setInterval(async () => {
-            if (authService.isGuestUser() && authService.isGuestSessionExpired()) {
-                console.log('[DASHBOARD] Refreshing expired guest session');
-                await authService.createGuestUser();
-                await updateDashboardStats();
-            }
-        }, 60000); // Check every minute
-
-        console.log('[DASHBOARD] Guest dashboard initialized');
-    } else {
-        // For regular users, just update stats normally
-        await updateDashboardStats();
-    }
 }
 
 /**

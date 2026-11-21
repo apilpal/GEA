@@ -32,6 +32,13 @@ export class UserSessionComponent extends BaseComponent {
     }
 
     /**
+     * Required by BaseComponent; this component renders through render().
+     */
+    protected performRender(): void {
+        this.render();
+    }
+
+    /**
      * Render the user session display and logout button HTML and CSS into the shadow DOM.
      * Includes user info display, logout button, and confirmation dialog.
      */
@@ -327,9 +334,6 @@ export class UserSessionComponent extends BaseComponent {
     /**
      * Update the user information display.
      * @param user - The authenticated user data.
-    /**
-     * Update the user information display.
-     * @param user - The authenticated user data.
      */
     private updateUserDisplay(user: AuthUser): void {
         const nameEl = this.$('#user-name') as HTMLElement;
@@ -355,19 +359,6 @@ export class UserSessionComponent extends BaseComponent {
                 roleEl.style.fontSize = '0.625rem';
                 roleEl.title = 'Development/Testing Mode - Bypass User';
             }
-        }
-    }
-     */
-    private updateUserDisplay(user: AuthUser): void {
-        const nameEl = this.$('#user-name') as HTMLElement;
-        const roleEl = this.$('#user-role') as HTMLElement;
-
-        if (nameEl) {
-            nameEl.textContent = user.username;
-        }
-
-        if (roleEl) {
-            roleEl.textContent = user.role.toUpperCase();
         }
     }
 

@@ -227,24 +227,12 @@ async function handleHashChange() {
 }
 
 /**
- * Checks if the current user is authenticated or has guest access.
- * @returns {Promise<boolean>} True if authenticated or guest user, false otherwise.
+ * Checks if the current user is logged in.
+ * @returns {Promise<boolean>} True if authenticated, false otherwise.
  */
 async function checkAuthentication(): Promise<boolean> {
-    // First check auth context state (works for logged-in users including guests)
     const state = authContext.getState();
-    if (state.isAuthenticated && state.user) {
-        return true;
-    }
-    
-    // For guest users, check localStorage for guest token
-    try {
-        const { authService } = await import('./services/auth-service');
-        return authService.isGuestUser();
-    } catch (error) {
-        console.error('Failed to check guest status:', error);
-        return false;
-    }
+    return !!(state.isAuthenticated && state.user);
 }
 
 /**

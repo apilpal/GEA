@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('[AUTH-DEBUG] AppController: Current auth state:', JSON.stringify(state, null, 2));
 
             // Check auth service for guest user state - using authContext to avoid module import issues
-            const isGuestUser = authContext.getState().user?.is_guest || false;
+            const isGuestUser = false;
             const storedUser = authContext.getState().user;
             console.log('[AUTH-DEBUG] AppController: AuthContext guest user check:', isGuestUser);
             console.log('[AUTH-DEBUG] AppController: AuthContext stored user:', storedUser ? JSON.stringify(storedUser, null, 2) : 'null');
@@ -110,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
             console.log('[TIMING-LOG] === 15-SECOND FALLBACK TIMEOUT TRIGGERED ===');
             console.log('[TIMING-LOG] Timestamp:', new Date().toISOString());
             const state = authContext.getState();
-            const hasStoredGuest = authService.isGuestUser();
+            const hasStoredGuest = false;
             console.log('[AUTH-DEBUG] AppController: Fallback timeout triggered, checking auth state:', state);
             console.log('[AUTH-DEBUG] AppController: Has stored guest user:', hasStoredGuest);
 
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.log('[AUTH-DEBUG] AppController: Auth still loading after timeout, checking if we have guest data');
 
                 // For guest users, even if loading state persists, we should show the app
-                const isGuestUser = (state.user && state.user.is_guest) || hasStoredGuest;
+                const isGuestUser = hasStoredGuest;
                 if (isGuestUser) {
                     console.log('[AUTH-DEBUG] AppController: Guest user found, showing main app');
                     const mainApp = document.getElementById('main-app');
@@ -140,32 +140,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     console.log('[AUTH-DEBUG] AppController: Guest app activated via fallback timeout');
                 } else {
-                    console.log('[AUTH-DEBUG] AppController: No guest user, showing dashboard for unauthenticated user');
-                    const loginPage = document.getElementById('login-page');
-                    const mainApp = document.getElementById('main-app');
-                    const appContainer = document.getElementById('app');
-                    const authLoading = document.getElementById('auth-loading');
-
-                    if (loginPage) loginPage.classList.remove('active');
-                    if (mainApp) {
-                      mainApp.classList.remove('main-app-hidden');
-                      mainApp.classList.add('main-app-visible');
-                    }
-                    if (appContainer) appContainer.classList.remove('login-active');
-                    if (authLoading) {
-                      authLoading.classList.remove('auth-loading-visible');
-                      authLoading.classList.add('auth-loading-hidden');
-                    }
-
-                    // Load dashboard with login button for unauthenticated users
-                    updateDashboardStats().then(() => {
-                        console.log('[AUTH-DEBUG] AppController: Dashboard loaded via fallback timeout');
-                        updateDashboardWelcome();
-                    }).catch((error) => {
-                        console.error('[AUTH-DEBUG] AppController: Failed to load dashboard via fallback timeout:', error);
-                    });
-
-                    console.log('[AUTH-DEBUG] AppController: Dashboard activated via fallback timeout');
+                    console.log('[AUTH-DEBUG] AppController: Not logged in, showing login page');
+                    showLoginScreen();
                 }
             }
         }, 5000); // 5-second fallback timeout to ensure app shows
@@ -302,6 +278,29 @@ async function initializeAuth(): Promise<void> {
 }
 
 /**
+ * Shows the login page and hides the loading spinner and main app.
+ */
+function showLoginScreen(): void {
+    const loginPage = document.getElementById('login-page');
+    const mainApp = document.getElementById('main-app');
+    const appContainer = document.getElementById('app');
+    const authLoading = document.getElementById('auth-loading');
+    const logoutBtn = document.getElementById('logout-btn');
+
+    if (authLoading) {
+        authLoading.classList.remove('auth-loading-visible');
+        authLoading.classList.add('auth-loading-hidden');
+    }
+    if (mainApp) {
+        mainApp.classList.remove('main-app-visible');
+        mainApp.classList.add('main-app-hidden');
+    }
+    if (loginPage) loginPage.classList.add('active');
+    if (appContainer) appContainer.classList.add('login-active');
+    if (logoutBtn) logoutBtn.style.display = 'none';
+}
+
+/**
  * Updates the UI based on the current authentication state.
  * Toggles visibility of login/main app elements and updates user display.
  */
@@ -322,8 +321,8 @@ function updateAuthUI(): void {
     
     // Critical fix: Properly detect authenticated state including guest users
     // Check multiple conditions for guest authentication
-    const hasStoredGuest = authService.isGuestUser();
-    const hasAuthContextGuest = state.user?.is_guest === true;
+    const hasStoredGuest = false;
+    const hasAuthContextGuest = false;
     const hasRegularAuth = state.isAuthenticated && state.user !== null;
 
     const isAuthenticated = hasRegularAuth || hasAuthContextGuest || hasStoredGuest;
@@ -404,28 +403,8 @@ function updateAuthUI(): void {
         });
         
     } else {
-        console.log('[AUTH-DEBUG] AppController: Showing dashboard for unauthenticated users');
-        // Show main app for unauthenticated users (dashboard with login button), hide login page and loading
-        if (authLoading) {
-          authLoading.classList.remove('auth-loading-visible');
-          authLoading.classList.add('auth-loading-hidden');
-        }
-        if (loginPage) loginPage.classList.remove('active');
-        if (mainApp) {
-          mainApp.classList.remove('main-app-hidden');
-          mainApp.classList.add('main-app-visible');
-        }
-        if (appContainer) appContainer.classList.remove('login-active');
-        if (logoutBtn) logoutBtn.style.display = 'none'; // Keep as is for now
-
-        // Load dashboard with login button for unauthenticated users
-        updateDashboardStats().then(() => {
-            console.log('[AUTH-DEBUG] AppController: Dashboard data loaded for unauthenticated user');
-            // Update welcome text
-            updateDashboardWelcome();
-        }).catch((error) => {
-            console.error('[AUTH-DEBUG] AppController: Failed to load dashboard data for unauthenticated user:', error);
-        });
+        // Not logged in: show ONLY the login page. All data requires login.
+        showLoginScreen();
     }
 
     const uiUpdateTime = performance.now() - uiUpdateStartTime;
@@ -478,7 +457,7 @@ function updateDashboardWelcome(): void {
     if (!welcomeTitle || !welcomeSubtitle) return;
     
     const state = authContext.getState();
-    const isGuest = state.user?.is_guest === true;
+    const isGuest = false;
     
     if (isGuest) {
         welcomeTitle.textContent = 'School Management Dashboard';
@@ -503,9 +482,9 @@ function handleAuthStateChange(state: any): void {
     console.log('[AUTH-DEBUG] AppController: Previous auth state - isAuthenticated:', authContextState?.isAuthenticated, 'user:', authContextState?.user?.username || 'none');
     
     // CRITICAL FIX: Properly detect authentication transitions including guest users
-    const wasAuthenticated = (authContextState?.isAuthenticated && authContextState?.user !== null) || authContextState?.user?.is_guest === true;
-    const isAuthenticated = (state.isAuthenticated && state.user !== null) || state.user?.is_guest === true;
-    const isGuestUser = state.user?.is_guest === true;
+    const wasAuthenticated = !!(authContextState?.isAuthenticated && authContextState?.user !== null);
+    const isAuthenticated = !!(state.isAuthenticated && state.user !== null);
+    const isGuestUser = false;
     
     console.log('[AUTH-DEBUG] AppController: === GUEST AUTH STATE HANDLING ===');
     console.log('[AUTH-DEBUG] AppController: wasAuthenticated:', wasAuthenticated);

@@ -108,7 +108,7 @@ class Config:
     MCP_ENABLED: bool = os.getenv("MCP_ENABLED", "true").lower() == "true"
 
     # Login Bypass Configuration
-    LOGIN_BYPASS_ENABLED: bool = os.getenv("LOGIN_BYPASS_ENABLED", "true").lower() == "true"
+    LOGIN_BYPASS_ENABLED: bool = os.getenv("LOGIN_BYPASS_ENABLED", "false").lower() == "true"
     LOGIN_BYPASS_USERNAME: str = os.getenv("LOGIN_BYPASS_USERNAME", "bypass_user")
     LOGIN_BYPASS_ROLE: str = os.getenv("LOGIN_BYPASS_ROLE", "admin")
 

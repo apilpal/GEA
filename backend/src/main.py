@@ -31,6 +31,12 @@ from src.api.v1.routers import students, drivers, reports, charts, auth, csv_syn
 
 # Import utilities
 from src.utils import auth_utils
+from fastapi import Depends
+from src.utils.auth_utils import require_admin, require_staff, check_permissions
+from src.core.models import UserRole
+
+# Roles allowed to see money/reports
+require_finance = check_permissions([UserRole.ADMIN, UserRole.TEACHER, UserRole.ACCOUNTANT])
 
 
 # Setup logging
@@ -186,14 +192,16 @@ def create_app() -> FastAPI:
         )
 
     # Include routers
-    app.include_router(students.router, prefix="/api", tags=["students"])
-    app.include_router(drivers.router, prefix="/api", tags=["drivers"])
-    app.include_router(reports.router, prefix="/api", tags=["reports"])
-    app.include_router(charts.router, prefix="/api", tags=["charts"])
+    # Every data router requires a logged-in user with a suitable role.
+    # (auth router stays open: it contains login itself and does its own checks.)
+    app.include_router(students.router, prefix="/api", tags=["students"], dependencies=[Depends(require_staff)])
+    app.include_router(drivers.router, prefix="/api", tags=["drivers"], dependencies=[Depends(require_staff)])
+    app.include_router(reports.router, prefix="/api", tags=["reports"], dependencies=[Depends(require_finance)])
+    app.include_router(charts.router, prefix="/api", tags=["charts"], dependencies=[Depends(require_finance)])
     app.include_router(auth.router, prefix="/api", tags=["auth"])
-    app.include_router(csv_sync.router, prefix="/api", tags=["csv-sync"])
-    app.include_router(dashboard.router, prefix="/api", tags=["dashboard"])
-    app.include_router(chat.router, prefix="/api", tags=["chat"])
+    app.include_router(csv_sync.router, prefix="/api", tags=["csv-sync"], dependencies=[Depends(require_admin)])
+    app.include_router(dashboard.router, prefix="/api", tags=["dashboard"], dependencies=[Depends(require_finance)])
+    app.include_router(chat.router, prefix="/api", tags=["chat"], dependencies=[Depends(require_staff)])
 
     # Health check endpoint
     @app.get("/api/health", response_model=HealthResponse)

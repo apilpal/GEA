@@ -812,7 +812,7 @@ export class ChatService {
             if (score > 0.2) { // Minimum relevance threshold
                 relevantMemories.push({ entry, score });
             }
-        }
+        });
 
         // Sort by score and return top entries
         return relevantMemories
