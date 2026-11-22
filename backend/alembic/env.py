@@ -16,19 +16,24 @@ if config.config_file_name is not None:
 
 # add your model's MetaData object here
 # for 'autogenerate' support
+import os
 import sys
 from pathlib import Path
 
-# Add the src directory to the path
-sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+# Make `src.*` importable when alembic is run from backend/
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BACKEND_DIR))
 
-from core.models.models import Base
+from src.core.models import Base  # noqa: E402  (also registers the school tables)
+from src.core.models import chat_models  # noqa: E402,F401  (registers the chat tables)
+
 target_metadata = Base.metadata
 
-# other values from the config, defined by the needs of env.py,
-# can be acquired:
-# my_important_option = config.get_main_option("my_important_option")
-# ... etc.
+# The database comes from ALEMBIC_DATABASE_URL if set, otherwise from sqlalchemy.url
+# in alembic.ini (sqlite:///./data/students.db, relative to backend/).
+_url_override = os.getenv("ALEMBIC_DATABASE_URL")
+if _url_override:
+    config.set_main_option("sqlalchemy.url", _url_override)
 
 
 def run_migrations_offline() -> None:
@@ -49,6 +54,7 @@ def run_migrations_offline() -> None:
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
+        render_as_batch=True,
     )
 
     with context.begin_transaction():
@@ -70,7 +76,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            render_as_batch=True,  # SQLite cannot ALTER constraints in place
         )
 
         with context.begin_transaction():

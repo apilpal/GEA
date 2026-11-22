@@ -28,7 +28,7 @@ from typing import List, Optional, Dict, Any
 from enum import Enum
 import os
 import asyncio
-from sqlalchemy import Column, Integer, String, Float, Boolean, DateTime, create_engine
+from sqlalchemy import Column, Integer, String, Float, Boolean, Date, DateTime, ForeignKey, create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.pool import StaticPool
@@ -459,13 +459,24 @@ class DBStudent(Base):
     route = Column(String(50), nullable=True, index=True)  # Indexed for faster queries
     name = Column(String(100), nullable=False, index=True)  # Indexed for search
     father_name = Column(String(100), nullable=True, index=True)  # Indexed for search
-    mobile = Column(String(15), nullable=True, unique=True)  # Unique constraint for mobile
+    mobile = Column(String(15), nullable=True, index=True)  # Not unique: siblings share the parent's number
     class_ = Column(String(20), nullable=True, index=True)  # Using string since ClassEnum values are strings
     address = Column(String(200), nullable=True)
     fees = Column(Float, nullable=True, default=0.0)
     status = Column(String(20), nullable=False, default="active", index=True)  # Status field with index
     created_at = Column(Integer, nullable=False, index=True)  # Timestamp index
     updated_at = Column(Integer, nullable=False, index=True)  # Timestamp index
+    # School fields (Phase 1). Foreign keys point at tables in school_models.py
+    # (registered on the same Base).
+    class_section_id = Column(Integer, ForeignKey("class_sections.id"), nullable=True, index=True)
+    route_id = Column(Integer, ForeignKey("routes.id"), nullable=True, index=True)
+    admission_no = Column(String(20), nullable=True, unique=True)
+    sr_no = Column(String(20), nullable=True)
+    roll_no = Column(Integer, nullable=True)
+    mother_name = Column(String(100), nullable=True)
+    dob = Column(Date, nullable=True)
+    house = Column(String(30), nullable=True)
+    village = Column(String(100), nullable=True, index=True)
 
 class DBDriver(Base):
     """SQLAlchemy model for driver database records.
