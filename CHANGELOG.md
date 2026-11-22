@@ -10,8 +10,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - One-command local run: `pnpm dev` starts the backend and frontend together, `scripts/termux-setup.sh` sets everything up on Termux, and `pnpm create-admin` creates the first admin.
 - Demo data on the dashboard while the database is empty: 75 students, 5 drivers, fee 500 per student.
-- `pnpm seed` loads that same sample set into the database. It replaces existing students and drivers, so all installs end up identical (`--append` keeps existing rows).
+- `pnpm seed` loads that same sample set into the database. It only replaces its own sample rows (including those from older versions of the script) and keeps students and drivers you added yourself, so it is safe to rerun. `--reset` deletes everything first and asks for confirmation.
+- Migration `0003_auth_tables` creates the `token_blacklist`, `auth_audit_log` and `refresh_tokens` tables, which were missing from databases built only by Alembic.
+- Tests for the auth tables, token refresh and the seed in `backend/tests_school`.
 - Responsive sidebar start-up behaviour for small screens.
+
+### Fixed
+- Token refresh: the refresh cookie was never read (a `Cookie` object was used as the token), so refreshing always failed. The cookie set by `/login` now refreshes the session, and invalid or wrong-type tokens give 401 instead of a 500 error.
+- `/api/auth/login-enhanced` and the enhanced refresh (token rotation) failed with a 500 error; audit-log entries had no IP address and were never saved.
 
 ### Changed
 - Login is required, and access to students, drivers, reports, charts, the dashboard and CSV sync depends on the user's role.

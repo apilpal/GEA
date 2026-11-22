@@ -235,6 +235,7 @@ class AuditLogger:
 
         except Exception as e:
             logger.error(f"Failed to log login audit: {e}")
+            await db.rollback()
 
     @staticmethod
     async def log_token_refresh(db: AsyncSession, username: str, device_id: str,
@@ -245,7 +246,8 @@ class AuditLogger:
                 username=username,
                 action="token_refresh",
                 device_id=device_id,
-                metadata={"old_jti": old_jti, "new_jti": new_jti},
+                ip_address="0.0.0.0",  # the endpoint does not pass the client address yet
+                metadata_json=json.dumps({"old_jti": old_jti, "new_jti": new_jti}),
                 success=True,
                 created_at=datetime.now(timezone.utc)
             )
@@ -256,6 +258,7 @@ class AuditLogger:
 
         except Exception as e:
             logger.error(f"Failed to log token refresh audit: {e}")
+            await db.rollback()
 
     @staticmethod
     async def log_logout(db: AsyncSession, username: str, device_id: str,
@@ -266,7 +269,8 @@ class AuditLogger:
                 username=username,
                 action="logout",
                 device_id=device_id,
-                metadata={"jti": jti},
+                ip_address="0.0.0.0",  # the endpoint does not pass the client address yet
+                metadata_json=json.dumps({"jti": jti}),
                 success=True,
                 created_at=datetime.now(timezone.utc)
             )
@@ -277,6 +281,7 @@ class AuditLogger:
 
         except Exception as e:
             logger.error(f"Failed to log logout audit: {e}")
+            await db.rollback()
 
 class JWTService:
     """Enhanced JWT service with comprehensive security features."""
@@ -389,7 +394,7 @@ class JWTService:
 
             return claims
 
-        except (jwt.ExpiredSignatureError, jwt.InvalidSignatureError, KeyError) as e:
+        except (jwt.ExpiredSignatureError, jwt.JWTError, KeyError) as e:
             logger.warning(f"Token verification failed: {e}")
             return None
         except Exception as e:

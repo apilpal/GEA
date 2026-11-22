@@ -22,7 +22,7 @@ All endpoints require proper authentication except for login and refresh
 operations. The register endpoint is restricted to admin users only.
 """
 
-from fastapi import APIRouter, HTTPException, status, Depends, Response
+from fastapi import APIRouter, Cookie, HTTPException, status, Depends, Response
 from fastapi.security import HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
@@ -258,40 +258,28 @@ async def logout(
     response.delete_cookie(key="refresh_token", path="/")
     return {"message": "Successfully logged out"}
 
-@router.post("/refresh", response_model=TokenResponse)
-async def refresh_token(
-    refresh_token: str = None,
-    db: AsyncSession = Depends(get_db)
-) -> TokenResponse:
-    """Refresh access token using refresh token.
+def _user_profile(user) -> User:
+    """Build the public user profile returned with token responses."""
+    return User(
+        id=user.id,
+        username=user.username,
+        email=user.email,
+        role=UserRole(user.role),
+        is_active=user.is_active,
+        created_at=user.created_at,
+        updated_at=user.updated_at
+    )
 
-    Validates the provided refresh token and issues a new access token
-    if the refresh token is valid and the user is still active.
 
-    Args:
-        refresh_token (str, optional): Refresh token from request body or cookie
-        db (AsyncSession): Database session dependency
+async def _refresh_with_login_token(refresh_token: str, response: Response, db: AsyncSession) -> TokenResponse:
+    """Issue a new access token from a refresh token created by ``/login``.
 
-    Returns:
-        TokenResponse: New access token
-
-    Raises:
-        HTTPException: If refresh token is missing, invalid, or user is inactive
+    ``/login`` signs its tokens with the shared secret (HS256), unlike the enhanced RS256
+    tokens from ``/login-enhanced``, so they are verified with ``verify_token``.
+    Invalid, expired or wrong-type tokens give 401, never a server error.
     """
-    # Try to get refresh token from cookie if not provided in request
-    if not refresh_token:
-        from fastapi import Cookie
-        refresh_token = Cookie(None, alias="refresh_token")
-
-    if not refresh_token:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Refresh token missing"
-        )
-
     payload = verify_token(refresh_token, "refresh")
-
-    username: str = payload.get("sub")
+    username = payload.get("sub") if payload else None
     if username is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -305,13 +293,56 @@ async def refresh_token(
             detail="User not found or inactive"
         )
 
-    # Create new access token
     access_token = create_access_token(
         data={"sub": user.username},
         expires_delta=timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        max_age=config.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        expires=None,
+        path="/",
+        secure=False,  # same as /login
+        samesite="lax"
+    )
+    return TokenResponse(access_token=access_token, token_type="bearer", user=_user_profile(user))
 
-    return TokenResponse(access_token=access_token)
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh_token(
+    response: Response,
+    refresh_token: Optional[str] = None,
+    refresh_token_cookie: Optional[str] = Cookie(default=None, alias="refresh_token"),
+    db: AsyncSession = Depends(get_db)
+) -> TokenResponse:
+    """Refresh the access token using a refresh token from ``/login``.
+
+    Validates the refresh token (from the request or the ``refresh_token`` cookie) and
+    issues a new access token if the user is still active.
+
+    Args:
+        response (Response): FastAPI response object for cookie setting
+        refresh_token (str, optional): Refresh token passed in the request
+        refresh_token_cookie (str, optional): Refresh token from the HttpOnly cookie
+        db (AsyncSession): Database session dependency
+
+    Returns:
+        TokenResponse: New access token with user information
+
+    Raises:
+        HTTPException: If the refresh token is missing, invalid or the user is inactive
+    """
+    refresh_token = refresh_token or refresh_token_cookie
+
+    if not refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token missing"
+        )
+
+    return await _refresh_with_login_token(refresh_token, response, db)
 
 @router.get("/me", response_model=User)
 async def get_current_user_info(current_user: User = Depends(get_current_active_user_from_any_source)) -> User:
@@ -409,7 +440,8 @@ async def register_user(
 @router.post("/token/refresh", response_model=TokenResponse)
 async def refresh_access_token(
     response: Response,
-    refresh_token: str = None,
+    refresh_token: Optional[str] = None,
+    refresh_token_cookie: Optional[str] = Cookie(default=None, alias="refresh_token"),
     db: AsyncSession = Depends(get_db)
 ) -> TokenResponse:
     """Refresh access token using refresh token with enhanced security.
@@ -432,10 +464,8 @@ async def refresh_access_token(
     Raises:
         HTTPException: If refresh token is invalid, expired, or user is inactive
     """
-    # Try to get refresh token from cookie if not provided in request
-    if not refresh_token:
-        from fastapi import Cookie
-        refresh_token = Cookie(None, alias="refresh_token")
+    # Use the refresh token cookie when none was provided in the request
+    refresh_token = refresh_token or refresh_token_cookie
 
     if not refresh_token:
         raise HTTPException(
@@ -446,10 +476,8 @@ async def refresh_access_token(
     # Verify refresh token using enhanced JWT service
     token_claims = jwt_service.verify_token(refresh_token)
     if not token_claims or token_claims.type != TokenType.REFRESH:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid refresh token"
-        )
+        # Not an enhanced (RS256) token: it may be the refresh cookie set by /login.
+        return await _refresh_with_login_token(refresh_token, response, db)
 
     # Check if refresh token is blacklisted
     if await jwt_service.blacklist_manager.is_blacklisted(db, token_claims.jti):
@@ -466,15 +494,20 @@ async def refresh_access_token(
             detail="User not found or inactive"
         )
 
+    # Read everything needed from `user` now: the commits below expire it.
+    user_data = _user_profile(user)
+    username = user.username
+    role = user.role
+
     # Generate new token pair (token rotation)
     session_id = secrets.token_urlsafe(32)
     device_id = token_claims.device_id
 
     token_pair = jwt_service.create_token_pair(
-        username=user.username,
+        username=username,
         device_id=device_id,
         session_id=session_id,
-        role=user.role,
+        role=role,
         is_guest=getattr(user, 'is_guest', False)
     )
 
@@ -485,7 +518,7 @@ async def refresh_access_token(
 
     # Log token refresh for audit trail
     await jwt_service.audit_logger.log_token_refresh(
-        db, user.username, device_id, token_claims.jti,
+        db, username, device_id, token_claims.jti,
         token_pair.refresh_token_claims.jti if hasattr(token_pair, 'refresh_token_claims') else token_claims.jti
     )
 
@@ -499,17 +532,6 @@ async def refresh_access_token(
         path="/",
         secure=config.is_production,  # Secure in production
         samesite="strict"  # Strict for enhanced security
-    )
-
-    # Create user profile data (without sensitive information)
-    user_data = User(
-        id=user.id,
-        username=user.username,
-        email=user.email,
-        role=UserRole(user.role),
-        is_active=user.is_active,
-        created_at=user.created_at,
-        updated_at=user.updated_at
     )
 
     return TokenResponse(
@@ -655,6 +677,11 @@ async def enhanced_login(
             detail="Inactive user"
         )
 
+    # Read everything needed from `user` now: committing the audit log below expires it.
+    user_data = _user_profile(user)
+    username = user.username
+    role = user.role
+
     # Generate device fingerprint (in production, extract from request headers)
     device_id = DeviceFingerprint.generate(
         user_agent="unknown",  # Extract from request headers in production
@@ -667,21 +694,21 @@ async def enhanced_login(
 
     # Create enhanced token pair
     token_pair = jwt_service.create_token_pair(
-        username=user.username,
+        username=username,
         device_id=device_id,
         session_id=session_id,
-        role=user.role,
+        role=role,
         is_guest=getattr(user, 'is_guest', False)
     )
 
     # Log successful login
     await jwt_service.audit_logger.log_login(
-        db, user.username, device_id, "0.0.0.0", True
+        db, username, device_id, "0.0.0.0", True
     )
 
     # Reset rate limiting for successful login if enabled
     if config.ENABLE_LOGIN_RATE_LIMITING:
-        jwt_service.reset_rate_limit(user.username)
+        jwt_service.reset_rate_limit(username)
 
     # Implement cookie minimization strategy:
     # - HttpOnly cookie for refresh token only (server-side only)
@@ -695,17 +722,6 @@ async def enhanced_login(
         path="/",
         secure=config.is_production,  # Secure in production
         samesite="strict"  # Strict for enhanced security
-    )
-
-    # Create user profile data
-    user_data = User(
-        id=user.id,
-        username=user.username,
-        email=user.email,
-        role=UserRole(user.role),
-        is_active=user.is_active,
-        created_at=user.created_at,
-        updated_at=user.updated_at
     )
 
     return TokenResponse(
