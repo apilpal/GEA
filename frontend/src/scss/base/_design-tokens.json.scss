@@ -208,11 +208,11 @@ $design-tokens: (
         @if meta.type-of($values) == 'map' and meta.type-of($value) == 'map' {
           $json: $json + '"#{$key}": {';
           @each $subkey, $subvalue in $value {
-            $json: $json + '"#{$subkey}": "#{$subvalue}",';
+            $json: $json + '"#{$subkey}": "#{meta.inspect($subvalue)}",';
           }
           $json: str-slice($json, 1, -1) + '},'; // Remove last comma and close
         } @else {
-          $json: $json + '"#{$key}": "#{$value}",';
+          $json: $json + '"#{$key}": "#{meta.inspect($value)}",';
         }
       }
     }

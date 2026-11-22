@@ -8,6 +8,7 @@
     "setup": "bash scripts/termux-setup.sh",
     "dev": "node scripts/dev.mjs",
     "start": "node scripts/dev.mjs",
-    "create-admin": "cd backend && .venv/bin/python setup_local.py"
+    "create-admin": "cd backend && .venv/bin/python setup_local.py",
+    "reset-password": "cd backend && .venv/bin/python setup_local.py --reset-password"
   }
 }

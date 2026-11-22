@@ -14,7 +14,7 @@ if [ "$IS_TERMUX" = 1 ]; then
   say "Installing system packages (python, nodejs, build tools)"
   pkg update -y
   # rust/clang are needed because bcrypt and pydantic-core are compiled on the phone.
-  pkg install -y python nodejs git rust clang make binutils libffi openssl python-cryptography
+  pkg install -y python nodejs git rust clang make binutils libffi openssl python-cryptography libcompiler-rt
   # Android build hint needed by Rust-based Python packages
   export ANDROID_API_LEVEL="$(getprop ro.build.version.sdk 2>/dev/null || echo 24)"
 fi

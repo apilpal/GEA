@@ -5,6 +5,10 @@ Run from the backend folder (scripts/termux-setup.sh does this for you):
     python setup_local.py
 
 For a non-interactive run set ADMIN_USERNAME, ADMIN_EMAIL and ADMIN_PASSWORD.
+
+To set a new password for an existing user (for example if you forgot it):
+
+    python setup_local.py --reset-password
 Safe to run again: existing tables and users are left alone.
 """
 
@@ -29,6 +33,7 @@ from sqlalchemy import select, func  # noqa: E402
 
 from core.models.models import Base, DBUser, CreateUserRequest, SessionLocal, sync_engine  # noqa: E402
 from utils.user_utils import create_user  # noqa: E402
+from utils.auth_utils import hash_password  # noqa: E402
 
 
 def ask(prompt: str, default: str = "") -> str:
@@ -57,7 +62,26 @@ async def make_admin() -> None:
     print(f"Created admin user '{username}'.")
 
 
+async def reset_password() -> None:
+    username = ask("Username to reset", "admin")
+    async with SessionLocal() as db:
+        user = await db.scalar(select(DBUser).where(DBUser.username == username))
+        if user is None:
+            sys.exit(f"No user named '{username}'.")
+        while True:
+            password = getpass.getpass("New password (min 8 characters): ")
+            if len(password) >= 8 and password == getpass.getpass("Repeat password: "):
+                break
+            print("Passwords did not match or are too short. Try again.")
+        user.hashed_password = hash_password(password)
+        await db.commit()
+    print(f"Password updated for '{username}'.")
+
+
 async def main() -> None:
+    if "--reset-password" in sys.argv:
+        await reset_password()
+        return
     Base.metadata.create_all(sync_engine)
     print("Database tables are ready.")
     if await admin_exists():

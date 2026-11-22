@@ -12,3 +12,5 @@ bcrypt
 requests
 alembic
 slowapi
+greenlet
+cffi

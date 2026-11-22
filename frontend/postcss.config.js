@@ -1,7 +1,18 @@
+// Optional plugins: the dev server also works when these dev packages are not installed
+// (for example on a phone), because styles.css is already built.
+function optional(name, options) {
+  try {
+    return require(name)(options);
+  } catch (error) {
+    if (error && error.code === 'MODULE_NOT_FOUND') return false;
+    throw error;
+  }
+}
+
 module.exports = {
   plugins: [
     // PostCSS Preset Env - enables modern CSS features with fallbacks
-    require('postcss-preset-env')({
+    optional('postcss-preset-env', {
       stage: 3,
       features: {
         'nesting-rules': true,
@@ -23,7 +34,7 @@ module.exports = {
     }),
 
     // CSSNano for production optimization
-    process.env.NODE_ENV === 'production' ? require('cssnano')({
+    process.env.NODE_ENV === 'production' ? optional('cssnano', {
       preset: [
         'default',
         {
