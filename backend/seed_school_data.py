@@ -109,10 +109,29 @@ def _clip(value, low, high):
     return max(low, min(high, value))
 
 
+def clear_orphans(session: Session) -> int:
+    """Delete attendance, marks and fee rows whose student no longer exists.
+
+    Such rows are left behind when students are deleted directly (for example by
+    ``seed_sample_data.py --reset``). They would clash with the ids of new students.
+    """
+    gone = ~sm.DBAttendance.student_id.in_(select(DBStudent.id))
+    removed = 0
+    orphan_invoices = select(sm.DBFeeInvoice.id).where(~sm.DBFeeInvoice.student_id.in_(select(DBStudent.id)))
+    removed += session.execute(delete(sm.DBFeePayment).where(sm.DBFeePayment.invoice_id.in_(orphan_invoices))).rowcount or 0
+    removed += session.execute(delete(sm.DBFeeInvoice).where(~sm.DBFeeInvoice.student_id.in_(select(DBStudent.id)))).rowcount or 0
+    removed += session.execute(delete(sm.DBAssessmentScore).where(~sm.DBAssessmentScore.student_id.in_(select(DBStudent.id)))).rowcount or 0
+    removed += session.execute(delete(sm.DBAttendance).where(gone)).rowcount or 0
+    return removed
+
+
 def seed(session: Session, verbose: bool = False) -> dict:
     """Add the demo school. Returns counts; does nothing if the demo students already exist."""
     rng = random.Random(SEED)
     log = print if verbose else (lambda *a, **k: None)
+    leftovers = clear_orphans(session)
+    if leftovers:
+        log(f"Removed {leftovers} leftover rows of deleted students.")
 
     # --- reference data (shared, get-or-create) ------------------------------------
     year = session.scalar(select(sm.DBAcademicYear).where(sm.DBAcademicYear.name == "2026-27"))

@@ -146,3 +146,14 @@ def test_upper_classes_have_two_papers_for_hindi(engine):
         engine, "SELECT sc.part FROM assessment_scores sc JOIN students s ON s.id = sc.student_id "
                 "JOIN subjects su ON su.id = sc.subject_id WHERE su.name = 'Hindi' AND s.class_ = '2'")}
     assert parts_lower == {1}
+
+
+def test_rows_left_by_deleted_students_do_not_block_a_new_seed(engine):
+    first = run_seed(engine)
+    with engine.begin() as conn:  # what `seed_sample_data.py --reset` does: delete students only
+        conn.execute(sa.text("DELETE FROM students"))
+    assert q(engine, "SELECT COUNT(*) FROM attendance")[0][0] > 0  # leftovers exist
+    second = run_seed(engine)
+    assert second["students"] == 521
+    assert second["attendance"] == first["attendance"]
+    assert second["payments"] == first["payments"]

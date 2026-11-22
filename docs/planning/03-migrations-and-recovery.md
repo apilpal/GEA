@@ -25,15 +25,40 @@ The schema is managed by Alembic (`backend/alembic/`). The old revisions are kep
   - `students.fees`, `students.class_`, `students.route` and `students.address` are kept unchanged.
 - `0003_auth_tables` - `token_blacklist`, `auth_audit_log` and `refresh_tokens`, which the JWT service uses for token revocation, rotation and the audit trail. Tables that already exist (databases from the old setup) are left as they are.
 
-## Backups and rollback
+## Backups and restore (issue #31)
 
-`setup_local.py` copies the database to `backend/data/backups/students-<time>-before-upgrade.db` using SQLite's backup API before any migration. These files are ignored by git.
+`backend/db_backup.py` makes and restores backups of the SQLite database. From the repo root you can use the shortcuts `pnpm backup` and `pnpm restore -- <file>`; from `backend/` run `python db_backup.py <command>`.
 
-Revision 0002 cannot be downgraded. To roll back, stop the app and restore the backup:
+| Task | Command |
+|---|---|
+| Back up now | `python db_backup.py backup` |
+| List backups | `python db_backup.py list` |
+| Check a backup file | `python db_backup.py verify <file>` |
+| Restore a backup | stop the app, then `python db_backup.py restore <file>` |
 
-```
-cp backend/data/backups/<file>.db backend/data/students.db
-```
+**How it works.** Backups use SQLite's backup API, so the copy is consistent even while the app is running, and only committed data is copied. Each backup is written under a temporary name, checked with `PRAGMA integrity_check`, and only then kept. Files are named `students-YYYYMMDD-HHMMSS.db` and stored in `backend/data/backups/` (ignored by git).
+
+**Frequency and retention.**
+- Back up at the end of every school day, and before any bulk import, seed or upgrade. `python setup_local.py` already makes a `-before-upgrade` copy automatically.
+- The newest 14 regular backups are kept; older ones are deleted. `-before-upgrade` and `-before-restore` copies are never deleted automatically.
+
+**Restore steps.**
+1. Stop the app (Ctrl+C on `pnpm dev`).
+2. Run `python db_backup.py list`, pick a file, then `python db_backup.py restore backend/data/backups/<file>` and type `yes`.
+3. The backup is verified first. The database as it was just before the restore is saved as `...-before-restore.db`, so a restore can itself be undone.
+4. Start the app and check the dashboard counts.
+
+If the backup is damaged the restore stops and the current database is left unchanged.
+
+**Errors and privacy.** Failures print a short message and are logged to `backend/logs/backup.log` with file names, sizes and error types only. Logs and messages never contain passwords, tokens or student details.
+
+**Limitations.**
+- Backups stay on the same phone. Copy the newest file to another place (for example your Downloads folder, or another device) regularly; a lost phone loses the backups too.
+- Backups are not encrypted. They contain real student data once real data is entered, so keep them private.
+- There is no automatic schedule yet (planned for Phase 5). Run `pnpm backup` yourself, or add it to a Termux scheduled job.
+- SQLite only. A PostgreSQL deployment needs `pg_dump` instead.
+
+**Rolling back a migration.** Revision 0002 cannot be downgraded. Stop the app and restore the `-before-upgrade` backup made by `setup_local.py`.
 
 ## Notes
 
