@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - One-command local run: `pnpm dev` starts the backend and frontend together, `scripts/termux-setup.sh` sets everything up on Termux, and `pnpm create-admin` creates the first admin.
 - Demo data on the dashboard while the database is empty: 75 students, 5 drivers, fee 500 per student.
+- `pnpm seed` loads that same sample set into the database. It replaces existing students and drivers, so all installs end up identical (`--append` keeps existing rows).
 - Responsive sidebar start-up behaviour for small screens.
 
 ### Changed

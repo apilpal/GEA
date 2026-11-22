@@ -6,13 +6,16 @@ Seeds the database with 75 sample students and 5 sample drivers (a transport fee
 500 per student) so the dashboard, transport and report pages have something to show.
 These are the same people and routes as the demo data in frontend/src/ts/demo-data.ts.
 
-Run it from the backend folder, after setup (scripts/termux-setup.sh does the setup):
+Run it from the backend folder, after setup (scripts/termux-setup.sh does the setup).
+By default it REPLACES all students and drivers with exactly this sample set, so every
+phone or computer ends up with identical data no matter what was in the database before.
+User accounts (logins) are not touched.
 
 Usage:
-    python seed_sample_data.py [--clear] [--verbose]
+    python seed_sample_data.py [--append] [--verbose]
 
 Options:
-    --clear     Delete ALL existing students and drivers before seeding (not only sample rows)
+    --append    Keep existing students and drivers and only add sample rows that are missing
     --verbose   Enable detailed logging
 """
 
@@ -20,6 +23,7 @@ import asyncio
 import sys
 from datetime import datetime, UTC
 from typing import List, Dict, Any
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -152,8 +156,10 @@ SAMPLE_DRIVERS = [
 async def create_sample_students(db: AsyncSession, clear: bool = False) -> int:
     """Create sample students in the database."""
     if clear:
+        removed = await db.scalar(select(func.count()).select_from(DBStudent))
         await db.execute(DBStudent.__table__.delete())
         await db.commit()
+        print(f"   Removed {removed} existing students")
 
     created_count = 0
     for student_data in SAMPLE_STUDENTS:
@@ -190,8 +196,10 @@ async def create_sample_students(db: AsyncSession, clear: bool = False) -> int:
 async def create_sample_drivers(db: AsyncSession, clear: bool = False) -> int:
     """Create sample drivers in the database."""
     if clear:
+        removed = await db.scalar(select(func.count()).select_from(DBDriver))
         await db.execute(DBDriver.__table__.delete())
         await db.commit()
+        print(f"   Removed {removed} existing drivers")
 
     created_count = 0
     for driver_data in SAMPLE_DRIVERS:
@@ -224,7 +232,7 @@ async def create_sample_drivers(db: AsyncSession, clear: bool = False) -> int:
     await db.commit()
     return created_count
 
-async def main(clear: bool = False, verbose: bool = False):
+async def main(clear: bool = True, verbose: bool = False):
     """Main function to seed sample data."""
     print("🌱 Starting sample data seeding...")
 
@@ -256,13 +264,15 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Seed 75 sample students and 5 sample drivers")
-    parser.add_argument("--clear", action="store_true", help="Delete ALL existing students and drivers before seeding")
+    parser.add_argument("--append", action="store_true", help="Keep existing students and drivers; only add missing sample rows")
+    parser.add_argument("--clear", action="store_true", help=argparse.SUPPRESS)  # old option; replacing is now the default
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
 
     args = parser.parse_args()
 
-    if args.clear:
-        print("⚠️  Deleting all existing students and drivers...")
+    replace = not args.append
+    if replace:
+        print("⚠️  Replacing all existing students and drivers with the sample set (logins are kept)...")
 
-    exit_code = asyncio.run(main(clear=args.clear, verbose=args.verbose))
+    exit_code = asyncio.run(main(clear=replace, verbose=args.verbose))
     sys.exit(exit_code)

@@ -11,7 +11,7 @@ App (installable, mobile-first) with a FastAPI backend and a TypeScript frontend
 - **Login with roles** - JWT authentication using HttpOnly cookies. Roles are admin, teacher, accountant, driver, student and parent; staff roles manage students and drivers, finance roles see reports and charts, and only admins can use CSV sync.
 - **AI chat assistant** - a chat page backed by the `/api/chat` endpoints.
 - **CSV sync** - bulk-load driver and student data from CSV files.
-- **Demo data** - while the database is empty the dashboard shows sample data (75 students, 5 drivers, fee 500 each) so every page has something to display. `pnpm seed` loads the same sample data into the database.
+- **Demo data** - while the database is empty the dashboard shows sample data (75 students, 5 drivers, fee 500 each) so every page has something to display. `pnpm seed` puts exactly the same sample data into the database, so every phone shows the same thing.
 - **Runs on a phone** - one-command setup for Termux, no Docker or PostgreSQL required (SQLite by default).
 
 ## Quick start
@@ -52,7 +52,7 @@ docs/           All documentation - start at docs/README.md
 | `pnpm dev` | Start backend (port 8000) and frontend (port 5173) |
 | `RELOAD=1 pnpm dev` | Same, and restart the backend when you change Python code |
 | `pnpm create-admin` | Run the database/admin setup again (existing users are kept) |
-| `pnpm seed` | Add 75 sample students and 5 sample drivers (fee 500 each) to the database; safe to run twice |
+| `pnpm seed` | Replace all students and drivers with the 75 sample students and 5 sample drivers (fee 500 each); logins are kept |
 | `./test.sh` | Run backend, frontend and end-to-end tests |
 
 Test tools (pytest, Jest, Puppeteer) are separate from the runtime packages; see
