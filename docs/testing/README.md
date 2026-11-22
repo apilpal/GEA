@@ -119,7 +119,7 @@ HEADLESS=false npm test -- --testPathPattern=puppeteer
 ## 📊 Coverage Reports
 
 ### **Current Coverage Status**
-- **[📊 Frontend Coverage](./frontend-COVERAGE_REPORT.md)** - Detailed frontend coverage
+- **[📊 Frontend Coverage](../reports/frontend-coverage-report.md)** - Detailed frontend coverage
 - **[📈 Coverage Trends](./coverage-trends.md)** - Coverage improvement tracking *(Coming Soon)*
 - **[🎯 Coverage Goals](./coverage-goals.md)** - Target coverage metrics *(Coming Soon)*
 

@@ -511,8 +511,8 @@ npm test -- --watchAll=false --verbose
 
 - [Frontend Testing Setup](frontend-README.md)
 - [Jest Configuration Guide](../development/testing-guide.md)
-- [Component Development Guide](../development/component-registry.md)
-- [ES Module Migration Guide](../development/build-optimization.md)
+- [Component Development Guide](../architecture/component-registry.md)
+- [ES Module Migration Guide](../guides/build-optimization.md)
 
 ## 10. Support and Maintenance
 

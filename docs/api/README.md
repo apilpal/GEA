@@ -52,7 +52,7 @@ Complete reference of all available API endpoints with detailed information:
 - **Status Codes**: HTTP status code explanations
 
 ### **🔐 Authentication** (`./authentication.md`)
-- **[🔐 Complete Authentication Documentation](../development/authentication.md)**
+- **[🔐 Complete Authentication Documentation](../guides/authentication.md)**
 - JWT token management and security features
 - Authentication flows and session management
 - Security considerations and best practices
@@ -740,7 +740,7 @@ curl -v "http://127.0.0.1:8001/api/auth/me" \
 ```
 
 ### **💾 Database Models** (`./backend-DATABASE_README.md`)
-- **[Current Database Documentation](./backend-DATABASE_README.md)**
+- **[Current Database Documentation](database.md)**
 - Data models and relationships
 - Migration scripts and schema
 - Database configuration
@@ -853,7 +853,7 @@ The API supports Cross-Origin Resource Sharing for:
 
 - **[🏗️ Backend Setup](../../development/backend/)** - Backend configuration and setup
 - **[🔐 Authentication Guide](../../development/authentication.md)** - Security and JWT implementation
-- **[💾 Database Documentation](./backend-DATABASE_README.md)** - Data models and schema
+- **[💾 Database Documentation](database.md)** - Data models and schema
 - **[🐛 API Troubleshooting](../../troubleshooting/)** - Common API issues
 
 For additional help or to report issues, please refer to the **[Support Documentation](../../troubleshooting/support.md)** or create an issue in the project repository.

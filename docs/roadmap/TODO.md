@@ -3,6 +3,16 @@
 ## Project Overview
 This TODO file tracks development tasks for the Student Profiles Progressive Web App, which includes a FastAPI backend with SQLite database and a TypeScript frontend PWA for managing student and driver information.
 
+## Current focus
+
+- [ ] Remove generated `.js` and `.map` files from the `ts` folders and let `tsc` generate them
+- [ ] Create tests for the location bar HTTPS address changes
+- [ ] Create a test that validates the payload sent to the server
+- [ ] Make the client and server request and response models the same
+- [ ] Update tests
+- [x] Restructure the docs and move all `.md` files to the right location (see [documentation index](../README.md))
+- [ ] Make `frontend/styles.css` build from `frontend/src/scss` (the SCSS does not compile cleanly today)
+
 ## High Priority Tasks
 
 ### 🔴 Critical Issues

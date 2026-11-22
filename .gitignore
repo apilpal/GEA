@@ -279,3 +279,9 @@ roo/*
 # These patterns are consolidated from various sections above
 # to avoid duplication while maintaining comprehensive coverage
 frontend/src/jscookies.txt
+
+# ========================================
+# Generated test output
+# ========================================
+test-results/
+bypass_test_report.json

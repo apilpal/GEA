@@ -1106,9 +1106,9 @@ echo "   Look for authentication or configuration errors"
 
 ### **Related Documentation**
 
-- **[Login Bypass Feature Documentation](../development/login-bypass.md)** - Complete feature guide
-- **[Authentication System Documentation](../development/authentication.md)** - Authentication system details
-- **[Development Workflow](../getting-started/development-workflow.md)** - Development setup guide
+- **[Login Bypass Feature Documentation](../guides/login-bypass/overview.md)** - Complete feature guide
+- **[Authentication System Documentation](../guides/authentication.md)** - Authentication system details
+- **[Development Workflow](../archive/duplicates/development-workflow-getting-started.md)** - Development setup guide
 - **[API Documentation](../api/README.md)** - API endpoint reference
 
 ---

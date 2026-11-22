@@ -820,6 +820,6 @@ npm run fix:all           # Apply all fixes
 - [MIME Type Troubleshooting](frontend-mime-types.md)
 - [Build Optimization Guide](build-optimization.md)
 - [Development Workflow](development-workflow.md)
-- [Component Registry System](../development/component-registry.md)
+- [Component Registry System](../architecture/component-registry.md)
 - [Comprehensive Test Issues Documentation](test-issues-comprehensive.md)
 - [Issue Tracker](issue-tracker.md)

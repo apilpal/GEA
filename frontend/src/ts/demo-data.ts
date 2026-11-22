@@ -2,21 +2,103 @@
 // This is clearly marked as sample data and never participates in authentication.
 import { authContext } from './components/auth/auth-context';
 
-export const DEMO_DRIVERS = [
-    { name: 'Alex Morgan', route: 'North Route', status: 'active', vehicle_number: 'BUS-101', contact_number: '555-0101', total_students: 3 },
-    { name: 'Jamie Patel', route: 'East Route', status: 'active', vehicle_number: 'BUS-204', contact_number: '555-0102', total_students: 2 },
-    { name: 'Taylor Chen', route: 'West Route', status: 'active', vehicle_number: 'BUS-309', contact_number: '555-0103', total_students: 2 }
-];
+/** Monthly transport fee charged to every demo student. */
+export const MONTHLY_FEE = 500;
+
+// Change this to show another currency in the demo dashboard (for example 'Rs. ').
+const CURRENCY_SYMBOL = '$';
+const formatMoney = (amount: number): string => `${CURRENCY_SYMBOL}${amount.toLocaleString()}`;
 
 export const DEMO_STUDENTS = [
-    { id: 1, name: 'Avery Johnson', father_name: 'Morgan Johnson', mobile: '555-1001', class: '10', class_: '10', address: '12 Oak Street', fees: 125, route: 'North Route' },
-    { id: 2, name: 'Noah Williams', father_name: 'Casey Williams', mobile: '555-1002', class: '8', class_: '8', address: '48 Pine Avenue', fees: 110, route: 'North Route' },
-    { id: 3, name: 'Mia Garcia', father_name: 'Riley Garcia', mobile: '555-1003', class: '11', class_: '11', address: '7 Maple Road', fees: 140, route: 'North Route' },
-    { id: 4, name: 'Ethan Patel', father_name: 'Jordan Patel', mobile: '555-1004', class: '9', class_: '9', address: '90 Lake Drive', fees: 120, route: 'East Route' },
-    { id: 5, name: 'Sofia Kim', father_name: 'Alex Kim', mobile: '555-1005', class: '7', class_: '7', address: '3 Cedar Lane', fees: 105, route: 'East Route' },
-    { id: 6, name: 'Lucas Brown', father_name: 'Drew Brown', mobile: '555-1006', class: '12', class_: '12', address: '25 Hill Street', fees: 150, route: 'West Route' },
-    { id: 7, name: 'Isla Davis', father_name: 'Sam Davis', mobile: '555-1007', class: '6', class_: '6', address: '61 River Road', fees: 100, route: 'West Route' }
+    { id: 1, name: 'Avery Johnson', father_name: 'Morgan Johnson', mobile: '555-1001', class: '10', class_: '10', address: '12 Oak Street', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 2, name: 'Noah Williams', father_name: 'Casey Williams', mobile: '555-1002', class: '8', class_: '8', address: '48 Pine Avenue', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 3, name: 'Mia Garcia', father_name: 'Riley Garcia', mobile: '555-1003', class: '11', class_: '11', address: '7 Maple Road', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 4, name: 'Ethan Patel', father_name: 'Jordan Patel', mobile: '555-1004', class: '9', class_: '9', address: '90 Lake Drive', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 5, name: 'Sofia Kim', father_name: 'Alex Kim', mobile: '555-1005', class: '7', class_: '7', address: '3 Cedar Lane', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 6, name: 'Lucas Brown', father_name: 'Drew Brown', mobile: '555-1006', class: '12', class_: '12', address: '25 Hill Street', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 7, name: 'Isla Davis', father_name: 'Sam Davis', mobile: '555-1007', class: '6', class_: '6', address: '61 River Road', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 8, name: 'Liam Johnson', father_name: 'Morgan Johnson', mobile: '555-1008', class: '6', class_: '6', address: '59 Oak Street', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 9, name: 'Emma Williams', father_name: 'Casey Williams', mobile: '555-1009', class: '9', class_: '9', address: '66 Pine Avenue', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 10, name: 'Oliver Garcia', father_name: 'Riley Garcia', mobile: '555-1010', class: '12', class_: '12', address: '73 Maple Road', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 11, name: 'Ava Patel', father_name: 'Jordan Patel', mobile: '555-1011', class: '8', class_: '8', address: '80 Lake Drive', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 12, name: 'Elijah Kim', father_name: 'Alex Kim', mobile: '555-1012', class: '11', class_: '11', address: '87 Cedar Lane', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 13, name: 'Charlotte Brown', father_name: 'Drew Brown', mobile: '555-1013', class: '7', class_: '7', address: '4 Hill Street', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 14, name: 'James Davis', father_name: 'Sam Davis', mobile: '555-1014', class: '10', class_: '10', address: '11 River Road', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 15, name: 'Amelia Martin', father_name: 'Chris Martin', mobile: '555-1015', class: '6', class_: '6', address: '18 Park Avenue', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 16, name: 'Benjamin Lopez', father_name: 'Pat Lopez', mobile: '555-1016', class: '9', class_: '9', address: '25 Elm Street', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 17, name: 'Harper Nguyen', father_name: 'Dana Nguyen', mobile: '555-1017', class: '12', class_: '12', address: '32 Sunset Boulevard', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 18, name: 'Henry Walker', father_name: 'Kelly Walker', mobile: '555-1018', class: '8', class_: '8', address: '39 Willow Way', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 19, name: 'Evelyn Hall', father_name: 'Robin Hall', mobile: '555-1019', class: '11', class_: '11', address: '46 Garden Road', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 20, name: 'Theo Young', father_name: 'Jesse Young', mobile: '555-1020', class: '7', class_: '7', address: '53 Oak Street', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 21, name: 'Luna Allen', father_name: 'Taylor Allen', mobile: '555-1021', class: '10', class_: '10', address: '60 Pine Avenue', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 22, name: 'Jack King', father_name: 'Lee King', mobile: '555-1022', class: '6', class_: '6', address: '67 Maple Road', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 23, name: 'Ella Wright', father_name: 'Cameron Wright', mobile: '555-1023', class: '9', class_: '9', address: '74 Lake Drive', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 24, name: 'Owen Scott', father_name: 'Skyler Scott', mobile: '555-1024', class: '12', class_: '12', address: '81 Cedar Lane', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 25, name: 'Aria Johnson', father_name: 'Quinn Johnson', mobile: '555-1025', class: '8', class_: '8', address: '88 Hill Street', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 26, name: 'Leo Williams', father_name: 'Avery Williams', mobile: '555-1026', class: '11', class_: '11', address: '5 River Road', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 27, name: 'Chloe Garcia', father_name: 'Rowan Garcia', mobile: '555-1027', class: '7', class_: '7', address: '12 Park Avenue', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 28, name: 'Caleb Patel', father_name: 'Blake Patel', mobile: '555-1028', class: '10', class_: '10', address: '19 Elm Street', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 29, name: 'Layla Kim', father_name: 'Reese Kim', mobile: '555-1029', class: '6', class_: '6', address: '26 Sunset Boulevard', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 30, name: 'Ryan Brown', father_name: 'Parker Brown', mobile: '555-1030', class: '9', class_: '9', address: '33 Willow Way', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 31, name: 'Zoe Davis', father_name: 'Hayden Davis', mobile: '555-1031', class: '12', class_: '12', address: '40 Garden Road', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 32, name: 'Nathan Martin', father_name: 'Sidney Martin', mobile: '555-1032', class: '8', class_: '8', address: '47 Oak Street', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 33, name: 'Nora Lopez', father_name: 'Morgan Lopez', mobile: '555-1033', class: '11', class_: '11', address: '54 Pine Avenue', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 34, name: 'Isaac Nguyen', father_name: 'Casey Nguyen', mobile: '555-1034', class: '7', class_: '7', address: '61 Maple Road', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 35, name: 'Hazel Walker', father_name: 'Riley Walker', mobile: '555-1035', class: '10', class_: '10', address: '68 Lake Drive', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 36, name: 'Adam Hall', father_name: 'Jordan Hall', mobile: '555-1036', class: '6', class_: '6', address: '75 Cedar Lane', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 37, name: 'Lily Young', father_name: 'Alex Young', mobile: '555-1037', class: '9', class_: '9', address: '82 Hill Street', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 38, name: 'Aaron Allen', father_name: 'Drew Allen', mobile: '555-1038', class: '12', class_: '12', address: '89 River Road', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 39, name: 'Violet King', father_name: 'Sam King', mobile: '555-1039', class: '8', class_: '8', address: '6 Park Avenue', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 40, name: 'Daniel Wright', father_name: 'Chris Wright', mobile: '555-1040', class: '11', class_: '11', address: '13 Elm Street', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 41, name: 'Aurora Scott', father_name: 'Pat Scott', mobile: '555-1041', class: '7', class_: '7', address: '20 Sunset Boulevard', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 42, name: 'Samuel Johnson', father_name: 'Dana Johnson', mobile: '555-1042', class: '10', class_: '10', address: '27 Willow Way', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 43, name: 'Stella Williams', father_name: 'Kelly Williams', mobile: '555-1043', class: '6', class_: '6', address: '34 Garden Road', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 44, name: 'Joshua Garcia', father_name: 'Robin Garcia', mobile: '555-1044', class: '9', class_: '9', address: '41 Oak Street', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 45, name: 'Ruby Patel', father_name: 'Jesse Patel', mobile: '555-1045', class: '12', class_: '12', address: '48 Pine Avenue', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 46, name: 'Wyatt Kim', father_name: 'Taylor Kim', mobile: '555-1046', class: '8', class_: '8', address: '55 Maple Road', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 47, name: 'Penelope Brown', father_name: 'Lee Brown', mobile: '555-1047', class: '11', class_: '11', address: '62 Lake Drive', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 48, name: 'Eli Davis', father_name: 'Cameron Davis', mobile: '555-1048', class: '7', class_: '7', address: '69 Cedar Lane', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 49, name: 'Maya Martin', father_name: 'Skyler Martin', mobile: '555-1049', class: '10', class_: '10', address: '76 Hill Street', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 50, name: 'Julian Lopez', father_name: 'Quinn Lopez', mobile: '555-1050', class: '6', class_: '6', address: '83 River Road', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 51, name: 'Naomi Nguyen', father_name: 'Avery Nguyen', mobile: '555-1051', class: '9', class_: '9', address: '90 Park Avenue', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 52, name: 'Hudson Walker', father_name: 'Rowan Walker', mobile: '555-1052', class: '12', class_: '12', address: '7 Elm Street', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 53, name: 'Clara Hall', father_name: 'Blake Hall', mobile: '555-1053', class: '8', class_: '8', address: '14 Sunset Boulevard', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 54, name: 'Levi Young', father_name: 'Reese Young', mobile: '555-1054', class: '11', class_: '11', address: '21 Willow Way', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 55, name: 'Alice Allen', father_name: 'Parker Allen', mobile: '555-1055', class: '7', class_: '7', address: '28 Garden Road', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 56, name: 'Mason King', father_name: 'Hayden King', mobile: '555-1056', class: '10', class_: '10', address: '35 Oak Street', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 57, name: 'Grace Wright', father_name: 'Sidney Wright', mobile: '555-1057', class: '6', class_: '6', address: '42 Pine Avenue', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 58, name: 'Carter Scott', father_name: 'Morgan Scott', mobile: '555-1058', class: '9', class_: '9', address: '49 Maple Road', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 59, name: 'Ivy Johnson', father_name: 'Casey Johnson', mobile: '555-1059', class: '12', class_: '12', address: '56 Lake Drive', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 60, name: 'Dylan Williams', father_name: 'Riley Williams', mobile: '555-1060', class: '8', class_: '8', address: '63 Cedar Lane', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 61, name: 'Emilia Garcia', father_name: 'Jordan Garcia', mobile: '555-1061', class: '11', class_: '11', address: '70 Hill Street', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 62, name: 'Gabriel Patel', father_name: 'Alex Patel', mobile: '555-1062', class: '7', class_: '7', address: '77 River Road', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 63, name: 'Willow Kim', father_name: 'Drew Kim', mobile: '555-1063', class: '10', class_: '10', address: '84 Park Avenue', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 64, name: 'Asher Brown', father_name: 'Sam Brown', mobile: '555-1064', class: '6', class_: '6', address: '91 Elm Street', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 65, name: 'Eliana Davis', father_name: 'Chris Davis', mobile: '555-1065', class: '9', class_: '9', address: '8 Sunset Boulevard', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 66, name: 'Jaxon Martin', father_name: 'Pat Martin', mobile: '555-1066', class: '12', class_: '12', address: '15 Willow Way', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 67, name: 'Piper Lopez', father_name: 'Dana Lopez', mobile: '555-1067', class: '8', class_: '8', address: '22 Garden Road', fees: MONTHLY_FEE, route: 'Central Route' },
+    { id: 68, name: 'Miles Nguyen', father_name: 'Kelly Nguyen', mobile: '555-1068', class: '11', class_: '11', address: '29 Oak Street', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 69, name: 'Sadie Walker', father_name: 'Robin Walker', mobile: '555-1069', class: '7', class_: '7', address: '36 Pine Avenue', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 70, name: 'Felix Hall', father_name: 'Jesse Hall', mobile: '555-1070', class: '10', class_: '10', address: '43 Maple Road', fees: MONTHLY_FEE, route: 'West Route' },
+    { id: 71, name: 'Iris Young', father_name: 'Taylor Young', mobile: '555-1071', class: '6', class_: '6', address: '50 Lake Drive', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 72, name: 'Roman Allen', father_name: 'Lee Allen', mobile: '555-1072', class: '9', class_: '9', address: '57 Cedar Lane', fees: MONTHLY_FEE, route: 'North Route' },
+    { id: 73, name: 'Jade King', father_name: 'Cameron King', mobile: '555-1073', class: '12', class_: '12', address: '64 Hill Street', fees: MONTHLY_FEE, route: 'East Route' },
+    { id: 74, name: 'Ezra Wright', father_name: 'Skyler Wright', mobile: '555-1074', class: '8', class_: '8', address: '71 River Road', fees: MONTHLY_FEE, route: 'South Route' },
+    { id: 75, name: 'Freya Scott', father_name: 'Quinn Scott', mobile: '555-1075', class: '11', class_: '11', address: '78 Park Avenue', fees: MONTHLY_FEE, route: 'North Route' }
 ];
+
+const DEMO_DRIVER_LIST = [
+    { name: 'Alex Morgan', route: 'North Route', status: 'active', vehicle_number: 'BUS-101', contact_number: '555-0101' },
+    { name: 'Jamie Patel', route: 'East Route', status: 'active', vehicle_number: 'BUS-204', contact_number: '555-0102' },
+    { name: 'Taylor Chen', route: 'West Route', status: 'active', vehicle_number: 'BUS-309', contact_number: '555-0103' },
+    { name: 'Jordan Rivera', route: 'South Route', status: 'active', vehicle_number: 'BUS-412', contact_number: '555-0104' },
+    { name: 'Sam Okafor', route: 'Central Route', status: 'active', vehicle_number: 'BUS-515', contact_number: '555-0105' }
+];
+
+export const DEMO_DRIVERS = DEMO_DRIVER_LIST.map((driver) => ({
+    ...driver,
+    total_students: DEMO_STUDENTS.filter((student) => student.route === driver.route).length
+}));
 
 const PAGE_TITLES: Record<string, string> = {
     dashboard: 'Dashboard', transport: 'Transport', students: 'Students',
@@ -117,7 +199,7 @@ function renderDemoData(): void {
     setText('total-drivers-dash', totalDrivers);
     setText('report-total-students', totalStudents);
     setText('report-total-drivers', totalDrivers);
-    setText('report-total-revenue', `$${totalRevenue.toLocaleString()}`);
+    setText('report-total-revenue', formatMoney(totalRevenue));
     setText('total-drivers-stats', totalDrivers);
     setText('total-students-stats', totalStudents);
     setText('avg-students-per-driver', (totalStudents / totalDrivers).toFixed(1));
@@ -138,7 +220,7 @@ function renderDemoData(): void {
         activity.replaceChildren();
         [
             `${totalStudents} students assigned across ${totalDrivers} routes`,
-            `Monthly transport fees: $${totalRevenue.toLocaleString()}`
+            `Monthly transport fees: ${formatMoney(totalRevenue)}`
         ].forEach((text) => {
             const item = document.createElement('div');
             item.className = 'activity-item';
@@ -206,7 +288,7 @@ function renderDriverStudents(route: string): void {
     tbody.replaceChildren();
     DEMO_STUDENTS.filter((student) => student.route === route).forEach((student, index) => {
         const row = document.createElement('tr');
-        [String(index + 1), student.route, student.name, student.father_name, student.mobile, student.class, student.address, `$${student.fees}`]
+        [String(index + 1), student.route, student.name, student.father_name, student.mobile, student.class, student.address, formatMoney(student.fees)]
             .forEach((value) => appendCell(row, value));
         tbody.appendChild(row);
     });
@@ -223,7 +305,7 @@ function renderReports(totalRevenue: number): void {
         student_count: DEMO_STUDENTS.filter((student) => student.route === driver.route).length,
         revenue: DEMO_STUDENTS.filter((student) => student.route === driver.route).reduce((sum, student) => sum + student.fees, 0)
     }));
-    fillRows('driver-student-tbody', byDriver.map((driver) => [driver.driver_name, String(driver.student_count), `$${driver.revenue.toLocaleString()}`]));
+    fillRows('driver-student-tbody', byDriver.map((driver) => [driver.driver_name, String(driver.student_count), formatMoney(driver.revenue)]));
     fillRows('driver-stats-tbody', byDriver.map((driver) => [driver.driver_name, String(driver.student_count)]));
 
     const revenueByDriver: Record<string, number> = {};
@@ -235,7 +317,7 @@ function renderReports(totalRevenue: number): void {
     setChartData('#revenue-driver-chart', Object.keys(revenueByDriver), Object.values(revenueByDriver), 'Fees by Route');
     setChartData('#revenue-class-chart', Object.keys(revenueByClass), Object.values(revenueByClass), 'Fees by Grade');
     setChartData('#student-distribution-chart', byDriver.map((driver) => driver.driver_name), byDriver.map((driver) => driver.student_count), 'Students by Driver');
-    setText('report-total-revenue', `$${totalRevenue.toLocaleString()}`);
+    setText('report-total-revenue', formatMoney(totalRevenue));
 }
 
 function setChartData(selector: string, labels: string[], values: number[], label: string): void {

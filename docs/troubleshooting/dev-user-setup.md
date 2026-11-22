@@ -441,8 +441,8 @@ async def cleanup_test_data():
 ## Related Documentation
 
 - [Authentication System Guide](development/authentication.md) - Complete authentication documentation
-- [API Documentation](../api/backend-DATABASE_README.md) - API endpoint reference
-- [Testing Guide](../testing/frontend-COVERAGE_REPORT.md) - Testing strategies and coverage
+- [API Documentation](../api/database.md) - API endpoint reference
+- [Testing Guide](../reports/frontend-coverage-report.md) - Testing strategies and coverage
 - [Troubleshooting Guide](TROUBLESHOOTING.md) - General troubleshooting help
 
 ## Support

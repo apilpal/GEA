@@ -10,12 +10,12 @@ Centralized troubleshooting resource for the Student Profiles PWA. Find solution
 - **[Production Issues](./production-issues.md)** - Production deployment issues *(Coming Soon)*
 
 ### **Current Documentation**
-- **[🔓 Login Bypass Issues](./login-bypass-troubleshooting.md)** - **Development authentication problems**
-- **[📋 Dev User Setup](./dev-user-setup.md)** - Complete development environment setup
-- **[🐞 Bug Reports](./bugs.md)** - Known issues and bug tracking
-- **[🔍 Frontend Issues](./frontend-common-issues.md)** - Frontend-specific problems
-- **[🌐 MIME Types](./frontend-mime-types.md)** - Web server configuration issues
-- **[📊 Test Issues](./test-issues-comprehensive.md)** - Testing-related problems
+- **[🔓 Login Bypass Issues](login-bypass-troubleshooting.md)** - **Development authentication problems**
+- **[📋 Dev User Setup](dev-user-setup.md)** - Complete development environment setup
+- **[🐞 Bug Reports](bugs.md)** - Known issues and bug tracking
+- **[🔍 Frontend Issues](frontend-common-issues.md)** - Frontend-specific problems
+- **[🌐 MIME Types](frontend-mime-types.md)** - Web server configuration issues
+- **[📊 Test Issues](test-issues-comprehensive.md)** - Testing-related problems
 
 ---
 
@@ -43,7 +43,7 @@ Centralized troubleshooting resource for the Student Profiles PWA. Find solution
 | **Port Conflicts** | Port already in use | [Port Configuration](./common-issues.md#port-conflicts) |
 | **Permission Errors** | File access issues | [Permissions Guide](./common-issues.md#permissions) |
 | **Dependency Issues** | Missing packages | [Dependencies](./common-issues.md#dependencies) |
-| **Environment Setup** | Configuration problems | [Environment Setup](./dev-user-setup.md) |
+| **Environment Setup** | Configuration problems | [Environment Setup](dev-user-setup.md) |
 
 ### **💻 Development Issues**
 | Issue | Description | Solution |
@@ -51,12 +51,12 @@ Centralized troubleshooting resource for the Student Profiles PWA. Find solution
 | **Build Failures** | Compilation errors | [Build Issues](./development-issues.md#build-failures) |
 | **Hot Reload** | Development server issues | [Hot Reload](./development-issues.md#hot-reload) |
 | **Debugging** | Can't debug application | [Debug Guide](./development-issues.md#debugging) |
-| **Testing** | Test failures | [Test Issues](./test-issues-comprehensive.md) |
+| **Testing** | Test failures | [Test Issues](test-issues-comprehensive.md) |
 
 ### **🔐 Authentication Issues**
 | Issue | Description | Solution |
 |-------|-------------|----------|
-| **Bypass Login Problems** | Development authentication issues | **[Bypass Login Guide](./login-bypass-troubleshooting.md)** |
+| **Bypass Login Problems** | Development authentication issues | **[Bypass Login Guide](login-bypass-troubleshooting.md)** |
 | **JWT Token Issues** | Token expiration/validation | [Auth Issues](./development-issues.md#authentication) |
 | **Session Management** | Login/logout problems | [Auth Issues](./development-issues.md#authentication) |
 | **CORS Errors** | Cross-origin request failures | [CORS Issues](./development-issues.md#cors) |
@@ -64,10 +64,10 @@ Centralized troubleshooting resource for the Student Profiles PWA. Find solution
 ### **🌐 Frontend Issues**
 | Issue | Description | Solution |
 |-------|-------------|----------|
-| **Styling Problems** | CSS/SCSS issues | [Styling Issues](./frontend-common-issues.md#styling) |
-| **Component Errors** | Component failures | [Component Issues](./frontend-common-issues.md#components) |
-| **MIME Types** | File serving issues | [MIME Types](./frontend-mime-types.md) |
-| **PWA Features** | Service worker problems | [PWA Issues](./frontend-common-issues.md#pwa) |
+| **Styling Problems** | CSS/SCSS issues | [Styling Issues](frontend-common-issues.md#styling) |
+| **Component Errors** | Component failures | [Component Issues](frontend-common-issues.md#components) |
+| **MIME Types** | File serving issues | [MIME Types](frontend-mime-types.md) |
+| **PWA Features** | Service worker problems | [PWA Issues](frontend-common-issues.md#pwa) |
 
 ### **🔌 Backend Issues**
 | Issue | Description | Solution |
@@ -157,7 +157,7 @@ npm run dev  # Check browser console
 ## 📚 Related Documentation
 
 - **[💻 Development Guide](../../development/guide.md)** - Development best practices
-- **[🔧 Dev Setup](./dev-user-setup.md)** - Complete setup instructions
+- **[🔧 Dev Setup](dev-user-setup.md)** - Complete setup instructions
 - **[🧪 Testing Guide](../../testing/strategies.md)** - Testing methodologies
 - **[🚀 Deployment Guide](../../deployment/)** - Deployment troubleshooting
 
