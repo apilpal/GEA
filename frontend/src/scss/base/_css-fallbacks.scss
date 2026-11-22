@@ -9,10 +9,6 @@
 // ============================================================================
 
 // Check if CSS custom properties are supported
-@supports not (--css: variables) {
-  // Fallbacks for browsers without custom property support
-  @include css-variable-fallbacks();
-}
 
 // ============================================================================
 // CSS CUSTOM PROPERTY FALLBACKS
@@ -271,7 +267,6 @@
 @supports not (container-type: inline-size) {
   .container-query-polyfill {
     // Fallback behavior for container queries
-    @content;
   }
 }
 

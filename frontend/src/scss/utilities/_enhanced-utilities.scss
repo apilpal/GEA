@@ -4,6 +4,7 @@
 @use 'sass:map';
 @use '../base/variables' as vars;
 @use '../base/mixins' as mixins;
+@use '../base/css-fallbacks' as fallbacks;
 @use '../base/themes' as themes;
 
 // ============================================================================
@@ -11,40 +12,40 @@
 // ============================================================================
 
 // Color utilities with theme support and fallbacks
-.text-primary { @include mixins.progressive-enhancement(color, vars.$primary-color, '--color-primary'); }
-.text-secondary { @include mixins.progressive-enhancement(color, vars.$secondary-color, '--color-secondary'); }
-.text-accent { @include mixins.progressive-enhancement(color, vars.$accent-color, '--color-accent'); }
-.text-success { @include mixins.progressive-enhancement(color, vars.$success-color, '--color-success'); }
-.text-warning { @include mixins.progressive-enhancement(color, vars.$warning-color, '--color-warning'); }
-.text-danger { @include mixins.progressive-enhancement(color, vars.$danger-color, '--color-danger'); }
-.text-info { @include mixins.progressive-enhancement(color, vars.$info-color, '--color-info'); }
-.text-muted { @include mixins.progressive-enhancement(color, vars.$text-muted, '--color-text-muted'); }
+.text-primary { @include fallbacks.progressive-enhancement(color, vars.$primary-color, '--color-primary'); }
+.text-secondary { @include fallbacks.progressive-enhancement(color, vars.$secondary-color, '--color-secondary'); }
+.text-accent { @include fallbacks.progressive-enhancement(color, vars.$accent-color, '--color-accent'); }
+.text-success { @include fallbacks.progressive-enhancement(color, vars.$success-color, '--color-success'); }
+.text-warning { @include fallbacks.progressive-enhancement(color, vars.$warning-color, '--color-warning'); }
+.text-danger { @include fallbacks.progressive-enhancement(color, vars.$danger-color, '--color-danger'); }
+.text-info { @include fallbacks.progressive-enhancement(color, vars.$info-color, '--color-info'); }
+.text-muted { @include fallbacks.progressive-enhancement(color, vars.$text-muted, '--color-text-muted'); }
 
-.bg-primary { @include mixins.progressive-enhancement(background-color, vars.$primary-color, '--color-primary'); }
-.bg-secondary { @include mixins.progressive-enhancement(background-color, vars.$secondary-color, '--color-secondary'); }
-.bg-accent { @include mixins.progressive-enhancement(background-color, vars.$accent-color, '--color-accent'); }
-.bg-success { @include mixins.progressive-enhancement(background-color, vars.$success-color, '--color-success'); }
-.bg-warning { @include mixins.progressive-enhancement(background-color, vars.$warning-color, '--color-warning'); }
-.bg-danger { @include mixins.progressive-enhancement(background-color, vars.$danger-color, '--color-danger'); }
-.bg-info { @include mixins.progressive-enhancement(background-color, vars.$info-color, '--color-info'); }
-.bg-surface { @include mixins.progressive-enhancement(background-color, #ffffff, '--color-surface'); }
-.bg-surface-elevated { @include mixins.progressive-enhancement(background-color, #ffffff, '--color-surface-elevated'); }
+.bg-primary { @include fallbacks.progressive-enhancement(background-color, vars.$primary-color, '--color-primary'); }
+.bg-secondary { @include fallbacks.progressive-enhancement(background-color, vars.$secondary-color, '--color-secondary'); }
+.bg-accent { @include fallbacks.progressive-enhancement(background-color, vars.$accent-color, '--color-accent'); }
+.bg-success { @include fallbacks.progressive-enhancement(background-color, vars.$success-color, '--color-success'); }
+.bg-warning { @include fallbacks.progressive-enhancement(background-color, vars.$warning-color, '--color-warning'); }
+.bg-danger { @include fallbacks.progressive-enhancement(background-color, vars.$danger-color, '--color-danger'); }
+.bg-info { @include fallbacks.progressive-enhancement(background-color, vars.$info-color, '--color-info'); }
+.bg-surface { @include fallbacks.progressive-enhancement(background-color, #ffffff, '--color-surface'); }
+.bg-surface-elevated { @include fallbacks.progressive-enhancement(background-color, #ffffff, '--color-surface-elevated'); }
 
 // Border utilities with theme support
-.border-primary { @include mixins.progressive-enhancement(border-color, vars.$primary-color, '--color-primary'); }
-.border-secondary { @include mixins.progressive-enhancement(border-color, vars.$secondary-color, '--color-secondary'); }
-.border-accent { @include mixins.progressive-enhancement(border-color, vars.$accent-color, '--color-accent'); }
-.border-success { @include mixins.progressive-enhancement(border-color, vars.$success-color, '--color-success'); }
-.border-warning { @include mixins.progressive-enhancement(border-color, vars.$warning-color, '--color-warning'); }
-.border-danger { @include mixins.progressive-enhancement(border-color, vars.$danger-color, '--color-danger'); }
-.border-info { @include mixins.progressive-enhancement(border-color, vars.$info-color, '--color-info'); }
-.border-default { @include mixins.progressive-enhancement(border-color, vars.$border-color, '--color-border'); }
+.border-primary { @include fallbacks.progressive-enhancement(border-color, vars.$primary-color, '--color-primary'); }
+.border-secondary { @include fallbacks.progressive-enhancement(border-color, vars.$secondary-color, '--color-secondary'); }
+.border-accent { @include fallbacks.progressive-enhancement(border-color, vars.$accent-color, '--color-accent'); }
+.border-success { @include fallbacks.progressive-enhancement(border-color, vars.$success-color, '--color-success'); }
+.border-warning { @include fallbacks.progressive-enhancement(border-color, vars.$warning-color, '--color-warning'); }
+.border-danger { @include fallbacks.progressive-enhancement(border-color, vars.$danger-color, '--color-danger'); }
+.border-info { @include fallbacks.progressive-enhancement(border-color, vars.$info-color, '--color-info'); }
+.border-default { @include fallbacks.progressive-enhancement(border-color, vars.$border-color, '--color-border'); }
 
 // Shadow utilities with theme support
-.shadow-sm { @include mixins.shadow-enhanced('sm'); }
-.shadow-md { @include mixins.shadow-enhanced('md'); }
-.shadow-lg { @include mixins.shadow-enhanced('lg'); }
-.shadow-xl { @include mixins.shadow-enhanced('xl'); }
+.shadow-sm { @include fallbacks.shadow-enhanced('sm'); }
+.shadow-md { @include fallbacks.shadow-enhanced('md'); }
+.shadow-lg { @include fallbacks.shadow-enhanced('lg'); }
+.shadow-xl { @include fallbacks.shadow-enhanced('xl'); }
 .shadow-none { box-shadow: none; }
 
 // ============================================================================
@@ -159,10 +160,10 @@
 .items-stretch { align-items: stretch; }
 
 // Grid utilities with fallbacks
-.grid-cols-1 { @include mixins.grid-fallback(1, null); }
-.grid-cols-2 { @include mixins.grid-fallback(2, null); }
-.grid-cols-3 { @include mixins.grid-fallback(3, null); }
-.grid-cols-4 { @include mixins.grid-fallback(4, null); }
+.grid-cols-1 { @include fallbacks.grid-fallback(1, null); }
+.grid-cols-2 { @include fallbacks.grid-fallback(2, null); }
+.grid-cols-3 { @include fallbacks.grid-fallback(3, null); }
+.grid-cols-4 { @include fallbacks.grid-fallback(4, null); }
 
 .gap-1 { gap: vars.$space-1; }
 .gap-2 { gap: vars.$space-2; }
@@ -219,13 +220,13 @@
 // ============================================================================
 
 // Transition utilities with enhanced support
-.transition-fast { @include mixins.transition-enhanced($duration: vars.$transition-fast); }
-.transition-base { @include mixins.transition-enhanced($duration: vars.$transition-base); }
-.transition-slow { @include mixins.transition-enhanced($duration: vars.$transition-slow); }
+.transition-fast { @include fallbacks.transition-enhanced($duration: vars.$transition-fast); }
+.transition-base { @include fallbacks.transition-enhanced($duration: vars.$transition-base); }
+.transition-slow { @include fallbacks.transition-enhanced($duration: vars.$transition-slow); }
 
-.transition-colors { @include mixins.transition-enhanced(color, vars.$transition-base); }
-.transition-transform { @include mixins.transition-enhanced(transform, vars.$transition-base); }
-.transition-opacity { @include mixins.transition-enhanced(opacity, vars.$transition-base); }
+.transition-colors { @include fallbacks.transition-enhanced(color, vars.$transition-base); }
+.transition-transform { @include fallbacks.transition-enhanced(transform, vars.$transition-base); }
+.transition-opacity { @include fallbacks.transition-enhanced(opacity, vars.$transition-base); }
 
 // Transform utilities
 .transform { transform: translateZ(0); }
@@ -233,8 +234,8 @@
 
 .translate-x-0 { transform: translateX(0); }
 .translate-y-0 { transform: translateY(0); }
-.-translate-x-1 { transform: translateX(-vars.$space-1); }
-.-translate-y-1 { transform: translateY(-vars.$space-1); }
+.-translate-x-1 { transform: translateX(-1 * vars.$space-1); }
+.-translate-y-1 { transform: translateY(-1 * vars.$space-1); }
 
 .scale-95 { transform: scale(0.95); }
 .scale-100 { transform: scale(1); }
@@ -313,20 +314,25 @@
 // ============================================================================
 
 // Responsive text color utilities
+$text-color-map: (
+  primary: vars.$primary-color,
+  secondary: vars.$secondary-color,
+  accent: vars.$accent-color,
+  success: vars.$success-color,
+  warning: vars.$warning-color,
+  danger: vars.$danger-color,
+  info: vars.$info-color
+);
 @each $color in (primary, secondary, accent, success, warning, danger, info) {
-  .text-#{$color} {
-    @extend .text-#{$color};
-  }
-
   @media (min-width: vars.$tablet) {
     .sm\:text-#{$color} {
-      color: var(--color-#{$color}, #{map.get(vars.$color-map, $color)});
+      color: var(--color-#{$color}, #{map.get($text-color-map, $color)});
     }
   }
 
   @media (min-width: vars.$desktop) {
     .md\:text-#{$color} {
-      color: var(--color-#{$color}, #{map.get(vars.$color-map, $color)});
+      color: var(--color-#{$color}, #{map.get($text-color-map, $color)});
     }
   }
 }
