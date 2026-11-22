@@ -10,6 +10,7 @@
     "start": "node scripts/dev.mjs",
     "create-admin": "cd backend && .venv/bin/python setup_local.py",
     "seed": "cd backend && .venv/bin/python seed_sample_data.py",
+    "seed-school": "cd backend && .venv/bin/python seed_school_data.py",
     "reset-password": "cd backend && .venv/bin/python setup_local.py --reset-password"
   }
 }
