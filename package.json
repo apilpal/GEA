@@ -11,6 +11,8 @@
     "create-admin": "cd backend && .venv/bin/python setup_local.py",
     "seed": "cd backend && .venv/bin/python seed_sample_data.py",
     "seed-school": "cd backend && .venv/bin/python seed_school_data.py",
+    "backup": "cd backend && .venv/bin/python db_backup.py backup",
+    "restore": "cd backend && .venv/bin/python db_backup.py restore",
     "reset-password": "cd backend && .venv/bin/python setup_local.py --reset-password"
   }
 }

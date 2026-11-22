@@ -58,18 +58,9 @@ def upgrade_database() -> None:
         db_file = Path(url[len("sqlite:///"):])
         db_file.parent.mkdir(parents=True, exist_ok=True)
     if db_file is not None and db_file.exists() and db_file.stat().st_size > 0:
-        import sqlite3
-        from datetime import datetime
+        import db_backup
 
-        backup_dir = db_file.parent / "backups"
-        backup_dir.mkdir(exist_ok=True)
-        target = backup_dir / f"{db_file.stem}-{datetime.now():%Y%m%d-%H%M%S}-before-upgrade.db"
-        source = sqlite3.connect(db_file)
-        dest = sqlite3.connect(target)
-        with dest:
-            source.backup(dest)  # consistent copy even if the app is running
-        source.close()
-        dest.close()
+        target = db_backup.backup(db_file, suffix="before-upgrade")
         print(f"Backed up the database to {target}")
     cfg = Config(str(BACKEND_DIR / "alembic.ini"))
     cfg.set_main_option("script_location", str(BACKEND_DIR / "alembic"))
