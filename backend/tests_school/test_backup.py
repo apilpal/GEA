@@ -112,6 +112,8 @@ def test_a_damaged_backup_is_rejected_and_the_database_is_untouched(db):
 
 def test_logs_contain_no_student_details(db, caplog):
     import logging
+    # Alembic (run by the db fixture) switches off existing loggers; turn ours back on.
+    logging.getLogger("backup").disabled = False
     with caplog.at_level(logging.INFO, logger="backup"):
         target = db_backup.backup(db)
         db_backup.restore(target, db)
