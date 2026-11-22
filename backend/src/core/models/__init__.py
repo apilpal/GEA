@@ -23,6 +23,8 @@ from .models import (
     UserRole
 )
 
+from . import school_models  # noqa: E402,F401  (registers the school tables on Base)
+
 __all__ = [
     "HealthResponse",
     "User",

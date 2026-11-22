@@ -9,7 +9,8 @@ For a non-interactive run set ADMIN_USERNAME, ADMIN_EMAIL and ADMIN_PASSWORD.
 To set a new password for an existing user (for example if you forgot it):
 
     python setup_local.py --reset-password
-Safe to run again: existing tables and users are left alone.
+Safe to run again: it backs up an existing database, applies any new schema
+changes (Alembic) and leaves existing users alone.
 """
 
 import asyncio
@@ -31,7 +32,11 @@ if not os.getenv("SECRET_KEY"):
 
 from sqlalchemy import select, func  # noqa: E402
 
-from core.models.models import Base, DBUser, CreateUserRequest, SessionLocal, sync_engine  # noqa: E402
+from alembic import command  # noqa: E402
+from alembic.config import Config  # noqa: E402
+
+from core.models.models import DBUser, CreateUserRequest, SessionLocal  # noqa: E402
+from src.core.config.config import config as app_config  # noqa: E402
 from utils.user_utils import create_user  # noqa: E402
 from utils.auth_utils import hash_password  # noqa: E402
 
@@ -39,6 +44,37 @@ from utils.auth_utils import hash_password  # noqa: E402
 def ask(prompt: str, default: str = "") -> str:
     value = input(f"{prompt}{f' [{default}]' if default else ''}: ").strip()
     return value or default
+
+
+def upgrade_database() -> None:
+    """Bring the database to the latest schema with Alembic, backing it up first.
+
+    Databases made by the older setup (plain create_all) are adopted automatically:
+    revision 0001 only creates tables that are missing.
+    """
+    url = app_config.DATABASE_URL
+    db_file = None
+    if url.startswith("sqlite:///"):
+        db_file = Path(url[len("sqlite:///"):])
+        db_file.parent.mkdir(parents=True, exist_ok=True)
+    if db_file is not None and db_file.exists() and db_file.stat().st_size > 0:
+        import sqlite3
+        from datetime import datetime
+
+        backup_dir = db_file.parent / "backups"
+        backup_dir.mkdir(exist_ok=True)
+        target = backup_dir / f"{db_file.stem}-{datetime.now():%Y%m%d-%H%M%S}-before-upgrade.db"
+        source = sqlite3.connect(db_file)
+        dest = sqlite3.connect(target)
+        with dest:
+            source.backup(dest)  # consistent copy even if the app is running
+        source.close()
+        dest.close()
+        print(f"Backed up the database to {target}")
+    cfg = Config(str(BACKEND_DIR / "alembic.ini"))
+    cfg.set_main_option("script_location", str(BACKEND_DIR / "alembic"))
+    cfg.set_main_option("sqlalchemy.url", url)
+    command.upgrade(cfg, "head")
 
 
 async def admin_exists() -> bool:
@@ -82,8 +118,8 @@ async def main() -> None:
     if "--reset-password" in sys.argv:
         await reset_password()
         return
-    Base.metadata.create_all(sync_engine)
-    print("Database tables are ready.")
+    upgrade_database()
+    print("Database is up to date.")
     if await admin_exists():
         print("An admin user already exists - nothing to do.")
     else:
