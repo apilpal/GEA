@@ -1,43 +1,126 @@
-# Roadmap
+# School Academic & Fee Analytics Platform — Roadmap
 
-Where the project stands and what comes next. Last updated: November 2026.
-Older long-term ideas (microservices, machine learning, integrations) are kept in
-[docs/roadmap/strategic-roadmap-2025.md](docs/roadmap/strategic-roadmap-2025.md); the working task list is
-[docs/roadmap/TODO.md](docs/roadmap/TODO.md).
+**Target scale:** approximately 600 students, 30 teachers, 5 transport routes, and 100 van riders  
+**Stack:** FastAPI, SQLite, SQLAlchemy/Alembic, TypeScript, Vite, SCSS  
+**Locale:** INR (`₹`)  
+**Status:** Approved planning roadmap
 
-## Done
+## Objectives
 
-- **Login with roles** - login is required; staff roles manage students and drivers, finance roles see reports, charts and the dashboard, admins manage CSV sync. The guest login was removed.
-- **Run it on a phone** - `bash scripts/termux-setup.sh` once, then `pnpm dev` starts backend and frontend together (SQLite, no Docker).
-- **Demo data** - while the database is empty the dashboard shows 75 students, 5 drivers and a fee of 500 per student.
-- **Dashboard fixes** - authenticated API requests, dashboard navigation and the sidebar on small screens.
-- **Documentation cleanup** - one README, one documentation index, duplicate and generated files removed, old material moved to `docs/archive/`.
+- Make daily attendance, assessment marks, and fee entry quick and reliable.
+- Record neutral student marks per subject and class section.
+- Compare student, subject, class, and section performance across exams and terms.
+- Diagnose academic and operational gaps using attendance, transport, and fee data.
+- Give management clear fee billing, collection, pending dues, and route-level visibility.
 
-## Now
+## Delivery phases
 
-- **Fix the stylesheet build.** `frontend/styles.css` is a committed, out-of-date compiled file, and the SCSS in `frontend/src/scss` does not compile cleanly, so new styles do not reach the app. Make `styles.css` build from the SCSS and stop committing the output.
-- **Clean up generated frontend files.** Remove the generated `.js` and `.map` files from the `ts` folders and let `tsc` produce them.
-- **Real data instead of demo data.** Make adding students and drivers and importing CSV files simple enough that a school can replace the demo data on day one.
-- **Tests that match the code.** Update the existing tests after the login and guest changes; add a test for the location bar HTTPS changes and one that checks the payload sent to the server.
-- **One request/response model.** Make the frontend and backend request and response shapes the same.
+| Phase | Scope | Deliverables | Exit criteria |
+|---|---|---|---|
+| 0 | Foundation | Data rules, role matrix, migrations, backup and recovery | Definitions and permissions approved |
+| 1 | Schema and demo data | Academic, attendance, marks, and fee tables | Migration and seed process verified |
+| 2 | Entry and scorecards | Bulk entry APIs and student scorecards | Staff workflows tested by role |
+| 3 | Analytics engine | Management, class, subject, and fee analytics | Calculations independently verified |
+| 4 | Mobile and exports | Print, CSV, accessibility, and mobile UX | Pilot workflows usable on phones |
+| 5 | Pilot and operations | Staff pilot, training, monitoring, backup validation | Go-live criteria signed off |
 
-## Next
+## Phase 0 — Foundation and decisions
 
-- **Basic CI.** The CI workflows were removed. Add one small workflow that installs dependencies, runs the backend tests and the frontend tests on every pull request.
-- **Backups and validation.** Database backup and restore, input validation on API requests, and connection pooling for PostgreSQL.
-- **Per-role screens.** Give drivers, parents and students screens that show only their own routes, students and fees.
-- **Fees and payments.** Track which students have paid each month, not only the amount due.
-- **Reports export.** Download reports as CSV or PDF.
+- Review existing student, user, driver, route, authentication, and database structures.
+- Define academic-year, grade/section, subject, exam-term, fee-period, and payment rules.
+- Define Admin/Management, Teacher, and Office Clerk permissions, including assigned-class restrictions.
+- Map existing student and transport records into the academic model.
+- Document attendance, exam absence, fee discount, partial payment, overdue, and correction rules.
+- Select a migration, backup, restore, and audit strategy.
 
-## Later (ideas, not commitments)
+**Exit criteria:** Data rules, role matrix, migration plan, and backup procedure are approved.
 
-- Notifications to parents (route changes, delays).
-- Route planning help and a map view.
-- Offline use and installable PWA polish.
-- Translations and accessibility review.
-- Analytics over several months.
+## Phase 1 — Schema and realistic demo data
 
-## How this roadmap is kept
+- Add Alembic migrations for academic years and class sections.
+- Add migrations for subjects and class-subject mappings.
+- Extend student profiles with class/section, roll number, admission number, and village.
+- Add attendance, exam-term, assessment-score, fee-invoice, and fee-payment tables.
+- Add uniqueness constraints and indexes for common lookups and duplicate prevention.
+- Seed repeatable fictional data for approximately 600 students, 30 teachers, 5 routes, 5 subjects, and 2 terms.
+- Keep demo seeding separate from production data and make it safe to rerun.
+- Test database backup and restore with a seed dataset.
 
-Move an item up when work starts, and into **Done** (with a line in the
-[changelog](CHANGELOG.md)) when it ships. Keep it short; put detail in `docs/roadmap/`.
+**Exit criteria:** A fresh database migrates and seeds reproducibly without duplicate or destructive side effects.
+
+## Phase 2 — Entry workflows and student scorecards
+
+- Build the attendance roster endpoint for class/section and date.
+- Implement bulk attendance save in one transaction.
+- Build the marks roster endpoint for class, subject, and exam term.
+- Implement bulk marks upsert with 0-to-maximum-marks validation.
+- Build fee payment entry with unique receipt numbers and derived invoice status.
+- Add student search and filtering by name, class/section, village, route, and risk flag.
+- Build the student scorecard API with profile, attendance, transport, fees, marks, averages, and term trends.
+- Add mobile-friendly attendance, marks, and fee entry interfaces.
+- Record who made attendance, marks, and payment entries or changes.
+
+**Exit criteria:** Role-scoped staff workflows pass end-to-end tests and scorecard calculations reconcile independently.
+
+## Phase 3 — Analytics and diagnostics
+
+- Implement the management summary API.
+- Implement class-to-class and section-to-section comparisons.
+- Implement subject comparison and bottleneck analytics.
+- Implement fee analytics grouped by class/section and transport route.
+- Compute school, class, subject, attendance, and fee metrics server-side.
+- Add distinction, steady, borderline, and at-risk distribution buckets.
+- Add root-cause tags for attendance gaps, subject gaps, and high-spread polarization.
+- Add overdue and pending-fee follow-up lists.
+- Add report tables and charts with class/student drill-down.
+
+**Exit criteria:** Calculations pass normal, missing, partial, and edge-case fixtures; reports clearly explain risk labels.
+
+## Phase 4 — Mobile, print, and exports
+
+- Polish responsive student cards and tables.
+- Add sticky comparison-table columns and mobile horizontal scrolling.
+- Use numeric mobile keyboard input for marks and ₹ fee amounts.
+- Add printable student scorecards and class-comparison views.
+- Add CSV exports for students, marks, attendance, and fees.
+- Standardize `₹` formatting across forms, cards, receipts, and reports.
+- Review keyboard navigation, labels, focus, contrast, and screen-reader status.
+- Test on representative Android phones over local Wi-Fi/hotspot.
+
+**Exit criteria:** Core data-entry and reporting workflows are usable on a phone and reconcile after print/export.
+
+## Phase 5 — Pilot and operational readiness
+
+- Pilot with a limited set of classes, teachers, clerks, and fictional records.
+- Verify role restrictions, bulk saves, receipts, analytics, migration, and recovery.
+- Establish daily backup timing and test restoration from a real backup copy.
+- Add operational logging for bulk-save failures, authorization failures, and backup failures.
+- Publish staff operating guides for attendance, marks, payments, exports, and recovery.
+- Resolve pilot feedback and document known limitations.
+
+**Exit criteria:** Staff sign off; a backup is successfully restored; go-live and recovery procedures are documented.
+
+## Key implementation rules
+
+- Use Alembic migrations for every schema change.
+- Enforce authorization in FastAPI dependencies and services, not only in the frontend.
+- Keep payment and invoice changes in transactions that update audit records consistently.
+- Generate fee receipts with unique numbers and preserve a traceable payment history.
+- Keep demo data clearly separated from real records.
+- Define attendance and missing-mark edge cases before implementing averages and risk flags.
+- Back up SQLite before bulk imports or migration runs and test restoration.
+- Prefer server-side SQL/Python aggregation for compact analytics responses.
+
+## Working sequence
+
+1. Approve data definitions and permissions.
+2. Create migrations and seed/demo data.
+3. Build and test attendance, marks, and fee entry.
+4. Build student search and scorecards.
+5. Implement analytics APIs and verify calculations.
+6. Add reports, print, CSV, and mobile polish.
+7. Pilot, train users, and validate backups.
+
+## Tracking
+
+GitHub phase issues and sub-task issues should be created from this roadmap. Each issue should remain independently actionable and link back to the relevant phase and exit criterion.
