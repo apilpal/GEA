@@ -28,7 +28,7 @@ on the same Wi-Fi.
 
 ## Other commands
 - `pnpm create-admin` - run the admin/database setup again (existing users are kept).
-- `pnpm seed` - replace all students and drivers in the database with the 75 sample students and 5 sample drivers (fee 500 each). Every phone ends up with identical data, however many times you run it. It deletes students and drivers you added yourself; user logins are not touched. To keep your own records and only add missing sample rows, run `python seed_sample_data.py --append` in `backend/`.
+- `pnpm seed` - put the 75 sample students and 5 sample drivers (fee 500 each) in the database. It removes the sample rows it made before (including those from older versions of the script) and adds them again, so every phone ends up with the same sample data however many times you run it. Students, drivers and logins you added yourself are kept. To delete **everything** and start from the sample data only, run `python seed_sample_data.py --reset` in `backend/` (it asks you to type DELETE).
 - Add more users later from the API docs page: http://127.0.0.1:8000/docs
 
 ## If something goes wrong

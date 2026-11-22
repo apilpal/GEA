@@ -176,7 +176,7 @@ def verify_token(token: str, token_type: str = "access") -> Optional[dict]:
 
     Raises:
         jwt.ExpiredSignatureError: If token is expired (caught internally)
-        jwt.InvalidTokenError: If token is malformed (caught internally)
+        jwt.JWTError: If token is malformed (caught internally)
     """
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -190,7 +190,7 @@ def verify_token(token: str, token_type: str = "access") -> Optional[dict]:
             detail="Token has expired",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    except jwt.InvalidTokenError:
+    except jwt.JWTError:
         # Token is invalid/malformed
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

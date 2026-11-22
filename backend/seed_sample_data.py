@@ -7,15 +7,18 @@ Seeds the database with 75 sample students and 5 sample drivers (a transport fee
 These are the same people and routes as the demo data in frontend/src/ts/demo-data.ts.
 
 Run it from the backend folder, after setup (scripts/termux-setup.sh does the setup).
-By default it REPLACES all students and drivers with exactly this sample set, so every
-phone or computer ends up with identical data no matter what was in the database before.
-User accounts (logins) are not touched.
+
+By default it is safe to run at any time: it removes the sample rows it created before
+(including those from older versions of this script) and adds them again, so every phone
+or computer ends up with the same sample data. Students, drivers and logins that you added
+yourself are NOT touched.
 
 Usage:
-    python seed_sample_data.py [--append] [--verbose]
+    python seed_sample_data.py [--reset [--yes]] [--verbose]
 
 Options:
-    --append    Keep existing students and drivers and only add sample rows that are missing
+    --reset     Delete ALL students and drivers first (asks for confirmation)
+    --yes       Do not ask for confirmation with --reset
     --verbose   Enable detailed logging
 """
 
@@ -23,7 +26,7 @@ import asyncio
 import sys
 from datetime import datetime, UTC
 from typing import List, Dict, Any
-from sqlalchemy import func, select
+from sqlalchemy import delete, func, select
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -153,126 +156,167 @@ SAMPLE_DRIVERS = [
     for number, (name, route, vehicle_number, experience_years) in enumerate(_DRIVER_ROWS, start=1)
 ]
 
-async def create_sample_students(db: AsyncSession, clear: bool = False) -> int:
-    """Create sample students in the database."""
-    if clear:
-        removed = await db.scalar(select(func.count()).select_from(DBStudent))
-        await db.execute(DBStudent.__table__.delete())
-        await db.commit()
-        print(f"   Removed {removed} existing students")
+# Rows created by earlier versions of this script. They are removed again so that installs
+# that ran an old version end up with the same data as everyone else.
+LEGACY_STUDENTS = {
+    ("Alice Johnson", "1234567890"),
+    ("Bob Smith", "2345678901"),
+    ("Charlie Brown", "3456789012"),
+    ("Diana Prince", "4567890123"),
+    ("Ethan Hunt", "5678901234"),
+}
+LEGACY_DRIVERS = {
+    ("Driver Alex", "DL123456789"),
+    ("Driver Bob", "DL987654321"),
+    ("Driver Charlie", "DL456789123"),
+}
 
-    created_count = 0
+
+def sample_student_keys() -> set:
+    """(name, mobile) pairs that identify sample students, current and legacy."""
+    return {(s["name"], s["mobile"]) for s in SAMPLE_STUDENTS} | LEGACY_STUDENTS
+
+
+def sample_driver_keys() -> set:
+    """(name, license number) pairs that identify sample drivers, current and legacy."""
+    return {(d["name"], d["license_number"]) for d in SAMPLE_DRIVERS} | LEGACY_DRIVERS
+
+
+async def remove_sample_rows(db: AsyncSession) -> tuple:
+    """Delete the sample students and drivers made by this script; keep everything else."""
+    student_keys = sample_student_keys()
+    drivers_keys = sample_driver_keys()
+
+    students = (await db.execute(
+        select(DBStudent).where(DBStudent.mobile.in_({mobile for _, mobile in student_keys}))
+    )).scalars().all()
+    removed_students = 0
+    for student in students:
+        if (student.name, student.mobile) in student_keys:
+            await db.delete(student)
+            removed_students += 1
+
+    drivers = (await db.execute(
+        select(DBDriver).where(DBDriver.license_number.in_({license for _, license in drivers_keys}))
+    )).scalars().all()
+    removed_drivers = 0
+    for driver in drivers:
+        if (driver.name, driver.license_number) in drivers_keys:
+            await db.delete(driver)
+            removed_drivers += 1
+
+    await db.commit()
+    return removed_students, removed_drivers
+
+
+async def delete_everything(db: AsyncSession) -> tuple:
+    """Delete ALL students and drivers (used by --reset)."""
+    students = await db.scalar(select(func.count()).select_from(DBStudent))
+    drivers = await db.scalar(select(func.count()).select_from(DBDriver))
+    await db.execute(delete(DBStudent))
+    await db.execute(delete(DBDriver))
+    await db.commit()
+    return students, drivers
+
+
+async def create_sample_students(db: AsyncSession) -> int:
+    """Add every sample student (call remove_sample_rows first to avoid duplicates)."""
+    now = int(datetime.now(UTC).timestamp())
     for student_data in SAMPLE_STUDENTS:
-        try:
-            # Check if student already exists
-            existing = await db.execute(
-                DBStudent.__table__.select().where(DBStudent.mobile == student_data["mobile"])
-            )
-            if existing.scalar_one_or_none():
-                continue
-
-            student = DBStudent(
-                name=student_data["name"],
-                father_name=student_data["father_name"],
-                mobile=student_data["mobile"],
-                class_=student_data["class_"],
-                address=student_data["address"],
-                fees=student_data["fees"],
-                route=student_data["route"],
-                status="active",
-                created_at=int(datetime.now(UTC).timestamp()),
-                updated_at=int(datetime.now(UTC).timestamp())
-            )
-            db.add(student)
-            created_count += 1
-
-        except Exception as e:
-            print(f"Error creating student {student_data['name']}: {e}")
-            continue
-
+        db.add(DBStudent(
+            name=student_data["name"],
+            father_name=student_data["father_name"],
+            mobile=student_data["mobile"],
+            class_=student_data["class_"],
+            address=student_data["address"],
+            fees=student_data["fees"],
+            route=student_data["route"],
+            status="active",
+            created_at=now,
+            updated_at=now,
+        ))
     await db.commit()
-    return created_count
+    return len(SAMPLE_STUDENTS)
 
-async def create_sample_drivers(db: AsyncSession, clear: bool = False) -> int:
-    """Create sample drivers in the database."""
-    if clear:
-        removed = await db.scalar(select(func.count()).select_from(DBDriver))
-        await db.execute(DBDriver.__table__.delete())
-        await db.commit()
-        print(f"   Removed {removed} existing drivers")
 
-    created_count = 0
+async def create_sample_drivers(db: AsyncSession) -> int:
+    """Add every sample driver (call remove_sample_rows first to avoid duplicates)."""
+    now = int(datetime.now(UTC).timestamp())
     for driver_data in SAMPLE_DRIVERS:
-        try:
-            # Check if driver already exists
-            existing = await db.execute(
-                DBDriver.__table__.select().where(DBDriver.name == driver_data["name"])
-            )
-            if existing.scalar_one_or_none():
-                continue
-
-            driver = DBDriver(
-                name=driver_data["name"],
-                route=driver_data["route"],
-                status=driver_data["status"],
-                vehicle_number=driver_data["vehicle_number"],
-                contact_number=driver_data["contact_number"],
-                license_number=driver_data["license_number"],
-                experience_years=driver_data["experience_years"],
-                created_at=int(datetime.now(UTC).timestamp()),
-                updated_at=int(datetime.now(UTC).timestamp())
-            )
-            db.add(driver)
-            created_count += 1
-
-        except Exception as e:
-            print(f"Error creating driver {driver_data['name']}: {e}")
-            continue
-
+        db.add(DBDriver(
+            name=driver_data["name"],
+            route=driver_data["route"],
+            status=driver_data["status"],
+            vehicle_number=driver_data["vehicle_number"],
+            contact_number=driver_data["contact_number"],
+            license_number=driver_data["license_number"],
+            experience_years=driver_data["experience_years"],
+            created_at=now,
+            updated_at=now,
+        ))
     await db.commit()
-    return created_count
+    return len(SAMPLE_DRIVERS)
 
-async def main(clear: bool = True, verbose: bool = False):
+
+async def seed(db: AsyncSession, reset: bool = False) -> dict:
+    """Put the sample data in the database and return what happened."""
+    if reset:
+        removed_students, removed_drivers = await delete_everything(db)
+    else:
+        removed_students, removed_drivers = await remove_sample_rows(db)
+
+    created_students = await create_sample_students(db)
+    created_drivers = await create_sample_drivers(db)
+    total_students = await db.scalar(select(func.count()).select_from(DBStudent))
+    total_drivers = await db.scalar(select(func.count()).select_from(DBDriver))
+    return {
+        "removed_students": removed_students,
+        "removed_drivers": removed_drivers,
+        "created_students": created_students,
+        "created_drivers": created_drivers,
+        "other_students": total_students - created_students,
+        "other_drivers": total_drivers - created_drivers,
+    }
+
+
+async def main(reset: bool = False, verbose: bool = False):
     """Main function to seed sample data."""
     print("🌱 Starting sample data seeding...")
 
-    # Get database session
     async for db in get_db():
         try:
-            # Create sample students
-            students_created = await create_sample_students(db, clear)
-            if verbose:
-                print(f"✅ Created {students_created} sample students")
-
-            # Create sample drivers
-            drivers_created = await create_sample_drivers(db, clear)
-            if verbose:
-                print(f"✅ Created {drivers_created} sample drivers")
-
-            print("🎉 Sample data seeding completed successfully!")
-            print(f"   - Students: {students_created}")
-            print(f"   - Drivers: {drivers_created}")
-            print(f"   - Monthly fees: {students_created * MONTHLY_FEE:,.0f}")
-
+            result = await seed(db, reset=reset)
         except Exception as e:
+            await db.rollback()
             print(f"❌ Error during seeding: {e}")
             return 1
 
+        if verbose or reset:
+            print(f"   Removed {result['removed_students']} students and {result['removed_drivers']} drivers")
+        print("🎉 Sample data seeding completed successfully!")
+        print(f"   - Students: {result['created_students']} sample" + (f" (plus {result['other_students']} of your own, kept)" if result["other_students"] else ""))
+        print(f"   - Drivers: {result['created_drivers']} sample" + (f" (plus {result['other_drivers']} of your own, kept)" if result["other_drivers"] else ""))
+        print(f"   - Monthly fees of the sample students: {result['created_students'] * MONTHLY_FEE:,.0f}")
+
     return 0
+
 
 if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Seed 75 sample students and 5 sample drivers")
-    parser.add_argument("--append", action="store_true", help="Keep existing students and drivers; only add missing sample rows")
-    parser.add_argument("--clear", action="store_true", help=argparse.SUPPRESS)  # old option; replacing is now the default
+    parser.add_argument("--reset", action="store_true", help="Delete ALL students and drivers first")
+    parser.add_argument("--clear", action="store_true", help=argparse.SUPPRESS)  # old name for --reset
+    parser.add_argument("--yes", action="store_true", help="Do not ask for confirmation with --reset")
     parser.add_argument("--verbose", "-v", action="store_true", help="Enable verbose logging")
 
     args = parser.parse_args()
+    reset = args.reset or args.clear
 
-    replace = not args.append
-    if replace:
-        print("⚠️  Replacing all existing students and drivers with the sample set (logins are kept)...")
+    if reset and not args.yes:
+        print("⚠️  --reset deletes ALL students and drivers, including any you added yourself.")
+        if input("Type DELETE to continue: ").strip() != "DELETE":
+            print("Cancelled. Nothing was changed.")
+            sys.exit(1)
 
-    exit_code = asyncio.run(main(clear=replace, verbose=args.verbose))
-    sys.exit(exit_code)
+    sys.exit(asyncio.run(main(reset=reset, verbose=args.verbose)))

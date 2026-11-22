@@ -23,6 +23,7 @@ The schema is managed by Alembic (`backend/alembic/`). The old revisions are kep
   - one class-section (section `A`) per distinct `students.class_` value, with `4th` and `7th` normalised to `4` and `7`; real sections are entered later;
   - the 2026-27 academic year, the three exams (Terminal 40, Half-yearly 60, Annual 100) and the standard subject names.
   - `students.fees`, `students.class_`, `students.route` and `students.address` are kept unchanged.
+- `0003_auth_tables` - `token_blacklist`, `auth_audit_log` and `refresh_tokens`, which the JWT service uses for token revocation, rotation and the audit trail. Tables that already exist (databases from the old setup) are left as they are.
 
 ## Backups and rollback
 
