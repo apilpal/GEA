@@ -55,6 +55,50 @@
     .mk-savebar .btn { width: 100%; min-height: 48px; }
     .mk-savebar .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>
+<style id="fees-scorecard-styles">
+    #fees-root, #scorecard-root { max-width: 760px; }
+    .fe-controls, .sc-controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .fe-controls .form-control { flex: 1 1 180px; }
+    .sc-field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 170px; font-size: 14px; color: var(--color-text-muted, #6b7280); }
+    .fe-message, .sc-message, .fe-note[data-kind="error"], .sc-note[data-kind="error"] { padding: 10px 12px; border-radius: 8px; margin: 8px 0; background: var(--color-surface, #f3f4f6); color: var(--color-text, #111827); }
+    .fe-message[data-kind="error"], .sc-message[data-kind="error"], .fe-note[data-kind="error"], .sc-note[data-kind="error"] { background: #fee2e2; color: #991b1b; }
+    .fe-message[data-kind="success"] { background: #dcfce7; color: #166534; }
+    .fe-note, .sc-note { font-size: 13px; color: var(--color-text-muted, #6b7280); margin: 2px 0 6px; }
+    .fe-results { display: flex; flex-direction: column; gap: 6px; }
+    .fe-student { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 10px; width: 100%; min-height: 52px; padding: 8px 12px; text-align: left; cursor: pointer; border: 1px solid var(--color-border, #e5e7eb); border-radius: 8px; background: var(--color-card-background, #fff); color: var(--color-text, #111827); }
+    .fe-student-name { font-weight: 600; flex: 1 1 140px; }
+    .fe-student-meta { font-size: 12px; color: var(--color-text-muted, #6b7280); flex: 1 1 140px; }
+    .fe-owe { font-weight: 600; color: #166534; }
+    .fe-bad { color: #dc2626; }
+    .fe-title, .sc-title { margin: 12px 0 2px; color: var(--color-text, #111827); }
+    .fe-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+    .fe-chip { flex: 1 1 110px; padding: 8px 10px; border-radius: 8px; background: var(--color-surface, #f3f4f6); color: var(--color-text, #111827); display: flex; flex-direction: column; font-size: 12px; }
+    .fe-chip strong { font-size: 16px; }
+    .fe-chip.fe-bad strong { color: #dc2626; }
+    .fe-invoice { padding: 10px 12px; margin: 8px 0; border: 1px solid var(--color-border, #e5e7eb); border-radius: 8px; background: var(--color-card-background, #fff); color: var(--color-text, #111827); }
+    .fe-inv-head { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+    .fe-inv-right { text-align: right; }
+    .fe-badge { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; text-transform: capitalize; }
+    .fe-paid { background: #dcfce7; color: #166534; }
+    .fe-partial { background: #fef3c7; color: #92400e; }
+    .fe-unpaid { background: #e5e7eb; color: #374151; }
+    .fe-overdue { background: #fee2e2; color: #991b1b; }
+    .fe-payment { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; padding: 4px 0; border-top: 1px dashed var(--color-border, #e5e7eb); margin-top: 6px; }
+    .fe-struck span { text-decoration: line-through; opacity: 0.7; }
+    .fe-link { background: none; border: none; color: #dc2626; text-decoration: underline; cursor: pointer; font-size: 13px; padding: 4px 0; min-height: 36px; }
+    .fe-pay { width: 100%; min-height: 44px; margin-top: 8px; }
+    .fe-form { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+    .fe-form .form-control { flex: 1 1 100px; min-height: 44px; }
+    .fe-form .btn { min-height: 44px; }
+    .sc-scroll { overflow-x: auto; }
+    .sc-table { width: 100%; border-collapse: collapse; font-size: 14px; color: var(--color-text, #111827); }
+    .sc-table th, .sc-table td { padding: 8px 6px; border-bottom: 1px solid var(--color-border, #e5e7eb); text-align: right; white-space: nowrap; }
+    .sc-table th:first-child, .sc-table td:first-child { text-align: left; }
+    .sc-table thead th { font-size: 12px; color: var(--color-text-muted, #6b7280); }
+    .sc-total th, .sc-total td { font-weight: 600; background: var(--color-surface, #f3f4f6); }
+    .sc-ab { color: #dc2626; font-weight: 600; }
+    .sc-attendance { font-weight: 600; color: var(--color-text, #111827); }
+</style>
 </head>
 <body>
     <div id="app">
@@ -121,6 +165,14 @@
                  <li class="menu-item" data-page="marks" role="menuitem" tabindex="-1">
                      <icon-edit size="18" aria-hidden="true"></icon-edit>
                      <span>Marks</span>
+                 </li>
+                 <li class="menu-item" data-page="scorecard" role="menuitem" tabindex="-1">
+                     <icon-file-alt size="18" aria-hidden="true"></icon-file-alt>
+                     <span>Scorecard</span>
+                 </li>
+                 <li class="menu-item" data-page="fees" role="menuitem" tabindex="-1">
+                     <icon-dollar-sign size="18" aria-hidden="true"></icon-dollar-sign>
+                     <span>Fees</span>
                  </li>
                  <li class="menu-item" data-page="reports" role="menuitem" tabindex="-1">
                      <icon-chart-bar size="18" aria-hidden="true"></icon-chart-bar>
@@ -392,6 +444,28 @@
                         </div>
                     </div>
                     <div id="marks-root"></div>
+                </div>
+
+                <!-- Scorecard Page -->
+                <div id="scorecard-page" class="page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <h2>Scorecard</h2>
+                            <p>Marks, totals, position and attendance of one student.</p>
+                        </div>
+                    </div>
+                    <div id="scorecard-root"></div>
+                </div>
+
+                <!-- Fees Page -->
+                <div id="fees-page" class="page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <h2>Fees</h2>
+                            <p>Find a student, see what is due and record payments.</p>
+                        </div>
+                    </div>
+                    <div id="fees-root"></div>
                 </div>
 
                 <!-- Reports Page -->

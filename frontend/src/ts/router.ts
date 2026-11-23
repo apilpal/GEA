@@ -81,6 +81,22 @@ const navigationConfig: NavigationConfig = {
             await loadMarksPage();
         }
     },
+    scorecard: {
+        title: 'Scorecard',
+        requiresAuth: true,
+        loadData: async () => {
+            const { loadScorecardPage } = await import('@/ts/page-managers/scorecard-manager');
+            await loadScorecardPage();
+        }
+    },
+    fees: {
+        title: 'Fees',
+        requiresAuth: true,
+        loadData: async () => {
+            const { loadFeesPage } = await import('@/ts/page-managers/fees-manager');
+            await loadFeesPage();
+        }
+    },
     reports: {
         title: 'Reports',
         requiresAuth: true
