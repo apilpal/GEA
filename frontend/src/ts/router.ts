@@ -65,6 +65,14 @@ const navigationConfig: NavigationConfig = {
         requiresAuth: true,
         loadData: async () => await loadStudentsForStudentsPage()
     },
+    attendance: {
+        title: 'Attendance',
+        requiresAuth: true,
+        loadData: async () => {
+            const { loadAttendancePage } = await import('@/ts/page-managers/attendance-manager');
+            await loadAttendancePage();
+        }
+    },
     reports: {
         title: 'Reports',
         requiresAuth: true
