@@ -29,6 +29,32 @@
     .att-savebar { position: sticky; bottom: 0; padding: 10px 0; background: var(--color-background, #fff); }
     .att-savebar .btn { width: 100%; min-height: 48px; }
 </style>
+<style id="marks-styles">
+    #marks-root { max-width: 760px; }
+    .mk-controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .mk-field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 150px; font-size: 14px; color: var(--color-text-muted, #6b7280); }
+    .mk-message { padding: 10px 12px; border-radius: 8px; margin: 8px 0; background: var(--color-surface, #f3f4f6); color: var(--color-text, #111827); }
+    .mk-message[data-kind="error"] { background: #fee2e2; color: #991b1b; }
+    .mk-message[data-kind="success"] { background: #dcfce7; color: #166534; }
+    .mk-summary { display: flex; gap: 14px; flex-wrap: wrap; font-weight: 600; font-size: 14px; margin: 8px 0; color: var(--color-text, #111827); }
+    .mk-bad { color: #dc2626; }
+    .mk-hint { font-size: 13px; color: var(--color-text-muted, #6b7280); margin: 4px 0 8px; }
+    .mk-list { display: flex; flex-direction: column; gap: 6px; }
+    .mk-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; padding: 8px 10px; border: 1px solid var(--color-border, #e5e7eb); border-radius: 8px; background: var(--color-card-background, #fff); }
+    .mk-name { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1 1 140px; color: var(--color-text, #111827); }
+    .mk-roll { min-width: 24px; text-align: right; color: var(--color-text-muted, #6b7280); font-size: 13px; }
+    .mk-cells { display: flex; gap: 10px; flex-wrap: wrap; }
+    .mk-cell { display: flex; align-items: center; gap: 4px; }
+    .mk-part { font-size: 12px; color: var(--color-text-muted, #6b7280); }
+    .mk-input { width: 76px; min-height: 44px; padding: 0 8px; text-align: right; font-size: 16px; border: 1px solid var(--color-border, #d1d5db); border-radius: 8px; background: #fff; color: #111827; }
+    .mk-input:disabled { background: #e5e7eb; }
+    .mk-input.mk-invalid { border-color: #dc2626; background: #fee2e2; }
+    .mk-ab { min-width: 44px; min-height: 44px; border: 1px solid var(--color-border, #d1d5db); border-radius: 8px; background: transparent; color: var(--color-text, #111827); font-weight: 600; cursor: pointer; }
+    .mk-ab.mk-ab-on { background: var(--color-danger, #dc2626); border-color: var(--color-danger, #dc2626); color: #fff; }
+    .mk-savebar { position: sticky; bottom: 0; padding: 10px 0; background: var(--color-background, #fff); }
+    .mk-savebar .btn { width: 100%; min-height: 48px; }
+    .mk-savebar .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
 </head>
 <body>
     <div id="app">
@@ -91,6 +117,10 @@
                  <li class="menu-item" data-page="attendance" role="menuitem" tabindex="-1">
                      <icon-file-alt size="18" aria-hidden="true"></icon-file-alt>
                      <span>Attendance</span>
+                 </li>
+                 <li class="menu-item" data-page="marks" role="menuitem" tabindex="-1">
+                     <icon-edit size="18" aria-hidden="true"></icon-edit>
+                     <span>Marks</span>
                  </li>
                  <li class="menu-item" data-page="reports" role="menuitem" tabindex="-1">
                      <icon-chart-bar size="18" aria-hidden="true"></icon-chart-bar>
@@ -351,6 +381,17 @@
                         </div>
                     </div>
                     <div id="attendance-root"></div>
+                </div>
+
+                <!-- Marks Page -->
+                <div id="marks-page" class="page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <h2>Marks</h2>
+                            <p>Pick a class, an exam and a subject, then enter the marks of the whole class.</p>
+                        </div>
+                    </div>
+                    <div id="marks-root"></div>
                 </div>
 
                 <!-- Reports Page -->

@@ -27,7 +27,7 @@ from src.core.config.config import config
 from src.core.models import HealthResponse
 
 # Import routers
-from src.api.v1.routers import students, drivers, reports, charts, auth, csv_sync, dashboard, chat, attendance
+from src.api.v1.routers import students, drivers, reports, charts, auth, csv_sync, dashboard, chat, attendance, marks
 
 # Import utilities
 from src.utils import auth_utils
@@ -203,6 +203,7 @@ def create_app() -> FastAPI:
     app.include_router(dashboard.router, prefix="/api", tags=["dashboard"], dependencies=[Depends(require_finance)])
     app.include_router(chat.router, prefix="/api", tags=["chat"], dependencies=[Depends(require_staff)])
     app.include_router(attendance.router, prefix="/api", tags=["attendance"])
+    app.include_router(marks.router, prefix="/api", tags=["marks"])
 
     # Health check endpoint
     @app.get("/api/health", response_model=HealthResponse)
