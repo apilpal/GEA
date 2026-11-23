@@ -73,6 +73,14 @@ const navigationConfig: NavigationConfig = {
             await loadAttendancePage();
         }
     },
+    marks: {
+        title: 'Marks',
+        requiresAuth: true,
+        loadData: async () => {
+            const { loadMarksPage } = await import('@/ts/page-managers/marks-manager');
+            await loadMarksPage();
+        }
+    },
     reports: {
         title: 'Reports',
         requiresAuth: true
