@@ -102,7 +102,7 @@ export const DEMO_DRIVERS = DEMO_DRIVER_LIST.map((driver) => ({
 
 const PAGE_TITLES: Record<string, string> = {
     dashboard: 'Dashboard', transport: 'Transport', students: 'Students',
-    reports: 'Reports', settings: 'Settings', chat: 'AI Chat'
+    attendance: 'Attendance', reports: 'Reports', settings: 'Settings', chat: 'AI Chat'
 };
 
 let initialized = false;

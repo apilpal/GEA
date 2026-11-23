@@ -9,6 +9,26 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="auth-visibility.css">
     
+<style id="attendance-styles">
+    #attendance-root { max-width: 720px; }
+    .att-controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+    .att-field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 160px; font-size: 14px; color: var(--color-text-muted, #6b7280); }
+    .att-message { padding: 10px 12px; border-radius: 8px; margin: 8px 0; background: var(--color-surface, #f3f4f6); color: var(--color-text, #111827); }
+    .att-message[data-kind="error"] { background: #fee2e2; color: #991b1b; }
+    .att-message[data-kind="success"] { background: #dcfce7; color: #166534; }
+    .att-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+    .att-summary { display: flex; gap: 12px; flex-wrap: wrap; font-weight: 600; font-size: 14px; }
+    .att-list { display: flex; flex-direction: column; gap: 6px; }
+    .att-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 10px; border: 1px solid var(--color-border, #e5e7eb); border-radius: 8px; background: var(--color-card-background, #fff); }
+    .att-name { display: flex; align-items: center; gap: 10px; min-width: 0; color: var(--color-text, #111827); }
+    .att-name span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .att-roll { min-width: 24px; text-align: right; color: var(--color-text-muted, #6b7280); font-size: 13px; }
+    .att-buttons { display: flex; gap: 4px; flex-shrink: 0; }
+    .att-btn { min-width: 44px; min-height: 44px; border: 1px solid var(--color-border, #d1d5db); border-radius: 8px; background: transparent; color: var(--color-text, #111827); font-weight: 600; cursor: pointer; }
+    .att-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .att-savebar { position: sticky; bottom: 0; padding: 10px 0; background: var(--color-background, #fff); }
+    .att-savebar .btn { width: 100%; min-height: 48px; }
+</style>
 </head>
 <body>
     <div id="app">
@@ -67,6 +87,10 @@
                  <li class="menu-item" data-page="students" role="menuitem" tabindex="-1">
                      <icon-users size="18" aria-hidden="true"></icon-users>
                      <span>Students</span>
+                 </li>
+                 <li class="menu-item" data-page="attendance" role="menuitem" tabindex="-1">
+                     <icon-file-alt size="18" aria-hidden="true"></icon-file-alt>
+                     <span>Attendance</span>
                  </li>
                  <li class="menu-item" data-page="reports" role="menuitem" tabindex="-1">
                      <icon-chart-bar size="18" aria-hidden="true"></icon-chart-bar>
@@ -316,6 +340,17 @@
 
                     <student-table id="studentTable"></student-table>
                     <student-profile-card id="studentProfile" style="display: none;"></student-profile-card>
+                </div>
+
+                <!-- Attendance Page -->
+                <div id="attendance-page" class="page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <h2>Attendance</h2>
+                            <p>Pick a class and a date. Everyone starts as present; tap only the exceptions.</p>
+                        </div>
+                    </div>
+                    <div id="attendance-root"></div>
                 </div>
 
                 <!-- Reports Page -->
