@@ -8,7 +8,7 @@ Endpoints (all under /api, for the admin and the office clerk):
 - POST /fees/payments: record a payment against an invoice (a unique receipt number is issued)
 - POST /fees/payments/{payment_id}/reverse: reverse a wrong payment (admin only)
 
-Rules (docs/planning/02-data-rules-and-roles.md):
+Rules:
 - Whole rupees. Invoice status is derived (paid, overdue, partial, unpaid), never typed.
 - A payment cannot be more than the balance, and cannot be dated in the future.
 - Receipt numbers are unique and never reused.

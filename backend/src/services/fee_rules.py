@@ -1,6 +1,6 @@
 """Rules for fee invoices and payments (issue #34). Pure functions, no database.
 
-From docs/planning/02-data-rules-and-roles.md:
+The school rules (see ROADMAP.md and the GitHub issues):
 - Amounts are whole rupees.
 - Invoice status is derived, never typed: paid, overdue, partial or unpaid.
 - A payment cannot be more than the balance. Receipts are unique and never reused.

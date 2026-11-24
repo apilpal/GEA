@@ -10,7 +10,7 @@ Endpoints (all under /api):
 - GET /marks/sheet?class_section_id=&exam_id=&subject_id=: the sheet for one class, exam and subject
 - PUT /marks/sheet: save the sheet (one transaction; any invalid mark rejects everything)
 
-Rules (docs/planning/02-data-rules-and-roles.md and src/services/marks_rules.py):
+Rules (src/services/marks_rules.py):
 - Admin may enter any subject of any class. A teacher only the subjects assigned to them in a class.
 - A mark is from 0 to the maximum of its part, with at most 2 decimals.
 - Saving a student again replaces the earlier mark (``updated_by`` and ``updated_at`` record it).

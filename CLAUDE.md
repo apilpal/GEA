@@ -10,9 +10,9 @@ Backend: FastAPI + SQLAlchemy 2 (async) + SQLite + Alembic. Frontend: TypeScript
 
 ## Where the plan is
 - **`ROADMAP.md` and the GitHub issues #21 to #41 in apilpal/GEA are the plan and are accurate** (roadmap phases #21 to #26, tasks under them).
-- **Do not read `docs/planning/` to learn what is true.** Those files were written early, carry dates and status lines that are now out of date, and can mislead you. Ignore them unless the owner names a file and asks you to look at it.
-- If the code, the tests or the owner disagree with a doc, they win. Do not change code to match a doc.
-- The business rules are summarised in "Rules that must not be broken" below and are enforced by the pure functions in `backend/src/services/` and their tests in `backend/tests_school/`. Read those instead of the docs.
+- **The whole `docs/` folder was removed** because it was out of date (it stays in git history). Do not recreate it, and do not trust old copies or `README.md` text about features; the README still describes the old transport app. Fresh docs and a new README are written after Phase 5.
+- If the code, the tests or the owner disagree with the roadmap text, ask the owner; do not guess.
+- The business rules are summarised in "Rules that must not be broken" below and are enforced by the pure functions in `backend/src/services/` and their tests in `backend/tests_school/`. Read those.
 - Done: Phases 0 to 2 (data rules, schema, demo data, backup/restore, attendance entry, marks entry, fee payments, scorecards).
 - Next: Phase 3 analytics (#35 management/class, #36 subject comparison and diagnostics, #37 fee collection), Phase 4 mobile polish and print/CSV (#38, #39), Phase 5 operations and pilot (#40, #41).
 

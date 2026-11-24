@@ -1,6 +1,6 @@
 """Rules for exam marks (issue #33). Pure functions, no database.
 
-The school's rules (docs/planning/02-data-rules-and-roles.md):
+The school's rules:
 - Maximum marks: Terminal 40, Half-yearly 60, Annual 100.
 - In classes 6 to 8, Hindi, English and Mathematics have two papers (part I and part II)
   in the Terminal and Half-yearly exams. The split is assumed even until the school says
