@@ -9,8 +9,10 @@ Backend: FastAPI + SQLAlchemy 2 (async) + SQLite + Alembic. Frontend: TypeScript
 **The repo is public on purpose, with fake data only.** Never commit real student data, phone numbers, passwords, tokens or `.env` files. Demo data is clearly fictional (admission numbers start `DEMO-`).
 
 ## Where the plan is
-- GitHub issues #21 to #41 (roadmap phases #21 to #26, tasks under them) and `ROADMAP.md`.
-- `docs/planning/` is the source of truth: `02-data-rules-and-roles.md` (rules, role matrix, edge-case table, open decisions), then one file per feature (`05` attendance, `06` marks, `07` fees and scorecards). Read the rules file before changing any business rule, and update the docs in the same change.
+- **`ROADMAP.md` and the GitHub issues #21 to #41 in apilpal/GEA are the plan and are accurate** (roadmap phases #21 to #26, tasks under them).
+- **Do not read `docs/planning/` to learn what is true.** Those files were written early, carry dates and status lines that are now out of date, and can mislead you. Ignore them unless the owner names a file and asks you to look at it.
+- If the code, the tests or the owner disagree with a doc, they win. Do not change code to match a doc.
+- The business rules are summarised in "Rules that must not be broken" below and are enforced by the pure functions in `backend/src/services/` and their tests in `backend/tests_school/`. Read those instead of the docs.
 - Done: Phases 0 to 2 (data rules, schema, demo data, backup/restore, attendance entry, marks entry, fee payments, scorecards).
 - Next: Phase 3 analytics (#35 management/class, #36 subject comparison and diagnostics, #37 fee collection), Phase 4 mobile polish and print/CSV (#38, #39), Phase 5 operations and pilot (#40, #41).
 
@@ -25,7 +27,7 @@ Backend: FastAPI + SQLAlchemy 2 (async) + SQLite + Alembic. Frontend: TypeScript
 bash scripts/termux-setup.sh        # first time only
 pnpm dev                            # backend (8000) and frontend (5173) together
 pnpm seed-school                    # demo school data (521 students). Never run `pnpm seed` after it: it adds 75 old sample students
-pnpm backup / pnpm restore          # SQLite backup and restore (see docs/planning/03-migrations-and-recovery.md)
+pnpm backup / pnpm restore          # SQLite backup and restore
 cd backend && source .venv/bin/activate
 python -m pytest tests_school -q --noconftest --ignore=tests_school/test_token_refresh.py   # the real test suite, about 1 to 2 minutes
 ```
@@ -56,7 +58,7 @@ Database changes go through Alembic (`backend/alembic/versions`, current head `0
 - `demo-data.ts` still shows built-in sample data while the database is empty.
 
 ## Tests: what a new endpoint needs
-Follow `tests_school/test_marks_api.py`: a temp SQLite file migrated with Alembic, the router mounted on a small FastAPI app, `get_current_active_user_from_any_source` overridden per role. Cover: the happy path, every rule above that applies, each role (allowed and 403), anonymous access, invalid input leaving nothing written, a failed commit leaving nothing written, and the edge cases listed in `02-data-rules-and-roles.md`.
+Follow `tests_school/test_marks_api.py`: a temp SQLite file migrated with Alembic, the router mounted on a small FastAPI app, `get_current_active_user_from_any_source` overridden per role. Cover: the happy path, every rule above that applies, each role (allowed and 403), anonymous access, invalid input leaving nothing written, a failed commit leaving nothing written, and the edge cases the rules above imply.
 
 ## Open decisions (ask the owner, do not guess)
 Pass mark and whether every subject must be passed; the holiday list; advance payment for the whole year; the exact subject list per class group and whether oral/activity papers carry marks; section and teacher assignments (class teacher, subject teachers, linking teachers to logins); whether to remove the old `/public/*` endpoints; the real split of the 40 and 60 marks between part I and II (assumed even).
