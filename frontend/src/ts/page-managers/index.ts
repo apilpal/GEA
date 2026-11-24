@@ -4,3 +4,5 @@ export * from './students-manager';
 export * from './transport-manager';
 export * from './attendance-manager';
 export * from './marks-manager';
+export * from './fees-manager';
+export * from './scorecard-manager';
