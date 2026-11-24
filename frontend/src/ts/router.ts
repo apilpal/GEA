@@ -89,6 +89,14 @@ const navigationConfig: NavigationConfig = {
             await loadScorecardPage();
         }
     },
+    analytics: {
+        title: 'Analytics',
+        requiresAuth: true,
+        loadData: async () => {
+            const { loadAnalyticsPage } = await import('@/ts/page-managers/analytics-manager');
+            await loadAnalyticsPage();
+        }
+    },
     fees: {
         title: 'Fees',
         requiresAuth: true,

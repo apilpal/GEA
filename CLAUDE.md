@@ -14,7 +14,7 @@ Backend: FastAPI + SQLAlchemy 2 (async) + SQLite + Alembic. Frontend: TypeScript
 - If the code, the tests or the owner disagree with the roadmap text, ask the owner; do not guess.
 - The business rules are summarised in "Rules that must not be broken" below and are enforced by the pure functions in `backend/src/services/` and their tests in `backend/tests_school/`. Read those.
 - Done: Phases 0 to 2 (data rules, schema, demo data, backup/restore, attendance entry, marks entry, fee payments, scorecards).
-- Next: Phase 3 analytics (#35 management/class, #36 subject comparison and diagnostics, #37 fee collection), Phase 4 mobile polish and print/CSV (#38, #39), Phase 5 operations and pilot (#40, #41).
+- Phase 3 analytics: #35 management and class analytics is built (`routers/analytics.py`, `services/analytics_rules.py`, Analytics page). Next: #36 subject comparison and diagnostics, #37 fee collection, Phase 4 mobile polish and print/CSV (#38, #39), Phase 5 operations and pilot (#40, #41).
 
 ## How we work
 - **One issue, one branch, one PR**, named like `phase2-marks-33`, with `Closes #N` in the PR description. Keep PRs small and squash noisy commits before pushing.
@@ -61,7 +61,7 @@ Database changes go through Alembic (`backend/alembic/versions`, current head `0
 Follow `tests_school/test_marks_api.py`: a temp SQLite file migrated with Alembic, the router mounted on a small FastAPI app, `get_current_active_user_from_any_source` overridden per role. Cover: the happy path, every rule above that applies, each role (allowed and 403), anonymous access, invalid input leaving nothing written, a failed commit leaving nothing written, and the edge cases the rules above imply.
 
 ## Open decisions (ask the owner, do not guess)
-Pass mark and whether every subject must be passed; the holiday list; advance payment for the whole year; the exact subject list per class group and whether oral/activity papers carry marks; section and teacher assignments (class teacher, subject teachers, linking teachers to logins); whether to remove the old `/public/*` endpoints; the real split of the 40 and 60 marks between part I and II (assumed even).
+Pass mark and whether every subject must be passed (the Analytics bucket limits 75, 50 and 33 percent in `analytics_rules.py` are assumed until then); the holiday list; advance payment for the whole year; the exact subject list per class group and whether oral/activity papers carry marks; section and teacher assignments (class teacher, subject teachers, linking teachers to logins); whether to remove the old `/public/*` endpoints; the real split of the 40 and 60 marks between part I and II (assumed even).
 
 ## Known issues to pick up later
 Students page shows only 100 students (needs paging and search); "Class: N/A" on old sample students; Reports page uses `$` instead of `₹`; Reports, Charts and Dashboard still allow teachers although the role table says teachers must not see fee data; page headings are faint on the dark theme; the monthly invoice generator does not exist yet (the demo data has invoices).
