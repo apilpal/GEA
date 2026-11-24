@@ -98,6 +98,10 @@
     .sc-total th, .sc-total td { font-weight: 600; background: var(--color-surface, #f3f4f6); }
     .sc-ab { color: #dc2626; font-weight: 600; }
     .sc-attendance { font-weight: 600; color: var(--color-text, #111827); }
+    /* Readable on both the light and the dark theme: the result panels are always light. */
+    #sc-card, #fees-statement { background: #fff; color: #111827; padding: 12px; border-radius: 8px; }
+    #sc-card .sc-title, #fees-statement .fe-title, #sc-card .sc-table, #fees-statement .fe-invoice { color: #111827; }
+    #fees-statement .fe-invoice { background: #fff; }
 </style>
 </head>
 <body>
