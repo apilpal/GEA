@@ -9,7 +9,7 @@ Endpoints (all under /api):
 - GET /attendance/roster?class_section_id=&date=: the roster for one class and date
 - PUT /attendance/roster: save the whole class for one date (one transaction)
 
-Rules (docs/planning/02-data-rules-and-roles.md):
+Rules:
 - Admin may mark any class; a teacher only the classes they are class teacher of.
 - Dates in the future, Sundays and holidays cannot be marked.
 - A teacher can mark today and the 2 days before; an admin any date of the session.

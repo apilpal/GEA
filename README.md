@@ -29,8 +29,7 @@ Open **http://127.0.0.1:5173** and sign in with the admin account you created.
 The API documentation is at **http://127.0.0.1:8000/docs**.
 
 The first setup can take 10-30 minutes on a phone because two Python packages are compiled.
-More options (ports, auto-reload, opening the app from another device) are in
-[Running the app](docs/getting-started/running-on-termux.md).
+`RELOAD=1 pnpm dev` restarts the backend when you change Python code.
 
 ## Project layout
 
@@ -42,7 +41,6 @@ tests/          Backend API/unit/integration tests and test runner scripts
 e2e_tests/      End-to-end browser tests
 mcp-server/     Basic MCP server
 vscode-extension/  Basic VS Code extension (commands for the MCP server and backend API)
-docs/           All documentation - start at docs/README.md
 ```
 
 ## Useful commands
@@ -55,12 +53,12 @@ docs/           All documentation - start at docs/README.md
 | `pnpm seed` | Add or refresh the 75 sample students and 5 sample drivers (fee 500 each). Your own records and logins are kept, and it is safe to run again |
 | `./test.sh` | Run backend, frontend and end-to-end tests |
 
-Test tools (pytest, Jest, Puppeteer) are separate from the runtime packages; see
-[Testing](docs/testing/README.md) for how to set them up.
+Test tools (pytest, Jest, Puppeteer) are separate from the runtime packages. The maintained
+backend tests are in `backend/tests_school/` (see `CLAUDE.md` for the command).
 
 ## Documentation
 
-- [Documentation index](docs/README.md) - guides, architecture, API, deployment, testing, troubleshooting
+- The old `docs/` folder was removed because it was out of date. New documentation will be written after Phase 5. Until then, `CLAUDE.md`, `ROADMAP.md` and the GitHub issues are the reference.
 - [Roadmap](ROADMAP.md) - what is done, what is in progress and what comes next
 - [Changelog](CHANGELOG.md)
 

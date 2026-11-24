@@ -3,7 +3,7 @@
 All tables share the application's ``Base`` so ``alembic`` and ``create_all`` see
 them. Money is stored as whole rupees (INR) in integer columns. Dates are real
 ``Date`` columns. Rules these tables encode are documented in
-``docs/planning/02-data-rules-and-roles.md``.
+the GitHub issues and ROADMAP.md.
 """
 
 from sqlalchemy import (
