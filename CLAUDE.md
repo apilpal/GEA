@@ -31,7 +31,7 @@ pnpm backup / pnpm restore          # SQLite backup and restore
 cd backend && source .venv/bin/activate
 python -m pytest tests_school -q --noconftest --ignore=tests_school/test_token_refresh.py   # the real test suite, about 1 to 2 minutes
 ```
-Only `backend/tests_school/` is maintained. The older tests under `backend/` and `tests/` are not used. Always pass `--noconftest`.
+Only `backend/tests_school/` is maintained. Other older tests under `backend/` are not used. Always pass `--noconftest`.
 Database changes go through Alembic (`backend/alembic/versions`, current head `0003_auth_tables`). Never edit an old revision; add a new one. SQLite needs batch mode (already configured).
 
 ## Code map

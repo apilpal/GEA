@@ -27,12 +27,8 @@ The first setup can take 10-30 minutes on a phone because two Python packages ar
 
 ```
 backend/        FastAPI app (src/api/v1/routers, src/services, src/core), Alembic migrations, SQLite data
-frontend/       TypeScript + Vite PWA (src/ts, src/scss), Jest tests, mock API server
+frontend/       TypeScript + Vite PWA (src/ts, src/scss)
 scripts/        termux-setup.sh (one-time setup) and dev.mjs (runs both servers)
-tests/          Backend API/unit/integration tests and test runner scripts
-e2e_tests/      End-to-end browser tests
-mcp-server/     Basic MCP server
-vscode-extension/  Basic VS Code extension (commands for the MCP server and backend API)
 ```
 
 ## Useful commands
@@ -43,9 +39,10 @@ vscode-extension/  Basic VS Code extension (commands for the MCP server and back
 | `RELOAD=1 pnpm dev` | Same, and restart the backend when you change Python code |
 | `pnpm create-admin` | Run the database/admin setup again (existing users are kept) |
 | `pnpm seed` | Add or refresh the 75 sample students and 5 sample drivers (fee 500 each). Your own records and logins are kept, and it is safe to run again |
-| `./test.sh` | Run backend, frontend and end-to-end tests |
+| `pnpm seed-school` | Load the fake demo school (521 students). Do not run `pnpm seed` after it |
+| `pnpm backup` / `pnpm restore` | Back up or restore the SQLite database |
 
-Test tools (pytest, Jest, Puppeteer) are separate from the runtime packages. The maintained
+The maintained
 backend tests are in `backend/tests_school/` (see `CLAUDE.md` for the command).
 
 ## Documentation
