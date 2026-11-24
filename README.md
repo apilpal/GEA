@@ -1,18 +1,10 @@
-# Student Profiles PWA
+# Gurukul Educational Academy: school management app
 
-A school transport management app: keep track of students, drivers and bus routes, see
-fees and reports on a dashboard, and ask an AI assistant for help. It is a Progressive Web
-App (installable, mobile-first) with a FastAPI backend and a TypeScript frontend.
+A mobile-first Progressive Web App for Gurukul Educational Academy (Kaist, Jaswant Nagar, Etawah), built with a FastAPI backend and a TypeScript frontend. It runs on a phone in Termux with SQLite, no Docker needed.
 
-## Features
+**Status:** under active development, phase by phase (see [Roadmap](ROADMAP.md)). Done so far: school data model and demo data, backup and restore, attendance entry, marks entry, fee payments and receipts, and student scorecards. Next: analytics, mobile polish, print and CSV exports, then a pilot at the school.
 
-- **Students, drivers and routes** - add and edit records, assign students to a driver's route.
-- **Dashboard and reports** - totals, students per driver, and fees by route and by grade, with charts.
-- **Login with roles** - JWT authentication using HttpOnly cookies. Roles are admin, teacher, accountant, driver, student and parent; staff roles manage students and drivers, finance roles see reports and charts, and only admins can use CSV sync.
-- **AI chat assistant** - a chat page backed by the `/api/chat` endpoints.
-- **CSV sync** - bulk-load driver and student data from CSV files.
-- **Demo data** - while the database is empty the dashboard shows sample data (75 students, 5 drivers, fee 500 each) so every page has something to display. `pnpm seed` puts the same sample data into the database, so every phone shows the same thing; students and drivers you added yourself are kept.
-- **Runs on a phone** - one-command setup for Termux, no Docker or PostgreSQL required (SQLite by default).
+This repository is public and contains **fake demo data only**.
 
 ## Quick start
 
@@ -63,6 +55,8 @@ backend tests are in `backend/tests_school/` (see `CLAUDE.md` for the command).
 - [Changelog](CHANGELOG.md)
 
 ## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow. In short:
 
 1. Fork the repository (or create a branch if you have push access).
 2. Make your change on a branch: `git checkout -b my-change`.
