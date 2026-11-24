@@ -6,3 +6,4 @@ export * from './attendance-manager';
 export * from './marks-manager';
 export * from './fees-manager';
 export * from './scorecard-manager';
+export * from './analytics-manager';

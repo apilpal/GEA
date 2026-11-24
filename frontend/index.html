@@ -103,6 +103,29 @@
     #sc-card .sc-title, #fees-statement .fe-title, #sc-card .sc-table, #fees-statement .fe-invoice { color: #111827; }
     #fees-statement .fe-invoice { background: #fff; }
 </style>
+<style id="analytics-styles">
+    #analytics-root { max-width: 980px; background: #fff; color: #111827; padding: 12px; border-radius: 8px; }
+    .an-controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
+    .an-field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 170px; font-size: 14px; color: #4b5563; }
+    .an-title { margin: 14px 0 4px; color: #111827; font-size: 16px; }
+    .an-note { font-size: 13px; color: #4b5563; margin: 4px 0 6px; }
+    .an-note[data-kind="error"] { padding: 10px 12px; border-radius: 8px; background: #fee2e2; color: #991b1b; }
+    .an-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+    .an-chip { flex: 1 1 110px; padding: 8px 10px; border-radius: 8px; background: #f3f4f6; color: #111827; display: flex; flex-direction: column; font-size: 12px; border-left: 4px solid #9ca3af; }
+    .an-chip strong { font-size: 18px; }
+    .an-chip.an-distinction { border-left-color: #16a34a; }
+    .an-chip.an-steady { border-left-color: #2563eb; }
+    .an-chip.an-borderline { border-left-color: #d97706; }
+    .an-chip.an-at_risk { border-left-color: #dc2626; }
+    .an-rules { margin: 6px 0; font-size: 14px; color: #111827; }
+    .an-rules summary { cursor: pointer; min-height: 36px; display: flex; align-items: center; }
+    .an-scroll { overflow-x: auto; }
+    .an-table { width: 100%; border-collapse: collapse; font-size: 14px; color: #111827; }
+    .an-table th, .an-table td { padding: 8px 6px; border-bottom: 1px solid #e5e7eb; text-align: right; white-space: nowrap; }
+    .an-table th:first-child, .an-table td:first-child { text-align: left; }
+    .an-table thead th { font-size: 12px; color: #4b5563; }
+    .an-link { background: none; border: none; padding: 6px 0; min-height: 36px; color: #1d4ed8; text-decoration: underline; cursor: pointer; font-size: 14px; font-weight: 600; }
+</style>
 </head>
 <body>
     <div id="app">
@@ -173,6 +196,10 @@
                  <li class="menu-item" data-page="scorecard" role="menuitem" tabindex="-1">
                      <icon-file-alt size="18" aria-hidden="true"></icon-file-alt>
                      <span>Scorecard</span>
+                 </li>
+                 <li class="menu-item" data-page="analytics" role="menuitem" tabindex="-1">
+                     <icon-chart-bar size="18" aria-hidden="true"></icon-chart-bar>
+                     <span>Analytics</span>
                  </li>
                  <li class="menu-item" data-page="fees" role="menuitem" tabindex="-1">
                      <icon-dollar-sign size="18" aria-hidden="true"></icon-dollar-sign>
@@ -459,6 +486,17 @@
                         </div>
                     </div>
                     <div id="scorecard-root"></div>
+                </div>
+
+                <!-- Analytics Page -->
+                <div id="analytics-page" class="page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <h2>Analytics</h2>
+                            <p>How the school and each class are doing: marks, attendance and follow-up labels.</p>
+                        </div>
+                    </div>
+                    <div id="analytics-root"></div>
                 </div>
 
                 <!-- Fees Page -->
