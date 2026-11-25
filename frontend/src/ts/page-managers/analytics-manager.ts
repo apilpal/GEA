@@ -1,8 +1,8 @@
-// Analytics page (issue #35).
+// Analytics page (issues #35 and #36).
 // The admin sees the school summary and a class-by-class comparison; the admin and teachers can open
 // one class to see every student. All numbers are computed on the server. A student with no marks
 // yet is shown as "no marks yet" and is not counted as zero. Buckets are labels for follow-up, not
-// pass or fail. All text from the server is added with textContent, never innerHTML.
+// pass or fail. Notes (tags) always show their plain reason. All text from the server is added with textContent, never innerHTML.
 import { apiService } from '@/ts/services/api-service';
 
 interface Buckets { distinction: number; steady: number; borderline: number; at_risk: number }
@@ -19,6 +19,19 @@ interface StudentRow { student_id: number; name: string; roll_no: number | null;
 interface ClassDetail { class: { class_section_id: number; name: string; session: string | null }; exam: ExamOption | null;
                         exams: ExamOption[]; summary: Group; students: StudentRow[]; bucket_rules: BucketRule[] }
 interface ClassInfo { id: number; name: string; student_count: number }
+interface Tag { key: string; label: string; reason: string }
+interface TagRule { key: string; label: string; scope: string; rule: string }
+interface DiagStudent { student_id: number; name: string; roll_no: number | null; percent: number | null; bucket: keyof Buckets | null;
+                        tags: Tag[]; needs_follow_up: boolean; subjects: { subject_id: number; name: string; percent: number | null }[] }
+interface Diagnostics { summary: { average_percent: number | null; spread: number | null; attendance_rate: number | null;
+                                   school_attendance_rate: number | null; follow_up_students: number };
+                        tags: Tag[]; subjects: { subject_id: number; name: string; average_percent: number | null; with_marks: number }[];
+                        students: DiagStudent[]; tag_rules: TagRule[] }
+interface SubjectRow extends Group { subject_id: number; name: string }
+interface SubjectCell { taught: boolean; average_percent: number | null; with_marks: number }
+interface SubjectClass { class_section_id: number; name: string; average_percent: number | null; subjects: Record<string, SubjectCell> }
+interface Bottleneck { class_section_id: number; class: string; subject: string; average_percent: number; class_average: number; gap: number }
+interface SubjectComparison { subjects: SubjectRow[]; classes: SubjectClass[]; bottlenecks: Bottleneck[]; tag_rules: TagRule[] }
 
 const state = { examId: '' as string, classId: null as number | null };
 
@@ -89,6 +102,17 @@ function rulesBox(rules: BucketRule[]): HTMLElement {
         note('Labels use the average percent of the exams counted. Absent (AB) and marks not entered yet are left out, never counted as zero. A student with no marks is not placed in any label. These limits are not pass or fail marks; they are for follow-up until the school decides its pass mark.'));
 }
 
+function tagRulesBox(rules: TagRule[]): HTMLElement {
+    return el('details', { class: 'an-rules' },
+        el('summary', { text: 'What do the notes mean?' }),
+        el('ul', {}, ...rules.map(r => el('li', {}, el('strong', { text: `${r.label} (${r.scope}): ` }), r.rule))),
+        note('Notes explain why a class or student may need follow-up, with the numbers behind each one. They are not a diagnosis and not pass or fail. The limits are assumed until the school decides them.'));
+}
+
+function tagList(tags: Tag[]): HTMLElement {
+    return el('ul', { class: 'an-tags' }, ...tags.map(t => el('li', {}, el('strong', { text: `${t.label}: ` }), t.reason)));
+}
+
 function examSelect(exams: ExamOption[], onChange: (value: string) => void): HTMLElement {
     const select = el('select', { class: 'form-control', 'aria-label': 'Exam' }, el('option', { value: '', text: 'All exams together' }));
     exams.forEach(e => select.append(el('option', { value: String(e.exam_id), text: e.name })));
@@ -115,7 +139,7 @@ function comparisonTable(first: string, rows: HTMLElement[]): HTMLElement {
         el('thead', {}, el('tr', {}, ...heads.map(text => el('th', { text })))), el('tbody', {}, ...rows)));
 }
 
-function renderDetail(data: ClassDetail): void {
+function renderDetail(data: ClassDetail, diag: Diagnostics | null): void {
     const box = document.getElementById('an-detail');
     if (!box) return;
     const ranked = data.students.filter(s => s.percent !== null).length;
@@ -140,25 +164,51 @@ function renderDetail(data: ClassDetail): void {
             el('thead', {}, el('tr', {}, ...['Roll', 'Student', 'Percent', 'Label', 'Position', 'Attendance'].map(text => el('th', { text })))),
             el('tbody', {}, ...rows))),
         note('Students with the same percent share a position. A dash means there is nothing to count yet.'),
-        rulesBox(data.bucket_rules));
+        rulesBox(data.bucket_rules),
+        ...(diag ? diagnosticsPanel(diag) : []));
     box.style.display = 'block';
 }
 
-async function loadDetail(classId: number): Promise<void> {
+/** Class notes, subject averages and the students who may need follow-up, each with a plain reason. */
+export function diagnosticsPanel(diag: Diagnostics): HTMLElement[] {
+    const follow = diag.students.filter(s => s.needs_follow_up);
+    const subjectRows = diag.subjects.map(subject => el('tr', {},
+        el('th', { scope: 'row', text: subject.name }),
+        el('td', { text: percentLabel(subject.average_percent) }),
+        el('td', { text: String(subject.with_marks) })));
+    const followList = follow.map(student => el('li', {},
+        el('strong', { text: `${student.roll_no != null ? `${student.roll_no}. ` : ''}${student.name}` }),
+        el('span', { text: ` · ${percentLabel(student.percent)} · ${bucketLabel(student.bucket)}` }),
+        student.tags.length ? tagList(student.tags) : el('p', { class: 'an-note', text: 'Low marks, no other note.' })));
+    return [
+        el('h3', { class: 'an-title', text: 'Why? Notes for this class' }),
+        diag.tags.length ? tagList(diag.tags) : note('No class-level notes.'),
+        subjectRows.length ? el('div', { class: 'an-scroll' }, el('table', { class: 'an-table' },
+            el('thead', {}, el('tr', {}, ...['Subject', 'Class average', 'Students with marks'].map(text => el('th', { text })))),
+            el('tbody', {}, ...subjectRows))) : el('span'),
+        el('h3', { class: 'an-title', text: `Students who may need follow-up (${follow.length})` }),
+        follow.length ? el('ul', { class: 'an-follow' }, ...followList) : note('No student needs follow-up from the marks and attendance entered so far.'),
+        tagRulesBox(diag.tag_rules)];
+}
+
+async function loadDetail(classId: number, scroll = false): Promise<void> {
     const box = document.getElementById('an-detail');
     state.classId = classId;
     if (box) { box.replaceChildren(note('Loading…')); box.style.display = 'block'; }
     const query = state.examId ? `?exam_id=${encodeURIComponent(state.examId)}` : '';
-    const response = await apiService.get<ClassDetail>(`/analytics/classes/${classId}${query}`);
+    const [response, diag] = await Promise.all([
+        apiService.get<ClassDetail>(`/analytics/classes/${classId}${query}`),
+        apiService.get<Diagnostics>(`/analytics/classes/${classId}/diagnostics${query}`)]);
     if (response.error || !response.data) {
         if (box) { box.replaceChildren(note(response.error || 'Could not load the class', 'error')); }
         return;
     }
-    renderDetail(response.data);
+    renderDetail(response.data, diag.error || !diag.data ? null : diag.data);
+    if (scroll && box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function renderOverview(root: HTMLElement, data: Overview): void {
-    const classRows = data.classes.map(c => groupRow(c.name, c, () => { void loadDetail(c.class_section_id); }));
+    const classRows = data.classes.map(c => groupRow(c.name, c, () => { void loadDetail(c.class_section_id, true); }));
     const gradeRows = data.grades.map(g => groupRow(`Class ${g.grade} (${g.sections} section${g.sections === 1 ? '' : 's'})`, g));
     root.replaceChildren(
         el('div', { class: 'an-controls' }, examSelect(data.exams, value => { state.examId = value; void loadOverview(); })),
@@ -171,8 +221,49 @@ function renderOverview(root: HTMLElement, data: Overview): void {
         comparisonTable('Grade', gradeRows),
         el('h3', { class: 'an-title', text: 'Classes (tap a class to see its students)' }),
         comparisonTable('Class', classRows),
+        el('div', { id: 'an-subjects' }),
         el('div', { id: 'an-detail', style: 'display:none' }));
+    void loadSubjects();
     if (state.classId !== null && data.classes.some(c => c.class_section_id === state.classId)) void loadDetail(state.classId);
+}
+
+function renderSubjects(data: SubjectComparison): void {
+    const box = document.getElementById('an-subjects');
+    if (!box) return;
+    const subjectRows = data.subjects.map(s => groupRow(s.name, s));
+    const header = ['Class', 'Average', ...data.subjects.map(s => s.name)];
+    const matrixRows = data.classes.map(c => el('tr', {},
+        el('th', { scope: 'row', text: c.name }),
+        el('td', { text: percentLabel(c.average_percent) }),
+        ...data.subjects.map(s => {
+            const cell = c.subjects[String(s.subject_id)];
+            return el('td', { text: !cell || !cell.taught ? 'n/a' : percentLabel(cell.average_percent) });
+        })));
+    const bottlenecks = data.bottlenecks.map(b => {
+        const button = el('button', { type: 'button', class: 'an-link', text: `${b.class} · ${b.subject}` });
+        button.addEventListener('click', () => { void loadDetail(b.class_section_id, true); });
+        return el('li', {}, button,
+            el('span', { text: ` average ${percentLabel(b.average_percent)} is ${b.gap} points below the class average ${percentLabel(b.class_average)}` }));
+    });
+    box.replaceChildren(
+        el('h3', { class: 'an-title', text: 'Subjects across the school (weakest first)' }),
+        comparisonTable('Subject', subjectRows),
+        el('h3', { class: 'an-title', text: 'Biggest bottlenecks' }),
+        bottlenecks.length ? el('ul', { class: 'an-follow' }, ...bottlenecks) : note('No subject is far below its class average.'),
+        el('h3', { class: 'an-title', text: 'Average percent by class and subject' }),
+        el('div', { class: 'an-scroll' }, el('table', { class: 'an-table' },
+            el('thead', {}, el('tr', {}, ...header.map(text => el('th', { text })))), el('tbody', {}, ...matrixRows))),
+        note('n/a = the class does not have this subject. A dash = no marks to count yet.'),
+        tagRulesBox(data.tag_rules));
+}
+
+async function loadSubjects(): Promise<void> {
+    const box = document.getElementById('an-subjects');
+    if (!box) return;
+    const query = state.examId ? `?exam_id=${encodeURIComponent(state.examId)}` : '';
+    const response = await apiService.get<SubjectComparison>(`/analytics/subjects${query}`);
+    if (response.error || !response.data) { box.replaceChildren(note(response.error || 'Could not load the subject comparison', 'error')); return; }
+    renderSubjects(response.data);
 }
 
 async function loadOverview(): Promise<void> {
