@@ -97,6 +97,14 @@ const navigationConfig: NavigationConfig = {
             await loadAnalyticsPage();
         }
     },
+    collection: {
+        title: 'Fee collection',
+        requiresAuth: true,
+        loadData: async () => {
+            const { loadCollectionPage } = await import('@/ts/page-managers/collection-manager');
+            await loadCollectionPage();
+        }
+    },
     fees: {
         title: 'Fees',
         requiresAuth: true,

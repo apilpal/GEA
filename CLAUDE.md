@@ -14,7 +14,7 @@ Backend: FastAPI + SQLAlchemy 2 (async) + SQLite + Alembic. Frontend: TypeScript
 - If the code, the tests or the owner disagree with the roadmap text, ask the owner; do not guess.
 - The business rules are summarised in "Rules that must not be broken" below and are enforced by the pure functions in `backend/src/services/` and their tests in `backend/tests_school/`. Read those.
 - Done: Phases 0 to 2 (data rules, schema, demo data, backup/restore, attendance entry, marks entry, fee payments, scorecards).
-- Phase 3 analytics: #35 management and class analytics (`routers/analytics.py`, `services/analytics_rules.py`) and #36 subject comparison and diagnostics (`routers/diagnostics.py`, `services/diagnostic_rules.py`) are built, both shown on the Analytics page. Next: #37 fee collection, Phase 4 mobile polish and print/CSV (#38, #39), Phase 5 operations and pilot (#40, #41).
+- Phase 3 analytics: #35 management and class analytics (`routers/analytics.py`, `services/analytics_rules.py`) and #36 subject comparison and diagnostics (`routers/diagnostics.py`, `services/diagnostic_rules.py`) are built, both shown on the Analytics page, and #37 fee collection analytics (`routers/fee_analytics.py`, `services/fee_analytics_rules.py`, Fee collection page for the admin and the office clerk). Next: Phase 4 (#38 mobile polish, #39 print and CSV), Phase 4 mobile polish and print/CSV (#38, #39), Phase 5 operations and pilot (#40, #41).
 
 ## How we work
 - **One issue, one branch, one PR**, named like `phase2-marks-33`, with `Closes #N` in the PR description. Keep PRs small and squash noisy commits before pushing.

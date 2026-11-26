@@ -104,7 +104,7 @@
     #fees-statement .fe-invoice { background: #fff; }
 </style>
 <style id="analytics-styles">
-    #analytics-root { max-width: 980px; background: #fff; color: #111827; padding: 12px; border-radius: 8px; }
+    #analytics-root, #collection-root { max-width: 980px; background: #fff; color: #111827; padding: 12px; border-radius: 8px; }
     .an-controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 8px; }
     .an-field { display: flex; flex-direction: column; gap: 4px; flex: 1 1 170px; font-size: 14px; color: #4b5563; }
     .an-title { margin: 14px 0 4px; color: #111827; font-size: 16px; }
@@ -206,6 +206,10 @@
                  <li class="menu-item" data-page="fees" role="menuitem" tabindex="-1">
                      <icon-dollar-sign size="18" aria-hidden="true"></icon-dollar-sign>
                      <span>Fees</span>
+                 </li>
+                 <li class="menu-item" data-page="collection" role="menuitem" tabindex="-1">
+                     <icon-dollar-sign size="18" aria-hidden="true"></icon-dollar-sign>
+                     <span>Collection</span>
                  </li>
                  <li class="menu-item" data-page="reports" role="menuitem" tabindex="-1">
                      <icon-chart-bar size="18" aria-hidden="true"></icon-chart-bar>
@@ -499,6 +503,17 @@
                         </div>
                     </div>
                     <div id="analytics-root"></div>
+                </div>
+
+                <!-- Fee Collection Page -->
+                <div id="collection-page" class="page">
+                    <div class="page-header">
+                        <div class="page-header-content">
+                            <h2>Fee collection</h2>
+                            <p>What was billed, collected and is overdue, and who to follow up.</p>
+                        </div>
+                    </div>
+                    <div id="collection-root"></div>
                 </div>
 
                 <!-- Fees Page -->
