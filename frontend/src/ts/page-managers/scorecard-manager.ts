@@ -63,8 +63,8 @@ function renderCard(card: Card): void {
     const box = document.getElementById('sc-card');
     if (!box) return;
     const s = card.student;
-    const header = el('tr', {}, el('th', { text: 'Subject' }),
-        ...card.exams.map(e => el('th', { text: `${e.name} (${e.max_marks})` })), el('th', { text: 'Total' }));
+    const header = el('tr', {}, el('th', { scope: 'col', text: 'Subject' }),
+        ...card.exams.map(e => el('th', { scope: 'col', text: `${e.name} (${e.max_marks})` })), el('th', { scope: 'col', text: 'Total' }));
     const rows = card.subjects.map(subject => el('tr', {},
         el('th', { scope: 'row', text: subject.name }),
         ...card.exams.map(e => {
@@ -92,7 +92,7 @@ function renderCard(card: Card): void {
     box.replaceChildren(
         el('h3', { class: 'sc-title', text: s.name }),
         el('p', { class: 'sc-note', text: [`Class ${s.class_name}`, s.roll_no != null ? `Roll ${s.roll_no}` : '', s.admission_no || '', s.session ? `Session ${s.session}` : '', s.father_name ? `Father: ${s.father_name}` : '', s.mother_name ? `Mother: ${s.mother_name}` : ''].filter(Boolean).join(' · ') }),
-        el('div', { class: 'sc-scroll' }, el('table', { class: 'sc-table' }, el('thead', {}, header), el('tbody', {}, ...rows, totalRow, percentRow, positionRow))),
+        el('div', { class: 'sc-scroll' }, el('table', { class: 'sc-table' }, el('caption', { class: 'sr-only', text: `Marks of ${s.name} in every subject and exam` }), el('thead', {}, header), el('tbody', {}, ...rows, totalRow, percentRow, positionRow))),
         el('p', { class: 'sc-note', text: 'AB = absent. A dash means not entered yet. AB and dashes are left out of totals and percentages. * means one paper is not entered yet.' }),
         el('p', { class: 'sc-attendance', text: a.recorded
             ? `Attendance: ${percentText(a.rate)} (present ${a.present}, late ${a.late}, absent ${a.absent}, leave ${a.leave})`

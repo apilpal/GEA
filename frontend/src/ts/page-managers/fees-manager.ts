@@ -1,6 +1,7 @@
 // Fees page (issue #34): find a student, see the fee statement, record and reverse payments.
 // Amounts are whole rupees. All text from the server is added with textContent, never innerHTML.
 import { apiService } from '@/ts/services/api-service';
+import { formatRupees } from '@/ts/services/money';
 
 interface ClassInfo { id: number; name: string }
 interface Found {
@@ -28,7 +29,7 @@ const state = { classes: [] as ClassInfo[], current: null as Statement | null, b
 
 /** Rupees with the Indian digit grouping, e.g. ₹1,20,000. */
 export function rupees(amount: number): string {
-    return `₹${amount.toLocaleString('en-IN')}`;
+    return formatRupees(amount);
 }
 
 /** Whole rupees only: digits, more than zero. Returns the number or null. */
