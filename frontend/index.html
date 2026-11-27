@@ -129,6 +129,35 @@
     .an-link { background: none; border: none; padding: 6px 0; min-height: 36px; color: #1d4ed8; text-decoration: underline; cursor: pointer; font-size: 14px; font-weight: 600; }
 </style>
 <style id="mobile-polish">
+    /* Print and CSV buttons (issue #39) */
+    .print-only { display: none; }
+    .export-bar { margin: 4px 0 10px; }
+    .export-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+    .export-btn { min-height: 44px; }
+    .export-status { display: block; margin-top: 6px; font-size: 14px; min-height: 1.2em; color: #374151; }
+    .export-status[data-kind="error"] { color: #b91c1c; }
+    @media print {
+        @page { size: A4; margin: 12mm; }
+        html, body { background: #fff !important; color: #000 !important; height: auto !important; overflow: visible !important; }
+        .sidebar, .main-header, .no-print, .skip-link, .sidebar-backdrop, .notification-btn, #mobile-menu-btn,
+        .an-controls, .sc-controls, .fe-form, .an-link-hint { display: none !important; }
+        .main-content { margin: 0 !important; padding: 0 !important; width: auto !important; }
+        .page-container { padding: 0 !important; margin: 0 !important; }
+        .page:not(.active) { display: none !important; }
+        .print-only { display: block !important; font-size: 11pt; font-weight: 600; margin: 0 0 8pt; padding-bottom: 4pt; border-bottom: 1px solid #000; }
+        #analytics-root, #collection-root, #scorecard-root, #fees-root { max-width: none !important; padding: 0 !important; box-shadow: none !important; border-radius: 0 !important; }
+        #analytics-root *, #collection-root *, #scorecard-root *, #sc-card, #sc-card * { color: #000 !important; background: transparent !important; box-shadow: none !important; }
+        .an-scroll, .sc-scroll { overflow: visible !important; }
+        .an-table, .sc-table { font-size: 10pt; width: 100%; }
+        .an-table th:first-child, .an-table td:first-child, .sc-table th:first-child, .sc-table td:first-child { position: static !important; }
+        .an-table th, .an-table td, .sc-table th, .sc-table td { white-space: normal !important; border-bottom: 1px solid #999 !important; }
+        thead { display: table-header-group; }
+        tr, .an-chip, .sc-total { break-inside: avoid; page-break-inside: avoid; }
+        h3 { break-after: avoid; page-break-after: avoid; }
+        details > *:not(summary) { display: block !important; }
+        .an-link, .fe-link, .an-rules summary { min-height: 0 !important; }
+    }
+
     /* Drawer: menu scrolls, footer never covers items */
     .sidebar { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
     .sidebar .sidebar-header { flex: 0 0 auto; }

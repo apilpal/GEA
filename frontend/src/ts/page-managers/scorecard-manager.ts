@@ -2,6 +2,7 @@
 // AB (absent) and marks not entered yet are shown as such and never counted as zero.
 // All text from the server is added with textContent, never innerHTML.
 import { apiService } from '@/ts/services/api-service';
+import { exportBar } from '@/ts/services/export-tools';
 
 interface ClassInfo { id: number; name: string; student_count: number }
 interface StudentInfo { student_id: number; name: string; roll_no: number | null }
@@ -90,6 +91,7 @@ function renderCard(card: Card): void {
 
     const a = card.attendance;
     box.replaceChildren(
+        exportBar(`Scorecard of ${s.name}, class ${s.class_name}`),
         el('h3', { class: 'sc-title', text: s.name }),
         el('p', { class: 'sc-note', text: [`Class ${s.class_name}`, s.roll_no != null ? `Roll ${s.roll_no}` : '', s.admission_no || '', s.session ? `Session ${s.session}` : '', s.father_name ? `Father: ${s.father_name}` : '', s.mother_name ? `Mother: ${s.mother_name}` : ''].filter(Boolean).join(' · ') }),
         el('div', { class: 'sc-scroll' }, el('table', { class: 'sc-table' }, el('caption', { class: 'sr-only', text: `Marks of ${s.name} in every subject and exam` }), el('thead', {}, header), el('tbody', {}, ...rows, totalRow, percentRow, positionRow))),

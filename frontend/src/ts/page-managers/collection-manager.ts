@@ -4,6 +4,7 @@
 // collected. When nothing is due the rate is shown as a dash, never 0% or 100%. All text from the
 // server is added with textContent, never innerHTML.
 import { apiService } from '@/ts/services/api-service';
+import { exportBar, safeFileName } from '@/ts/services/export-tools';
 import { rupees } from '@/ts/page-managers/fees-manager';
 
 interface Group { invoices: number; billed: number; discount: number; net_due: number; collected: number;
@@ -142,6 +143,8 @@ function renderOverview(root: HTMLElement, data: Overview): void {
             select('Month', periodOptions, state.period, v => { state.period = v; reload(); }),
             select('Fee type', typeOptions, state.feeType, v => { state.feeType = v; reload(); })),
         el('h3', { class: 'an-title', text: `Fee collection · ${data.session} · as of ${data.as_of}` }),
+        exportBar(`Fee collection${state.period ? `, ${monthText(state.period)}` : ''}${state.feeType ? `, ${titleCase(state.feeType)}` : ''}, as of ${data.as_of}`, [
+            { label: 'Fees CSV', endpoint: '/exports/fees.csv', params: () => ({ period: state.period, fee_type: state.feeType }), fileName: () => safeFileName('fees', state.period, state.feeType) }]),
         totalsChips(data.totals),
         data.reversals.count ? note(`${data.reversals.count} payment(s) reversed, ${rupees(data.reversals.amount)} in total. These are not counted as collected.`) : el('span'),
         el('h3', { class: 'an-title', text: 'By fee type' }),
