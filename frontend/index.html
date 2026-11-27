@@ -129,6 +129,12 @@
     .an-link { background: none; border: none; padding: 6px 0; min-height: 36px; color: #1d4ed8; text-decoration: underline; cursor: pointer; font-size: 14px; font-weight: 600; }
 </style>
 <style id="mobile-polish">
+    /* Drawer: menu scrolls, footer never covers items */
+    .sidebar { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+    .sidebar .sidebar-header { flex: 0 0 auto; }
+    .sidebar .sidebar-menu { flex: 1 1 auto; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; margin: 0; padding: 8px 0; }
+    .sidebar .menu-item { padding: 12px 20px; min-height: 44px; }
+    .sidebar .sidebar-footer { position: static; flex: 0 0 auto; padding: 12px 20px calc(12px + env(safe-area-inset-bottom, 0px)); }
     /* Issue #38: phone and accessibility polish. These rules come last so they win over styles.css. */
     /* Page headings and subtitles follow the theme (they were fixed dark gray and faint on the dark theme). */
     .page-header { flex-wrap: wrap; gap: 8px 16px; border-bottom-color: var(--color-border, #e5e7eb); }
