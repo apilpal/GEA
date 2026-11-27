@@ -1,13 +1,13 @@
 // Deterministic demo content used when the application is run without seeded data.
 // This is clearly marked as sample data and never participates in authentication.
 import { authContext } from './components/auth/auth-context';
+import { formatRupees } from './services/money';
 
 /** Monthly transport fee charged to every demo student. */
 export const MONTHLY_FEE = 500;
 
-// Change this to show another currency in the demo dashboard (for example 'Rs. ').
-const CURRENCY_SYMBOL = '$';
-const formatMoney = (amount: number): string => `${CURRENCY_SYMBOL}${amount.toLocaleString()}`;
+// Money is always shown in rupees (₹).
+const formatMoney = (amount: number): string => formatRupees(amount);
 
 export const DEMO_STUDENTS = [
     { id: 1, name: 'Avery Johnson', father_name: 'Morgan Johnson', mobile: '555-1001', class: '10', class_: '10', address: '12 Oak Street', fees: MONTHLY_FEE, route: 'North Route' },

@@ -3,6 +3,7 @@ import { ChartComponent } from './components/charts/index';
 import { StudentTable, StudentProfileCard } from './components/students/index';
 import { DriverInfo } from './components/drivers/index';
 import { apiService } from './services/api-service';
+import { formatRupees } from './services/money';
 
 // Debug: Log the import to confirm it's working
 console.log('DriverInfo imported successfully:', DriverInfo);
@@ -483,7 +484,7 @@ function updateReportsSummary(summary: any) {
 
     if (totalStudentsEl) totalStudentsEl.textContent = summary.total_students || 0;
     if (totalDriversEl) totalDriversEl.textContent = summary.total_drivers || 0;
-    if (totalRevenueEl) totalRevenueEl.textContent = `$${(summary.total_revenue || 0).toLocaleString()}`;
+    if (totalRevenueEl) totalRevenueEl.textContent = formatRupees(summary.total_revenue);
 
     // Update driver-student table
     const tbody = document.getElementById('driver-student-tbody');
@@ -494,7 +495,7 @@ function updateReportsSummary(summary: any) {
             row.innerHTML = `
                 <td>${driver.driver_name}</td>
                 <td>${driver.student_count}</td>
-                <td>$${(driver.revenue || 0).toLocaleString()}</td>
+                <td>${formatRupees(driver.revenue)}</td>
             `;
             tbody.appendChild(row);
         });

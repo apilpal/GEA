@@ -42,6 +42,8 @@ Database changes go through Alembic (`backend/alembic/versions`, current head `0
 - Frontend: each screen is a page manager in `frontend/src/ts/page-managers/*-manager.ts`. **A new page needs four edits**: the menu item and `<div id="x-page" class="page">` in `frontend/index.html`, the entry in `navigationConfig` in `src/ts/router.ts`, the title in `PAGE_TITLES` in `src/ts/demo-data.ts` (a page missing there silently falls back to the dashboard), and an export in `page-managers/index.ts`.
 - `frontend/styles.css` is **compiled from SCSS and committed**. If you change `src/scss`, rebuild it. The newer pages keep their small styles in a `<style>` block in `index.html` instead.
 - Put server text on the page with `textContent`, never `innerHTML`.
+- Show money only with `formatRupees` from `src/ts/services/money.ts` (₹, Indian grouping). Never write `$` or format rupees by hand.
+- `styles.css` has no global `box-sizing: border-box`. The newer page roots get it from the `mobile-polish` block in `index.html`; add your new page root to that list. Panels that are always light (scorecard, fee statement) need explicit dark text colors, because the theme's text color is light on the dark theme. Check a new page at 360px width on both themes.
 
 ## Rules that must not be broken
 - Money is a whole-rupee integer. Payments are never edited or deleted: a wrong one is reversed by a new negative row linked to the original (admin only, with a reason). Receipt numbers are unique and never reused. Invoice status is derived, never stored.
@@ -64,4 +66,4 @@ Follow `tests_school/test_marks_api.py`: a temp SQLite file migrated with Alembi
 Pass mark and whether every subject must be passed (the Analytics bucket limits 75, 50 and 33 percent in `analytics_rules.py`, and the note limits in `diagnostic_rules.py`, are assumed until then); the holiday list; advance payment for the whole year; the exact subject list per class group and whether oral/activity papers carry marks; section and teacher assignments (class teacher, subject teachers, linking teachers to logins); whether to remove the old `/public/*` endpoints; the real split of the 40 and 60 marks between part I and II (assumed even).
 
 ## Known issues to pick up later
-Students page shows only 100 students (needs paging and search); "Class: N/A" on old sample students; Reports page uses `$` instead of `₹`; Reports, Charts and Dashboard still allow teachers although the role table says teachers must not see fee data; page headings are faint on the dark theme; the monthly invoice generator does not exist yet (the demo data has invoices).
+Students page shows only 100 students (needs paging and search); "Class: N/A" on old sample students; Reports, Charts and Dashboard still allow teachers although the role table says teachers must not see fee data; the monthly invoice generator does not exist yet (the demo data has invoices).

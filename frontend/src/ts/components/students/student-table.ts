@@ -1,5 +1,6 @@
 // Custom Element: Student Table
 import { BaseComponent } from '@/ts/components/core/index';
+import { formatRupees } from '@/ts/services/money';
 
 /**
  * Interface representing a student record with all possible fields.
@@ -187,7 +188,7 @@ class StudentTable extends BaseComponent {
                 <td role="gridcell" aria-label="Class: ${student.class || 'N/A'}">${student.class || 'N/A'}</td>
                 <td role="gridcell" aria-label="Mobile: ${student.mobile || 'N/A'}">${student.mobile || 'N/A'}</td>
                 <td role="gridcell" aria-label="Address: ${student.address || 'N/A'}" title="${student.address || ''}">${student.address ? (student.address.length > 30 ? student.address.substring(0, 27) + '...' : student.address) : 'N/A'}</td>
-                <td role="gridcell" aria-label="Fees: ${student.fees ? `₹${student.fees}` : 'N/A'}">${student.fees ? `₹${student.fees}` : 'N/A'}</td>
+                <td role="gridcell" aria-label="Fees: ${student.fees ? formatRupees(student.fees) : 'N/A'}">${student.fees ? formatRupees(student.fees) : 'N/A'}</td>
                 <td class="actions-cell" role="gridcell" aria-label="Actions for ${student.name || 'Unknown'}">
                     <button class="action-btn view-btn" data-action="view" data-index="${index}" aria-label="View details for ${student.name}" title="View Details">
                         <icon-eye size="16"></icon-eye>
@@ -321,7 +322,7 @@ class StudentTable extends BaseComponent {
                         </div>
                         <div class="info-item">
                             <span class="label">Fees:</span>
-                            <span class="value">${student.fees ? `₹${student.fees}` : 'N/A'}</span>
+                            <span class="value">${student.fees ? formatRupees(student.fees) : 'N/A'}</span>
                         </div>
                     </div>
                 </div>
@@ -349,7 +350,7 @@ class StudentTable extends BaseComponent {
                  <td role="gridcell" aria-label="Class: ${student.class || 'N/A'}">${student.class || 'N/A'}</td>
                  <td role="gridcell" aria-label="Mobile: ${student.mobile || 'N/A'}">${student.mobile || 'N/A'}</td>
                  <td role="gridcell" aria-label="Address: ${student.address || 'N/A'}" title="${student.address || ''}">${student.address ? (student.address.length > 30 ? student.address.substring(0, 27) + '...' : student.address) : 'N/A'}</td>
-                 <td role="gridcell" aria-label="Fees: ${student.fees ? `₹${student.fees}` : 'N/A'}">${student.fees ? `₹${student.fees}` : 'N/A'}</td>
+                 <td role="gridcell" aria-label="Fees: ${student.fees ? formatRupees(student.fees) : 'N/A'}">${student.fees ? formatRupees(student.fees) : 'N/A'}</td>
                  <td class="actions-cell" role="gridcell" aria-label="Actions for ${student.name || 'Unknown'}">
                      <button class="action-btn view-btn" data-action="view" data-index="${index}" aria-label="View details for ${student.name}" title="View Details">
                          <icon-eye size="16"></icon-eye>

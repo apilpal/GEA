@@ -80,7 +80,8 @@ function totalsChips(t: Group): HTMLElement {
 
 function table(heads: string[], rows: HTMLElement[]): HTMLElement {
     return el('div', { class: 'an-scroll' }, el('table', { class: 'an-table' },
-        el('thead', {}, el('tr', {}, ...heads.map(text => el('th', { text })))), el('tbody', {}, ...rows)));
+        el('caption', { class: 'sr-only', text: `${heads[0]} table: ${heads.slice(1).join(', ')}` }),
+        el('thead', {}, el('tr', {}, ...heads.map(text => el('th', { scope: 'col', text })))), el('tbody', {}, ...rows)));
 }
 
 function groupRow(label: string, g: Group, before: string[] = [], after: string[] = []): HTMLElement {

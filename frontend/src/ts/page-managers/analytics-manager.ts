@@ -121,8 +121,9 @@ function examSelect(exams: ExamOption[], onChange: (value: string) => void): HTM
     return el('label', { class: 'an-field' }, el('span', { text: 'Exam' }), select);
 }
 
-function groupRow(label: string, group: Group, onOpen?: () => void): HTMLElement {
-    const cells = [String(group.students), String(group.with_marks), percentLabel(group.average_percent), percentLabel(group.attendance_rate),
+function groupRow(label: string, group: Group, onOpen?: () => void, withAttendance = true): HTMLElement {
+    const cells = [String(group.students), String(group.with_marks), percentLabel(group.average_percent),
+                   ...(withAttendance ? [percentLabel(group.attendance_rate)] : []),
                    String(group.buckets.distinction), String(group.buckets.steady), String(group.buckets.borderline), String(group.buckets.at_risk)];
     const first = el('th', { scope: 'row' });
     if (onOpen) {
@@ -133,10 +134,11 @@ function groupRow(label: string, group: Group, onOpen?: () => void): HTMLElement
     return el('tr', {}, first, ...cells.map(text => el('td', { text })));
 }
 
-function comparisonTable(first: string, rows: HTMLElement[]): HTMLElement {
-    const heads = [first, 'Students', 'With marks', 'Average', 'Attendance', 'Distinction', 'Steady', 'Borderline', 'At risk'];
+function comparisonTable(first: string, rows: HTMLElement[], caption = '', withAttendance = true): HTMLElement {
+    const heads = [first, 'Students', 'With marks', 'Average', ...(withAttendance ? ['Attendance'] : []), 'Distinction', 'Steady', 'Borderline', 'At risk'];
     return el('div', { class: 'an-scroll' }, el('table', { class: 'an-table' },
-        el('thead', {}, el('tr', {}, ...heads.map(text => el('th', { text })))), el('tbody', {}, ...rows)));
+        el('caption', { class: 'sr-only', text: caption || `${first} comparison` }),
+        el('thead', {}, el('tr', {}, ...heads.map(text => el('th', { scope: 'col', text })))), el('tbody', {}, ...rows)));
 }
 
 function renderDetail(data: ClassDetail, diag: Diagnostics | null): void {
@@ -144,24 +146,21 @@ function renderDetail(data: ClassDetail, diag: Diagnostics | null): void {
     if (!box) return;
     const ranked = data.students.filter(s => s.percent !== null).length;
     const rows = data.students.map(s => el('tr', {},
-        el('td', { text: s.roll_no != null ? String(s.roll_no) : '' }),
-        el('th', { scope: 'row', text: s.name }),
+        el('th', { scope: 'row', text: `${s.roll_no != null ? `${s.roll_no}. ` : ''}${s.name}` }),
         el('td', { text: percentLabel(s.percent) }),
         el('td', { text: bucketLabel(s.bucket) }),
         el('td', { text: rankLabel(s.position, ranked) }),
         el('td', { text: percentLabel(s.attendance_rate) })));
-    const onExam = (value: string): void => {
-        state.examId = value;
-        if (isAdmin()) void loadOverview(); // reloads the overview and then this class
-        else void loadDetail(data.class.class_section_id);
-    };
+    // Only teachers get an exam picker here; the admin picks the exam once, at the top of the page.
+    const onExam = (value: string): void => { state.examId = value; void loadDetail(data.class.class_section_id); };
     box.replaceChildren(
-        el('div', { class: 'an-controls' }, examSelect(data.exams, onExam)),
+        ...(isAdmin() ? [] : [el('div', { class: 'an-controls' }, examSelect(data.exams, onExam))]),
         el('h3', { class: 'an-title', text: `Class ${data.class.name}${data.exam ? ` · ${data.exam.name}` : ' · all exams'}` }),
         chips(data.summary),
         bucketChips(data.summary.buckets),
         el('div', { class: 'an-scroll' }, el('table', { class: 'an-table' },
-            el('thead', {}, el('tr', {}, ...['Roll', 'Student', 'Percent', 'Label', 'Position', 'Attendance'].map(text => el('th', { text })))),
+            el('caption', { class: 'sr-only', text: `Students of class ${data.class.name}: percent, label, position and attendance` }),
+            el('thead', {}, el('tr', {}, ...['Student', 'Percent', 'Label', 'Position', 'Attendance'].map(text => el('th', { scope: 'col', text })))),
             el('tbody', {}, ...rows))),
         note('Students with the same percent share a position. A dash means there is nothing to count yet.'),
         rulesBox(data.bucket_rules),
@@ -184,7 +183,8 @@ export function diagnosticsPanel(diag: Diagnostics): HTMLElement[] {
         el('h3', { class: 'an-title', text: 'Why? Notes for this class' }),
         diag.tags.length ? tagList(diag.tags) : note('No class-level notes.'),
         subjectRows.length ? el('div', { class: 'an-scroll' }, el('table', { class: 'an-table' },
-            el('thead', {}, el('tr', {}, ...['Subject', 'Class average', 'Students with marks'].map(text => el('th', { text })))),
+            el('caption', { class: 'sr-only', text: 'Subject averages of this class' }),
+            el('thead', {}, el('tr', {}, ...['Subject', 'Class average', 'Students with marks'].map(text => el('th', { scope: 'col', text })))),
             el('tbody', {}, ...subjectRows))) : el('span'),
         el('h3', { class: 'an-title', text: `Students who may need follow-up (${follow.length})` }),
         follow.length ? el('ul', { class: 'an-follow' }, ...followList) : note('No student needs follow-up from the marks and attendance entered so far.'),
@@ -204,7 +204,13 @@ async function loadDetail(classId: number, scroll = false): Promise<void> {
         return;
     }
     renderDetail(response.data, diag.error || !diag.data ? null : diag.data);
-    if (scroll && box) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (scroll && box) {
+        // Move focus to the class heading so keyboard and screen-reader users land on the new content.
+        const heading = box.querySelector('h3');
+        if (heading) { heading.setAttribute('tabindex', '-1'); (heading as HTMLElement).focus({ preventScroll: true }); }
+        const calm = typeof window.matchMedia === 'function' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        box.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+    }
 }
 
 function renderOverview(root: HTMLElement, data: Overview): void {
@@ -230,7 +236,7 @@ function renderOverview(root: HTMLElement, data: Overview): void {
 function renderSubjects(data: SubjectComparison): void {
     const box = document.getElementById('an-subjects');
     if (!box) return;
-    const subjectRows = data.subjects.map(s => groupRow(s.name, s));
+    const subjectRows = data.subjects.map(s => groupRow(s.name, s, undefined, false));
     const header = ['Class', 'Average', ...data.subjects.map(s => s.name)];
     const matrixRows = data.classes.map(c => el('tr', {},
         el('th', { scope: 'row', text: c.name }),
@@ -247,12 +253,13 @@ function renderSubjects(data: SubjectComparison): void {
     });
     box.replaceChildren(
         el('h3', { class: 'an-title', text: 'Subjects across the school (weakest first)' }),
-        comparisonTable('Subject', subjectRows),
+        comparisonTable('Subject', subjectRows, 'Subjects across the school: average percent and labels', false),
         el('h3', { class: 'an-title', text: 'Biggest bottlenecks' }),
         bottlenecks.length ? el('ul', { class: 'an-follow' }, ...bottlenecks) : note('No subject is far below its class average.'),
         el('h3', { class: 'an-title', text: 'Average percent by class and subject' }),
         el('div', { class: 'an-scroll' }, el('table', { class: 'an-table' },
-            el('thead', {}, el('tr', {}, ...header.map(text => el('th', { text })))), el('tbody', {}, ...matrixRows))),
+            el('caption', { class: 'sr-only', text: 'Average percent of each class in each subject' }),
+            el('thead', {}, el('tr', {}, ...header.map(text => el('th', { scope: 'col', text })))), el('tbody', {}, ...matrixRows))),
         note('n/a = the class does not have this subject. A dash = no marks to count yet.'),
         tagRulesBox(data.tag_rules));
 }
