@@ -4,6 +4,7 @@
 // yet is shown as "no marks yet" and is not counted as zero. Buckets are labels for follow-up, not
 // pass or fail. Notes (tags) always show their plain reason. All text from the server is added with textContent, never innerHTML.
 import { apiService } from '@/ts/services/api-service';
+import { exportBar, safeFileName } from '@/ts/services/export-tools';
 
 interface Buckets { distinction: number; steady: number; borderline: number; at_risk: number }
 interface Group { students: number; with_marks: number; average_percent: number | null; buckets: Buckets;
@@ -141,6 +142,20 @@ function comparisonTable(first: string, rows: HTMLElement[], caption = '', withA
         el('thead', {}, el('tr', {}, ...heads.map(text => el('th', { scope: 'col', text })))), el('tbody', {}, ...rows)));
 }
 
+/** Print, and the CSV files of this class. Marks need an exam, so that button shows only when one is chosen. */
+function classExportBar(data: ClassDetail): HTMLElement {
+    const id = data.class.class_section_id;
+    const name = data.class.name;
+    const files = [
+        { label: 'Students CSV', endpoint: '/exports/students.csv', params: () => ({ class_section_id: id }), fileName: () => safeFileName('students', name) },
+        { label: 'Attendance CSV', endpoint: '/exports/attendance.csv', params: () => ({ class_section_id: id }), fileName: () => safeFileName('attendance', name) }];
+    if (data.exam) {
+        const exam = data.exam;
+        files.splice(1, 0, { label: 'Marks CSV', endpoint: '/exports/marks.csv', params: () => ({ exam_id: exam.exam_id, class_section_id: id }), fileName: () => safeFileName('marks', name, exam.name) });
+    }
+    return exportBar(`Class ${name} comparison${data.exam ? `, ${data.exam.name}` : ''}`, files);
+}
+
 function renderDetail(data: ClassDetail, diag: Diagnostics | null): void {
     const box = document.getElementById('an-detail');
     if (!box) return;
@@ -156,6 +171,7 @@ function renderDetail(data: ClassDetail, diag: Diagnostics | null): void {
     box.replaceChildren(
         ...(isAdmin() ? [] : [el('div', { class: 'an-controls' }, examSelect(data.exams, onExam))]),
         el('h3', { class: 'an-title', text: `Class ${data.class.name}${data.exam ? ` · ${data.exam.name}` : ' · all exams'}` }),
+        classExportBar(data),
         chips(data.summary),
         bucketChips(data.summary.buckets),
         el('div', { class: 'an-scroll' }, el('table', { class: 'an-table' },
@@ -219,6 +235,8 @@ function renderOverview(root: HTMLElement, data: Overview): void {
     root.replaceChildren(
         el('div', { class: 'an-controls' }, examSelect(data.exams, value => { state.examId = value; void loadOverview(); })),
         el('h3', { class: 'an-title', text: `School summary · ${data.session}${data.exam ? ` · ${data.exam.name}` : ' · all exams'}` }),
+        exportBar(`School summary${data.exam ? `, ${data.exam.name}` : ''}`, [
+            { label: 'All students CSV', endpoint: '/exports/students.csv', params: () => ({}), fileName: () => safeFileName('students') }]),
         chips(data.school),
         bucketChips(data.school.buckets),
         data.unassigned_students ? note(`${data.unassigned_students} active student(s) are not in a class this session and are not counted above.`) : el('span'),
