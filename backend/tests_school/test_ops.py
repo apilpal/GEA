@@ -123,6 +123,13 @@ def test_log_recent_is_newest_first_and_respects_since(log_file):
     assert len(ops_log.recent(limit=10)) == 3                  # a damaged line is skipped, not fatal
 
 
+def test_log_survives_alembic_switching_loggers_off(log_file):
+    import logging
+    logging.getLogger("ops").disabled = True          # what alembic's fileConfig does to existing loggers
+    ops_log.record("server_error", now=NOW, status=500)
+    assert len(ops_log.recent()) == 1
+
+
 def test_recent_with_no_log_is_empty(log_file):
     assert ops_log.recent() == []
 

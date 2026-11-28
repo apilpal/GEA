@@ -29,6 +29,9 @@ def _text(value) -> str:
 def _ensure_handler() -> None:
     """Attach the rotating file (1 MB, 5 files) once, and again if LOG_PATH was changed."""
     global _handler_path
+    # Alembic's logging setup (fileConfig) switches off every logger that already exists. Switch ours back on
+    # each time, or the log would silently stop after the first migration.
+    _logger.disabled = False
     if _handler_path == LOG_PATH:
         return
     for old in list(_logger.handlers):
