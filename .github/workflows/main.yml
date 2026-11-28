@@ -1,0 +1,753 @@
+name: Create GEA roadmap issues
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_create:
+        description: "Set true to create the missing roadmap issues (false = preview only)"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  create-roadmap-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Preview or create missing roadmap issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const confirmCreate = ${{ inputs.confirm_create }};
+            const epicRefs = {
+              STU: 75,
+              DSH: 76,
+              TRN: 77,
+              RPT: 78,
+              UX: 79
+            };
+
+            const issues = [
+              {
+                key: "STU-1",
+                title: "STU-1: Add server-side student paging, search and filters",
+                body: `## Goal
+            Make the full student list reachable and easy to navigate.
+
+            ## Work
+            - Add server-side pagination and search.
+            - Filter by class, route and student status.
+            - Preserve page and filters when returning from student details.
+            - Enforce role scoping in API queries.
+
+            ## Done when
+            - All authorized students are reachable; the list is not capped at 100.
+            - Search and filters run server-side.
+            - Returning preserves list position and filters.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+
+            ## Size
+            M`
+              },
+              {
+                key: "STU-2",
+                title: "STU-2: Build a phone-first student list",
+                body: `## Goal
+            Make everyday student lookup fast on small screens.
+
+            ## Work
+            - Use student cards on phone layouts.
+            - Show name, class, roll and route.
+            - Add a guardian-call action only where permitted.
+            - Open student details on card selection.
+            - Ensure touch targets are at least 44px.
+
+            ## Done when
+            - Works at 360px in light and dark themes.
+            - Cards show only role-authorized fields.
+            - Interactive controls have 44px touch targets.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+
+            ## Size
+            M`
+              },
+              {
+                key: "STU-3",
+                title: "STU-3: Add role-aware student detail tabs",
+                body: `## Goal
+            Provide a student detail page with permission-aware tabs.
+
+            ## Work
+            - Add Profile, Attendance, Marks, Fees and Transport tabs.
+            - Hide tabs the role cannot access.
+            - Enforce permissions in APIs, not only the UI.
+            - Add loading, empty and error states.
+
+            ## Done when
+            - Teachers cannot access Fees.
+            - Clerks cannot access Marks.
+            - API tests prove unauthorized data cannot be retrieved.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+            - SEC-3 fee-data restrictions.
+
+            ## Size
+            L`
+              },
+              {
+                key: "STU-4",
+                title: "STU-4: Improve student add and edit forms",
+                body: `## Goal
+            Make student data entry clearer and reduce invalid records.
+
+            ## Work
+            - Group related fields.
+            - Choose class, section and route from existing records.
+            - Validate mobile numbers using the school's approved format.
+            - Show clear save, validation and error messages.
+            - Avoid silently overwriting existing records.
+
+            ## Done when
+            - Class and route values come from valid lists.
+            - Invalid mobile input is explained.
+            - Save success/failure is visible.
+            - Existing records change only when explicitly edited.
+
+            ## Size
+            M`
+              },
+              {
+                key: "STU-5",
+                title: "STU-5: Add bulk class and section assignment",
+                body: `## Goal
+            Allow authorized staff to assign multiple students efficiently.
+
+            ## Work
+            - List students without a class.
+            - Select multiple students and assign class and section.
+            - Preview the selection before saving.
+            - Validate target class and section.
+            - Record assignment actions for auditability.
+
+            ## Done when
+            - Authorized staff can assign multiple students in one operation.
+            - Unassigned students are clearly listed.
+            - Invalid assignments are rejected and successful changes confirmed.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+
+            ## Size
+            M`
+              },
+              {
+                key: "STU-6",
+                title: "STU-6: Replace student delete with left-school workflow",
+                body: `## Goal
+            Prevent accidental hard deletion and use a controlled student-leaving workflow.
+
+            ## Work
+            - Replace the ordinary Delete action with Mark as left school.
+            - Show a confirmation naming the selected student.
+            - Hide left-school students from normal active lists while retaining authorized history.
+            - Restrict eventual hard deletion to the approved retention process.
+
+            ## Done when
+            - Normal UI workflows cannot hard-delete a student.
+            - Marking a student as left school requires explicit confirmation.
+            - The action is recorded in the audit trail.
+
+            ## Dependencies
+            - PRV-4 retention and left-school status.
+
+            ## Size
+            S`
+              },
+              {
+                key: "STU-7",
+                title: "STU-7: Mask sensitive student fields by default",
+                body: `## Goal
+            Reduce unnecessary exposure of student and guardian contact details.
+
+            ## Work
+            - Mask mobile numbers by default, showing only the last four digits.
+            - Provide a reveal action only to roles with a valid purpose.
+            - Log authorized reveals without storing the revealed value.
+            - Ensure masked values are not exposed in page source or client-side logs.
+
+            ## Done when
+            - Sensitive mobile fields are masked by default.
+            - Only authorized roles can reveal the full value.
+            - Reveal actions appear in the audit trail without recording the number.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+            - PRV-6 sensitive-data audit trail.
+
+            ## Size
+            S`
+              },
+              {
+                key: "DSH-1",
+                title: "DSH-1: Build role-specific dashboards",
+                body: `## Goal
+            Show each staff role only the information and tasks needed for its work.
+
+            ## Work
+            - Admin: school summary, collection and today's attendance.
+            - Teacher: assigned classes, attendance not yet marked and marks pending.
+            - Clerk: collected today and overdue fees.
+            - Enforce access in API responses as well as the UI.
+            - Use real database/API values only; show empty states when no data exists.
+
+            ## Done when
+            - Each role lands on its own dashboard.
+            - No role sees data outside its permissions.
+            - Figures match underlying authorized API data.
+            - Empty datasets never produce demo numbers.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+            - SEC-3 fee-data restrictions.
+
+            ## Size
+            L`
+              },
+              {
+                key: "DSH-2",
+                title: "DSH-2: Remove fabricated dashboard numbers and notifications",
+                body: `## Goal
+            Ensure every dashboard count, badge and notification represents real application data.
+
+            ## Work
+            - Remove the fixed unread-notification badge.
+            - Remove demo/fallback dashboard numbers.
+            - Replace empty values with clear empty states and next steps.
+            - Do not substitute fabricated values when an API request fails.
+
+            ## Done when
+            - No fixed or demo count is displayed as real data.
+            - Empty states explain what the user can do next.
+            - API failures are shown as errors, not zero or sample values.
+
+            ## Size
+            S`
+              },
+              {
+                key: "DSH-3",
+                title: "DSH-3: Add today's attendance status panel",
+                body: `## Goal
+            Help teachers and administrators see which classes completed attendance today.
+
+            ## Work
+            - Show attendance-marked and not-yet-marked classes for the current school day.
+            - Link each class to its attendance workflow.
+            - Respect teacher class assignments and admin permissions.
+            - Handle holidays, weekends and classes without enrolled students using school rules.
+
+            ## Done when
+            - Status uses actual attendance records and school calendar rules.
+            - Teachers see only assigned classes.
+            - Admins can identify classes with pending attendance.
+            - Each item links to the relevant attendance screen.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+
+            ## Size
+            M`
+              },
+              {
+                key: "DSH-4",
+                title: "DSH-4: Add accessible real-data dashboard charts",
+                body: `## Goal
+            Present attendance and fee trends accurately with an accessible alternative to charts.
+
+            ## Work
+            - Add attendance trend and monthly collection charts using real API data.
+            - Provide a table with the same values for accessibility.
+            - Respect fee-data permissions.
+            - Support light/dark themes and responsive layouts.
+
+            ## Done when
+            - Chart and table values match.
+            - No sample data is used.
+            - Teachers cannot retrieve fee chart data.
+            - Charts work on mobile and in both themes.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+            - SEC-3 fee-data restrictions.
+
+            ## Size
+            M`
+              },
+              {
+                key: "TRN-1",
+                title: "TRN-1: Add transport route summary cards",
+                body: `## Goal
+            Make route and rider information easy for authorized staff to understand.
+
+            ## Work
+            - Show route name, assigned driver, rider count and monthly fee summary.
+            - Open a route detail view with its authorized rider list.
+            - Calculate counts and totals from real records.
+            - Do not expose full student profiles in route summaries.
+
+            ## Done when
+            - A clerk can find riders on a route quickly.
+            - Counts and totals match underlying records.
+            - Each role sees only permitted fields.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+
+            ## Size
+            M`
+              },
+              {
+                key: "TRN-2",
+                title: "TRN-2: Separate Add Driver and Add Route workflows",
+                body: `## Goal
+            Ensure Add Route creates a route rather than opening the driver form.
+
+            ## Work
+            - Provide separate Add Driver and Add Route actions.
+            - Give each its own form, validation and save flow.
+            - Connect a driver to a route through an explicit assignment step.
+            - Show clear success and error messages.
+
+            ## Done when
+            - Add Driver opens only the driver form.
+            - Add Route opens only the route form.
+            - Both workflows validate and save the intended record.
+
+            ## Size
+            S`
+              },
+              {
+                key: "TRN-3",
+                title: "TRN-3: Create a driver view limited to the assigned route",
+                body: `## Goal
+            Give drivers only the minimum rider information needed for their own route.
+
+            ## Work
+            - Show only the signed-in driver's assigned route.
+            - Limit rider fields to name, class, stop and guardian phone where approved.
+            - Enforce route scoping in backend queries and authorization.
+            - Prevent drivers from accessing other student pages or routes.
+
+            ## Done when
+            - A driver cannot retrieve another route's riders by changing a URL or API parameter.
+            - Only approved rider fields are returned.
+            - Automated tests cover driver access boundaries.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+
+            ## Size
+            M`
+              },
+              {
+                key: "TRN-4",
+                title: "TRN-4: Add student-to-route assignment workflow",
+                body: `## Goal
+            Allow authorized staff to assign or move a student to a transport route with clear fee impact.
+
+            ## Work
+            - Support route assignment from student details and route details.
+            - Validate route and stop selections.
+            - Show applicable fee changes before saving.
+            - Update route rider counts and fee summaries from saved records.
+            - Record assignment changes for auditability.
+
+            ## Done when
+            - Authorized staff can assign and move students between routes.
+            - Fee impact is visible before confirmation.
+            - Route counts and fee summaries update from real data.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+            - Confirm existing fee rules before changing calculations.
+
+            ## Size
+            M`
+              },
+              {
+                key: "TRN-5",
+                title: "TRN-5: Decide whether GEA should collect live bus location",
+                body: `## Goal
+            Make an explicit privacy and safety decision before adding live transport tracking.
+
+            ## Work
+            - Document whether live location tracking is needed.
+            - If proposed, define child-safety purpose, authorized viewers, guardian notice, retention and access controls.
+            - Do not collect location until the school approves the decision and privacy review.
+            - Prefer no tracking if a clear need and safeguards cannot be established.
+
+            ## Done when
+            - A written school decision is recorded.
+            - No live location is collected before approval.
+            - If approved, a separate implementation issue defines safeguards and tests.
+
+            ## Dependencies
+            - PRV-1 data inventory.
+            - PRV-2 privacy notice and school review.
+
+            ## Size
+            S`
+              },
+              {
+                key: "RPT-1",
+                title: "RPT-1: Create a unified role-aware reports index",
+                body: `## Goal
+            Provide named, consistent school reports with safe filtering, printing and CSV export.
+
+            ## Work
+            - Add reports for class list, attendance register, marks sheet, fee dues and route list.
+            - Provide relevant filters for each report.
+            - Add Print and CSV actions where permitted.
+            - Remove the full-profile students-by-driver report.
+            - Document columns and allowed roles for every report.
+
+            ## Done when
+            - Each report lists its purpose, columns and permitted roles.
+            - Reports return only required fields.
+            - Print and CSV actions respect authorization and export safeguards.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+            - SEC-3 fee-data restrictions.
+            - PRV-8 export and print safeguards.
+
+            ## Size
+            L`
+              },
+              {
+                key: "RPT-2",
+                title: "RPT-2: Make Reports and Charts consistent and responsive",
+                body: `## Goal
+            Give Reports and Charts the same visual quality and responsive behavior as Analytics.
+
+            ## Work
+            - Align layout, typography, spacing and controls with the shared design system.
+            - Format currency consistently in Indian rupees.
+            - Add clear page titles and light/dark theme support.
+            - Fix tables, filters and actions for narrow phone widths.
+
+            ## Done when
+            - Reports and Charts pass a 360px viewport check.
+            - Both themes are usable.
+            - Currency and page titles are consistent.
+            - Visual changes do not alter data or permissions behavior.
+
+            ## Dependencies
+            - Shared design system from UX-6.
+
+            ## Size
+            M`
+              },
+              {
+                key: "RPT-3",
+                title: "RPT-3: Enforce report access by staff role",
+                body: `## Goal
+            Ensure each staff role can access only the reports needed for its duties.
+
+            ## Work
+            - Teachers: academic reports only.
+            - Clerks: fee reports only.
+            - Admins: all approved reports.
+            - Enforce role restrictions in API endpoints and navigation.
+            - Add positive and negative tests for each role.
+
+            ## Done when
+            - Teachers cannot retrieve fee reports.
+            - Clerks cannot retrieve restricted academic reports.
+            - Admins can access all approved reports.
+            - Tests verify allowed and denied access.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+            - SEC-3 fee-data restrictions.
+
+            ## Size
+            S`
+              },
+              {
+                key: "RPT-4",
+                title: "RPT-4: Consolidate charts into the pages where they are used",
+                body: `## Goal
+            Reduce duplicate navigation and keep each chart beside the workflow it explains.
+
+            ## Work
+            - Identify charts used by Analytics and Collection.
+            - Move useful charts into their relevant pages.
+            - Retire the standalone Charts page only if it adds no unique value.
+            - Provide a table alternative for every retained chart.
+
+            ## Done when
+            - Every retained chart has a clear home and matching table.
+            - No chart with unique required information is removed.
+            - Role permissions remain enforced.
+
+            ## Dependencies
+            - DSH-4 real-data chart patterns.
+            - SEC-3 fee-data restrictions.
+
+            ## Size
+            M`
+              },
+              {
+                key: "UX-1",
+                title: "UX-1: Add role-aware navigation and mobile task bar",
+                body: `## Goal
+            Make navigation simpler and show staff only areas they can use.
+
+            ## Work
+            - Group navigation into Daily Work, Reports and Admin.
+            - Show only pages available to the signed-in role.
+            - Add a mobile bottom bar for the four most-used tasks based on school workflows.
+            - Keep direct URL and API authorization independent of navigation.
+
+            ## Done when
+            - Users do not see links for unavailable modules.
+            - The mobile task bar works at phone widths.
+            - Keyboard and desktop navigation remain usable.
+            - Hiding a link never substitutes for backend authorization.
+
+            ## Dependencies
+            - SEC-2 role-scoped student data.
+            - SEC-3 fee-data restrictions.
+
+            ## Size
+            M`
+              },
+              {
+                key: "UX-2",
+                title: "UX-2: Improve bilingual sign-in experience",
+                body: `## Goal
+            Make sign-in understandable and accessible without exposing development-only controls.
+
+            ## Work
+            - Add clear authentication error messages.
+            - Add a show/hide password control.
+            - Remember the username only with explicit user choice and school approval.
+            - Support Hindi and English.
+            - Remove login-bypass hints and developer-only text from production UI.
+
+            ## Done when
+            - Wrong credentials produce a clear, non-revealing message.
+            - Password visibility can be toggled.
+            - Hindi and English sign-in labels are available.
+            - No bypass or developer hint appears in production.
+
+            ## Dependencies
+            - SEC-6 production safety checks.
+            - SEC-8 login hardening.
+            - UX-3 translations.
+
+            ## Size
+            M`
+              },
+              {
+                key: "UX-3",
+                title: "UX-3: Add complete Hindi and English translations",
+                body: `## Goal
+            Provide consistent bilingual labels and messages throughout the application.
+
+            ## Work
+            - Move user-facing strings into a shared translation resource.
+            - Cover pages, validation messages, notifications and empty/error states.
+            - Use a suitable Devanagari font.
+            - Test long Hindi and English labels to prevent clipping.
+
+            ## Done when
+            - Switching language updates all covered pages and messages.
+            - No user-facing hard-coded strings remain in covered screens.
+            - Long labels remain readable on mobile and desktop.
+
+            ## Dependencies
+            - Shared design system from UX-6.
+
+            ## Size
+            L`
+              },
+              {
+                key: "UX-4",
+                title: "UX-4: Standardize loading, empty, error and saved states",
+                body: `## Goal
+            Make application feedback consistent across every module.
+
+            ## Work
+            - Define shared patterns for loading, empty, error-with-retry and saved states.
+            - Apply them to Students, Dashboard, Attendance, Fees, Exams, Transport, Reports and Settings.
+            - Ensure errors are distinct from empty data.
+            - Provide accessible status announcements.
+
+            ## Done when
+            - Covered pages use the same state patterns and language.
+            - Failed requests are not shown as empty or successful.
+            - Retry actions work where appropriate.
+            - Status messages are accessible.
+
+            ## Size
+            M`
+              },
+              {
+                key: "UX-5",
+                title: "UX-5: Support safe draft recovery on poor networks",
+                body: `## Goal
+            Prevent staff from losing attendance and marks entry when connectivity is interrupted.
+
+            ## Work
+            - Define which forms may save a local draft and how drafts are protected.
+            - Support retrying a failed save.
+            - Clearly distinguish saved, pending and unsaved changes.
+            - Prevent duplicate submissions when retrying.
+            - Avoid storing unnecessary student data in browser storage.
+
+            ## Done when
+            - A network interruption does not silently discard in-progress entries.
+            - The UI clearly says when data is not saved.
+            - Retrying does not create duplicate records.
+            - Draft storage follows the approved privacy/security design.
+
+            ## Dependencies
+            - SEC-4 session/authentication design.
+            - PRV-1 data inventory and retention review.
+
+            ## Size
+            L`
+              },
+              {
+                key: "UX-6",
+                title: "UX-6: Build a shared SCSS design system and remove obsolete styles",
+                body: `## Goal
+            Create one maintainable visual foundation for all GEA pages.
+
+            ## Work
+            - Define shared color, spacing, typography, radius and component tokens in SCSS.
+            - Provide reusable styles for buttons, forms, cards, tables, dialogs and navigation.
+            - Replace page-specific inline styling where practical.
+            - Remove obsolete debug files and unused CSS only after confirming no page depends on them.
+            - Coordinate stylesheet cleanup with strict CSP work.
+
+            ## Done when
+            - New and updated pages use shared design tokens and components.
+            - Inline styling is removed from the agreed CSP scope.
+            - No active page relies on deleted styles.
+            - Light and dark themes remain consistent.
+
+            ## Dependencies
+            - Coordinate with SEC-5 strict frontend content security policy.
+
+            ## Size
+            L`
+              },
+              {
+                key: "UX-7",
+                title: "UX-7: Decide whether to keep the AI Chat page",
+                body: `## Goal
+            Make a documented product and privacy decision about AI Chat before further investment.
+
+            ## Work
+            - Ask the school whether AI Chat is needed and for which staff roles.
+            - If removed, remove navigation and disable entry points without breaking unrelated features.
+            - If retained, add a limitation notice, role-based starter prompts and safeguards against entering personal student data.
+            - Keep the feature disabled until the privacy decision and safeguards are approved.
+
+            ## Done when
+            - The school decision is documented.
+            - AI Chat is safely disabled/removed or has an approved scope and safeguards.
+            - Personal student data is not encouraged in prompts.
+
+            ## Dependencies
+            - PRV-9 AI chat personal-data limits.
+            - PRV-3 consent/legal review where applicable.
+
+            ## Size
+            S`
+              },
+              {
+                key: "UX-8",
+                title: "UX-8: Complete accessibility checks across remaining pages",
+                body: `## Goal
+            Bring the remaining GEA screens up to a consistent accessibility baseline.
+
+            ## Work
+            - Check labels, keyboard focus, contrast, headings and status messages.
+            - Cover Students, Dashboard, Transport, Reports, Charts, Attendance and Marks.
+            - Fix keyboard traps and controls without accessible names.
+            - Test representative phone and desktop layouts.
+
+            ## Done when
+            - All listed pages pass the agreed accessibility checklist.
+            - Forms and controls have programmatic labels.
+            - Keyboard focus is visible and logical.
+            - Status and validation messages are announced accessibly.
+
+            ## Dependencies
+            - Shared components from UX-6.
+            - UX-4 shared state patterns.
+
+            ## Size
+            M`
+              }
+            ];
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const existing = await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: "all", per_page: 100
+            });
+
+            const existingTitles = new Set(existing.map(item => item.title.toLowerCase()));
+            const existingMarkers = new Set(
+              existing.map(item => (item.body || "").match(/<!-- GEA-ROADMAP:([A-Z]+-\d+) -->/)?.[1]).filter(Boolean)
+            );
+
+            const results = [];
+            for (const item of issues) {
+              const marker = `<!-- GEA-ROADMAP:${item.key} -->`;
+              const titleExists = existingTitles.has(item.title.toLowerCase());
+              const markerExists = existingMarkers.has(item.key);
+              if (titleExists || markerExists) {
+                results.push({ key: item.key, result: "skipped (already exists)" });
+                continue;
+              }
+
+              const epic = epicRefs[item.key.split("-")[0]];
+              const body = `${marker}\n\n${item.body}\n\n---\n**Epic:** #${epic}\n**Roadmap:** GEA UI, privacy and security plan`;
+              if (!confirmCreate) {
+                results.push({ key: item.key, result: "preview only" });
+                continue;
+              }
+
+              const created = await github.rest.issues.create({
+                owner, repo, title: item.title, body
+              });
+              existingTitles.add(item.title.toLowerCase());
+              existingMarkers.add(item.key);
+              results.push({ key: item.key, result: "created", number: created.data.number, url: created.data.html_url });
+            }
+
+            core.summary
+              .addHeading("GEA roadmap issue creation")
+              .addTable([
+                [{data: "Issue key", header: true}, {data: "Result", header: true}, {data: "Issue", header: true}],
+                ...results.map(row => [row.key, row.result, row.url ? `[ #${row.number} ](${row.url})` : "—"])
+              ])
+              .addRaw(`\nMode: ${confirmCreate ? "CREATE" : "PREVIEW ONLY"}\n`)
+              .write();
+
+            const createdCount = results.filter(row => row.result === "created").length;
+            const skippedCount = results.filter(row => row.result.startsWith("skipped")).length;
+            core.info(`Roadmap items: ${issues.length}; created: ${createdCount}; skipped: ${skippedCount}; preview-only: ${results.filter(row => row.result === "preview only").length}`);
