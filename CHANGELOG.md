@@ -5,6 +5,7 @@ Short history of what changed. Older entries were removed because they described
 ## Unreleased
 
 ### Added
+- Phase 5 (#40): administrator backup status command, documented backup/restore and safe failure logging, staff quick-start and administrator operations/recovery guides, and backup-status regression tests.
 - Phase 0: data rules and roles, migrations and recovery plan.
 - Phase 1: school data model (years, classes, subjects, attendance, exams, marks, invoices, payments), demo data (`pnpm seed-school`, 521 fake students), backup and restore (`pnpm backup`, `pnpm restore`).
 - Phase 2: attendance entry, marks entry (with AB for absent), fee payments with receipts and admin-only reversals, student scorecards.

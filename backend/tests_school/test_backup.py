@@ -120,3 +120,28 @@ def test_logs_contain_no_student_details(db, caplog):
     text = " ".join(r.getMessage() for r in caplog.records)
     assert "students-" in text
     assert "Secret Student" not in text and "9000000000" not in text and "hash" not in text
+
+
+def test_status_reports_missing_backup_and_verified_latest_backup(db):
+    empty = db_backup.status(db)
+    assert empty["database_exists"] is True
+    assert empty["backup_count"] == 0
+    assert empty["latest_backup"] is None
+    assert empty["latest_backup_verified"] is None
+
+    made = db_backup.backup(db)
+    current = db_backup.status(db)
+    assert current["backup_count"] == 1
+    assert current["latest_backup"] == made.name
+    assert current["latest_backup_verified"] is True
+    assert current["latest_backup_rows"]["students"] == 3
+
+
+def test_status_reports_corrupt_latest_backup_without_student_data(db):
+    made = db_backup.backup(db)
+    made.write_text("not a sqlite database")
+    current = db_backup.status(db)
+    assert current["latest_backup_verified"] is False
+    assert current["latest_backup_error"]
+    assert "Secret Student" not in str(current)
+    assert "9000000000" not in str(current)

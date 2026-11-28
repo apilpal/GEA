@@ -5,6 +5,7 @@ Run from backend/ (or use the pnpm shortcuts from the repo root):
 
     python db_backup.py backup              make a backup now
     python db_backup.py list                show the backups
+    python db_backup.py status              show database and latest-backup health
     python db_backup.py verify FILE         check a backup file
     python db_backup.py restore FILE [--yes]  put a backup back (stop the app first!)
     python db_backup.py drill [FILE]        practise a restore on a temporary copy (live data is never touched)
@@ -248,6 +249,30 @@ def _database_path() -> Path:
     return (BACKEND_DIR / url[len("sqlite:///"):]).resolve()
 
 
+def status(db_path) -> dict:
+    """Return a safe operational snapshot without exposing database contents."""
+    db_path = Path(db_path)
+    backups = list_backups(db_path)
+    latest = backups[-1] if backups else None
+    result = {
+        "database": db_path.name,
+        "database_exists": db_path.is_file(),
+        "backup_count": len(backups),
+        "latest_backup": latest.name if latest else None,
+        "latest_backup_verified": None,
+        "latest_backup_rows": {},
+        "latest_backup_error": None,
+    }
+    if latest:
+        try:
+            result["latest_backup_rows"] = verify(latest)
+            result["latest_backup_verified"] = True
+        except BackupError as exc:
+            result["latest_backup_verified"] = False
+            result["latest_backup_error"] = str(exc)
+    return result
+
+
 def main(argv) -> int:
     logs = BACKEND_DIR / "logs"
     logs.mkdir(exist_ok=True)
@@ -257,7 +282,23 @@ def main(argv) -> int:
     command = args[0] if args else ""
     try:
         db_path = _database_path()
-        if command == "backup":
+        if command == "status":
+            snapshot = status(db_path)
+            print(f"Database: {snapshot['database']} "
+                  f"({'present' if snapshot['database_exists'] else 'missing'})")
+            print(f"Backups: {snapshot['backup_count']}")
+            if snapshot["latest_backup"]:
+                state = "verified" if snapshot["latest_backup_verified"] else "FAILED verification"
+                print(f"Latest: {snapshot['latest_backup']} ({state})")
+                if snapshot["latest_backup_verified"]:
+                    print(f"Rows: {snapshot['latest_backup_rows']}")
+                else:
+                    print(f"Reason: {snapshot['latest_backup_error']}")
+            else:
+                print("Latest: none")
+            log.info("status checked: %d backups; latest verified=%s",
+                     snapshot["backup_count"], snapshot["latest_backup_verified"])
+        elif command == "backup":
             path = backup(db_path)
             _ops("backup_ok", reason="manual", count=len(list_backups(db_path)))
             print(f"Backup saved: {path}\nRows: {verify(path)}")
