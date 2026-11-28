@@ -1,0 +1,96 @@
+name: Check and link roadmap sub-issues
+
+# Checks that every roadmap issue (STU, DSH, TRN, RPT, UX, SEC, PRV) is a GitHub sub-issue of its epic.
+# The "Epic: #N" line that create-roadmap-issues.yml writes only mentions the epic in text; it does not
+# make the issue a sub-issue, so the epic shows no progress. This workflow fixes that.
+# Run it once with "confirm_link" unticked to see the report, then ticked to link what is missing.
+# It never changes an issue that is already a sub-issue of another parent, and never edits issue text.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_link:
+        description: "Set true to link the missing sub-issues (false = report only)"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  link-roadmap-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report or link sub-issues
+        uses: actions/github-script@v7
+        env:
+          CONFIRM_LINK: ${{ inputs.confirm_link }}
+        with:
+          script: |
+            const confirmLink = process.env.CONFIRM_LINK === "true";
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const all = (await github.paginate(github.rest.issues.listForRepo, {
+              owner, repo, state: "all", per_page: 100
+            })).filter(item => !item.pull_request);
+
+            const byNumber = new Map(all.map(item => [item.number, item]));
+            const keyOf = item => (item.title.match(/^([A-Z]+-\d+)\b/) || [])[1];
+            const epicOf = item => {
+              const found = (item.body || "").match(/\*\*Epic:\*\*\s*#(\d+)/i);
+              return found ? Number(found[1]) : null;
+            };
+            const roadmap = all.filter(item => keyOf(item) && /^(STU|DSH|TRN|RPT|UX|SEC|PRV)-/.test(keyOf(item)));
+
+            // Same key used by two issues is a duplicate worth knowing about.
+            const seen = new Map();
+            const duplicates = [];
+            for (const item of roadmap) {
+              const key = keyOf(item);
+              if (seen.has(key)) duplicates.push(`${key}: #${seen.get(key)} and #${item.number}`);
+              else seen.set(key, item.number);
+            }
+
+            const rows = [];
+            for (const item of roadmap.sort((a, b) => a.number - b.number)) {
+              const key = keyOf(item);
+              const epic = epicOf(item);
+              if (!epic) { rows.push([key, `#${item.number}`, "none", "no Epic line: link by hand"]); continue; }
+              if (!byNumber.has(epic)) { rows.push([key, `#${item.number}`, `#${epic}`, "epic issue not found"]); continue; }
+
+              let parent = null;
+              try {
+                parent = (await github.request("GET /repos/{owner}/{repo}/issues/{issue_number}/parent",
+                  { owner, repo, issue_number: item.number })).data;
+              } catch (error) {
+                if (error.status !== 404) { rows.push([key, `#${item.number}`, `#${epic}`, `error ${error.status}`]); continue; }
+              }
+
+              if (parent && parent.number === epic) { rows.push([key, `#${item.number}`, `#${epic}`, "ok, already linked"]); continue; }
+              if (parent) { rows.push([key, `#${item.number}`, `#${epic}`, `linked to #${parent.number} instead: left as it is`]); continue; }
+              if (!confirmLink) { rows.push([key, `#${item.number}`, `#${epic}`, "missing: would link"]); continue; }
+
+              try {
+                await github.request("POST /repos/{owner}/{repo}/issues/{issue_number}/sub_issues",
+                  { owner, repo, issue_number: epic, sub_issue_id: item.id });
+                rows.push([key, `#${item.number}`, `#${epic}`, "linked now"]);
+              } catch (error) {
+                rows.push([key, `#${item.number}`, `#${epic}`, `could not link (error ${error.status})`]);
+              }
+            }
+
+            const count = text => rows.filter(row => row[3].startsWith(text)).length;
+            core.summary
+              .addHeading("Roadmap sub-issue check")
+              .addRaw(`Mode: ${confirmLink ? "LINK" : "REPORT ONLY"}. Roadmap issues found: ${roadmap.length}. `
+                + `Already linked: ${count("ok")}. Linked now: ${count("linked now")}. Missing: ${count("missing")}. `
+                + `Left alone or needing a look: ${rows.length - count("ok") - count("linked now") - count("missing")}.\n`)
+              .addTable([
+                [{data: "Key", header: true}, {data: "Issue", header: true}, {data: "Epic", header: true}, {data: "Result", header: true}],
+                ...rows
+              ])
+              .addRaw(duplicates.length ? `\nDuplicate keys: ${duplicates.join("; ")}\n` : "\nNo duplicate keys.\n")
+              .write();
+            core.info(`Roadmap issues: ${roadmap.length}; ok: ${count("ok")}; linked now: ${count("linked now")}; missing: ${count("missing")}`);

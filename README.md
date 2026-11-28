@@ -2,7 +2,7 @@
 
 A mobile-first Progressive Web App for Gurukul Educational Academy (Kaist, Jaswant Nagar, Etawah), built with a FastAPI backend and a TypeScript frontend. It runs on a phone in Termux with SQLite, no Docker needed.
 
-**Status:** under active development, phase by phase (see [Roadmap](ROADMAP.md)). Done so far: school data model and demo data, backup and restore, attendance entry, marks entry, fee payments and receipts, and student scorecards. Next: analytics, mobile polish, print and CSV exports, then a pilot at the school.
+**Status:** under active development, phase by phase (see [Roadmap](ROADMAP.md)). Done so far: school data model and demo data, backup and restore with a daily automatic backup, attendance entry, marks entry, fee payments and receipts, student scorecards, analytics, fee collection, mobile polish, and print and CSV exports. Next: security and privacy fixes and a screen-by-screen redesign (see [the plan](UI-PRIVACY-SECURITY-PLAN.md)), and a staff pilot at the school.
 
 This repository is public and contains **fake demo data only**.
 
