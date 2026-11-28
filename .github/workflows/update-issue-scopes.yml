@@ -1,0 +1,128 @@
+name: Update roadmap issue scopes
+
+# Applies the approved scope-boundary cleanup to existing issues.
+# Run with confirm_update=false first. Review the Actions summary before applying.
+# This workflow updates issue descriptions only; it does not close, create or relabel issues.
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_update:
+        description: "Set true to apply the issue-description updates (false = preview only)"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  update-issue-scopes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out approved issue scope data
+        uses: actions/checkout@v4
+
+      - name: Preview or update issue descriptions
+        uses: actions/github-script@v7
+        env:
+          CONFIRM_UPDATE: ${{ inputs.confirm_update }}
+        with:
+          script: |
+            const fs = require("fs");
+            const confirmUpdate = process.env.CONFIRM_UPDATE === "true";
+            const data = JSON.parse(
+              fs.readFileSync(".github/issue-data/issue-scope-updates.json", "utf8")
+            );
+
+            if (data.schema_version !== 1 || !Array.isArray(data.updates)) {
+              core.setFailed("Unsupported or invalid issue-scope update data.");
+              return;
+            }
+
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const results = [];
+            const seen = new Set();
+
+            for (const item of data.updates) {
+              if (!Number.isInteger(item.issue) || seen.has(item.issue)) {
+                results.push([String(item.issue), "FAILED: invalid or duplicate issue number"]);
+                continue;
+              }
+              seen.add(item.issue);
+
+              try {
+                const response = await github.rest.issues.get({
+                  owner, repo, issue_number: item.issue
+                });
+                const issue = response.data;
+
+                if (issue.pull_request) {
+                  results.push([`#${item.issue}`, "SKIPPED: target is a pull request"]);
+                  continue;
+                }
+                if (issue.state !== "open") {
+                  results.push([`#${item.issue}`, `SKIPPED: issue is ${issue.state}`]);
+                  continue;
+                }
+                if (!issue.title.startsWith(item.title_prefix)) {
+                  results.push([`#${item.issue}`, "FAILED: title did not match expected issue"]);
+                  continue;
+                }
+                if (typeof item.body !== "string" || !item.body.trim()) {
+                  results.push([`#${item.issue}`, "FAILED: replacement body is empty"]);
+                  continue;
+                }
+
+                if (issue.body === item.body) {
+                  results.push([`#${item.issue}`, "UNCHANGED: already matches"]);
+                  continue;
+                }
+
+                if (!confirmUpdate) {
+                  results.push([`#${item.issue}`, "PREVIEW: would update description"]);
+                  continue;
+                }
+
+                await github.rest.issues.update({
+                  owner, repo, issue_number: item.issue, body: item.body
+                });
+                results.push([`#${item.issue}`, "UPDATED"]);
+              } catch (error) {
+                results.push([`#${item.issue}`, `FAILED: ${error.message}`]);
+              }
+            }
+
+            const updated = results.filter(row => row[1] === "UPDATED").length;
+            const failed = results.filter(row => row[1].startsWith("FAILED")).length;
+            const preview = results.filter(row => row[1].startsWith("PREVIEW")).length;
+            const unchanged = results.filter(row => row[1].startsWith("UNCHANGED")).length;
+            const skipped = results.length - updated - failed - preview - unchanged;
+
+            core.summary
+              .addHeading("GEA issue scope update report")
+              .addRaw(`Mode: ${confirmUpdate ? "APPLY" : "PREVIEW ONLY"}\n`)
+              .addTable([
+                [{data: "Result", header: true}, {data: "Count", header: true}],
+                ["Configured targets", data.updates.length],
+                ["Updated", updated],
+                ["Would update", preview],
+                ["Already matching", unchanged],
+                ["Skipped", skipped],
+                ["Failed", failed]
+              ])
+              .addTable([
+                [{data: "Issue", header: true}, {data: "Result", header: true}],
+                ...results
+              ])
+              .write();
+
+            core.info(`Scope update complete. Updated=${updated}; preview=${preview}; unchanged=${unchanged}; skipped=${skipped}; failed=${failed}`);
+            if (failed > 0) {
+              core.setFailed(`${failed} issue scope update(s) failed. Review the report.`);
+            }
+            if (!confirmUpdate) {
+              core.info("Preview only. No GitHub issues were changed.");
+            }
