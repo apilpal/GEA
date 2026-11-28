@@ -13,6 +13,8 @@
     "seed-school": "cd backend && .venv/bin/python seed_school_data.py",
     "backup": "cd backend && .venv/bin/python db_backup.py backup",
     "restore": "cd backend && .venv/bin/python db_backup.py restore",
+    "backup:drill": "cd backend && .venv/bin/python db_backup.py drill",
+    "backup:status": "cd backend && .venv/bin/python db_backup.py status",
     "reset-password": "cd backend && .venv/bin/python setup_local.py --reset-password"
   }
 }

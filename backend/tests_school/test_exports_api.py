@@ -83,10 +83,12 @@ def env(tmp_path, monkeypatch):
         sec5 = DBClassSection(academic_year_id=year_id, grade="5", section="A", class_teacher_id=t_a.id)
         sec6 = DBClassSection(academic_year_id=year_id, grade="6", section="A", class_teacher_id=t_b.id)
         north = DBRoute(name="North Route", monthly_fee=400)
-        maths = DBSubject(name="Mathematics")
-        exam = DBExam(academic_year_id=year_id, name="Terminal", ordinal=1, max_marks=100)
-        s.add_all([sec5, sec6, north, maths, exam])
+        # The migration already seeds the subjects and the exams: use them, as the scorecard tests do.
+        maths = s.scalar(sa.select(DBSubject).where(DBSubject.name == "Mathematics")) or DBSubject(name="Mathematics")
+        exam = s.scalar(sa.select(DBExam).where(DBExam.academic_year_id == year_id, DBExam.name == "Terminal"))
+        s.add_all([sec5, sec6, north, maths])
         s.flush()
+        assert exam is not None
 
         def person(name, section, roll, **kw):
             st = DBStudent(name=name, class_section_id=section.id, roll_no=roll, father_name=f"Father of {name}",
@@ -99,9 +101,9 @@ def env(tmp_path, monkeypatch):
         bina = person("=Bina", sec5, 2)               # a name that looks like a formula
         dev = person("Dev", sec6, 1)
 
-        for student, marks, absent in ((asha, 80, False), (bina, None, True), (dev, 55, False)):
+        for student, marks, absent in ((asha, 32, False), (bina, None, True), (dev, 22, False)):
             s.add(DBAssessmentScore(exam_id=exam.id, student_id=student.id, subject_id=maths.id, part=1, marks=marks,
-                                    max_marks=100, is_absent=absent))
+                                    max_marks=40, is_absent=absent))
         for student, status in ((asha, "present"), (bina, "absent"), (dev, "late")):
             s.add(DBAttendance(student_id=student.id, class_section_id=student.class_section_id,
                                date=date(2026, 11, 10), status=status))
@@ -181,8 +183,8 @@ def test_marks_export_writes_ab_and_matches_the_total(env):
     env.as_user(ADMIN)
     rows = table(env.client.get("/api/exports/marks.csv", params={"exam_id": env.ids["exam"], "class_section_id": env.ids["5-A"]}))
     assert rows[0] == ["Class", "Roll", "Name", "Admission no", "Subject", "Part", "Marks", "Out of"]
-    assert [(r[2], r[6]) for r in rows[1:]] == [("Asha", "80"), ("'=Bina", "AB")]
-    assert sum(float(r[6]) for r in rows[1:] if r[6] != "AB") == 80.0
+    assert [(r[2], r[6]) for r in rows[1:]] == [("Asha", "32"), ("'=Bina", "AB")]
+    assert sum(float(r[6]) for r in rows[1:] if r[6] != "AB") == 32.0
 
 
 def test_marks_and_attendance_exports_are_limited_to_the_teachers_class(env):

@@ -41,6 +41,8 @@ scripts/        termux-setup.sh (one-time setup) and dev.mjs (runs both servers)
 | `pnpm seed` | Add or refresh the 75 sample students and 5 sample drivers (fee 500 each). Your own records and logins are kept, and it is safe to run again |
 | `pnpm seed-school` | Load the fake demo school (521 students). Do not run `pnpm seed` after it |
 | `pnpm backup` / `pnpm restore` | Back up or restore the SQLite database |
+| `pnpm backup:drill` | Practise a restore on a temporary copy of the newest backup (live data is not touched) |
+| `pnpm backup:status` | How old the newest backup is and what went wrong in the last 24 hours |
 
 The maintained
 backend tests are in `backend/tests_school/` (see `CLAUDE.md` for the command).
