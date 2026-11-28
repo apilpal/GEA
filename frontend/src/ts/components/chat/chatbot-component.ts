@@ -4,6 +4,14 @@ import { BaseComponent, ComponentProps, ComponentState, ComponentEventMap } from
 /**
  * Enhanced TypeScript interfaces for chat functionality with strict typing
  */
+
+/** Escape untrusted values before interpolating them into HTML templates. */
+function escapeHtml(value: unknown): string {
+    return String(value ?? '').replace(/[&<>\"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]!);
+}
+
 export interface ChatMessage {
     readonly id?: string;
     readonly conversation_id: string;
@@ -512,7 +520,7 @@ What would you like to know?`,
         errorElement.innerHTML = `
             <div class="error-content">
                 <icon-alert-circle size="16"></icon-alert-circle>
-                <span>${message}</span>
+                <span>${escapeHtml(message)}</span>
                 <button class="error-dismiss" onclick="this.parentElement.parentElement.remove()">
                     <icon-x size="14"></icon-x>
                 </button>

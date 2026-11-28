@@ -2,6 +2,14 @@
 import { BaseComponent } from '@/ts/components/core/index';
 
 /** User profile interface matching backend User model. */
+
+/** Escape untrusted values before interpolating them into HTML templates. */
+function escapeHtml(value: unknown): string {
+    return String(value ?? '').replace(/[&<>\"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]!);
+}
+
 interface UserProfile {
     /** Unique identifier for the user. */
     id: number;
@@ -365,24 +373,24 @@ export class ProfileComponent extends BaseComponent {
         displayDiv.innerHTML = `
             <span class="info-label">Username:</span>
             <span class="info-value">
-                ${profile.username}
+                ${escapeHtml(profile.username)}
                 ${bypassIndicator}
             </span>
 
             <span class="info-label">Email:</span>
-            <span class="info-value">${profile.email}</span>
+            <span class="info-value">${escapeHtml(profile.email)}</span>
 
             <span class="info-label">Role:</span>
-            <span class="info-value read-only">${profile.role.toUpperCase()}</span>
+            <span class="info-value read-only">${escapeHtml(profile.role.toUpperCase())}</span>
 
             <span class="info-label">Status:</span>
             <span class="info-value read-only">${profile.is_active ? 'Active' : 'Inactive'}</span>
 
             <span class="info-label">Member Since:</span>
-            <span class="info-value">${formatDate(profile.created_at)}</span>
+            <span class="info-value">${escapeHtml(formatDate(profile.created_at))}</span>
 
             <span class="info-label">Last Updated:</span>
-            <span class="info-value">${formatDate(profile.updated_at)}</span>
+            <span class="info-value">${escapeHtml(formatDate(profile.updated_at))}</span>
         `;
 
         // Add CSS for bypass indicator

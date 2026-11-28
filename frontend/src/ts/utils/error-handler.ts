@@ -3,6 +3,14 @@
 /**
  * Custom error class for application-specific errors with additional metadata.
  */
+
+/** Escape untrusted values before interpolating them into HTML templates. */
+function escapeHtml(value: unknown): string {
+    return String(value ?? '').replace(/[&<>\"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]!);
+}
+
 export class AppError extends Error {
     constructor(
         message: string,
@@ -21,10 +29,10 @@ export class AppError extends Error {
  */
 export function handleApiError(error: unknown, context: string): void {
     if (error instanceof AppError) {
-        showErrorToast(`${context}: ${error.message}`);
+        showErrorToast(`${context}: ${escapeHtml(error.message)}`);
         console.error(`[${context}] AppError:`, error);
     } else if (error instanceof Error) {
-        showErrorToast(`${context}: ${error.message}`);
+        showErrorToast(`${context}: ${escapeHtml(error.message)}`);
         console.error(`[${context}] Error:`, error);
     } else {
         showErrorToast(`${context}: An unexpected error occurred`);
@@ -70,7 +78,7 @@ export function showErrorToast(message: string): void {
 
     toast.innerHTML = `
         <icon-exclamation-circle size="16"></icon-exclamation-circle>
-        <span>${message}</span>
+        <span>${escapeHtml(message)}</span>
         <button class="toast-close" onclick="this.parentElement.remove()">
             <icon-times size="12"></icon-times>
         </button>
@@ -99,7 +107,7 @@ export function showSuccessToast(message: string): void {
 
     toast.innerHTML = `
         <icon-check-circle size="16"></icon-check-circle>
-        <span>${message}</span>
+        <span>${escapeHtml(message)}</span>
         <button class="toast-close" onclick="this.parentElement.remove()">
             <icon-times size="12"></icon-times>
         </button>
@@ -128,7 +136,7 @@ export function showInfoToast(message: string): void {
 
     toast.innerHTML = `
         <icon-info-circle size="16"></icon-info-circle>
-        <span>${message}</span>
+        <span>${escapeHtml(message)}</span>
         <button class="toast-close" onclick="this.parentElement.remove()">
             <icon-times size="12"></icon-times>
         </button>

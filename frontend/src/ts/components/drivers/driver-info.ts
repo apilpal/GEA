@@ -6,6 +6,14 @@ import type { DriverInfoData } from './types';
  * Custom web component that displays driver information in a card format.
  * Shows driver name, avatar, student count, route, and status information.
  */
+
+/** Escape untrusted values before interpolating them into HTML templates. */
+function escapeHtml(value: unknown): string {
+    return String(value ?? '').replace(/[&<>\"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]!);
+}
+
 class DriverInfo extends BaseComponent {
     /** Current driver data being displayed */
     private driver: DriverInfoData | null = null;

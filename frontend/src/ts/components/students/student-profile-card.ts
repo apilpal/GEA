@@ -6,6 +6,14 @@ import type { Student, ContactInfo, LocationDetails } from './types';
  * Custom web component that displays detailed student profile information in a card format.
  * Shows student avatar, basic info, contact details, and location information in an organized layout.
  */
+
+/** Escape untrusted values before interpolating them into HTML templates. */
+function escapeHtml(value: unknown): string {
+    return String(value ?? '').replace(/[&<>\"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]!);
+}
+
 class StudentProfileCard extends BaseComponent {
     /** Current student data being displayed in the profile card */
     private student: Student | null = null;
@@ -41,10 +49,10 @@ class StudentProfileCard extends BaseComponent {
         shadow.innerHTML = `
             <article class="profile-card" role="region" aria-labelledby="student-name" aria-live="polite">
                 <header class="profile-header">
-                    <span class="student-avatar" role="img" aria-label="Avatar for ${this.student.name}">${this.student.name.charAt(0).toUpperCase()}</span>
+                    <span class="student-avatar" role="img" aria-label="Avatar for ${escapeHtml(this.student.name)}">${escapeHtml(this.student.name.charAt(0).toUpperCase())}</span>
                     <div class="student-name-section">
-                        <h1 id="student-name">${this.student.name}</h1>
-                        <p class="student-route" aria-label="Transport route">Route: ${this.student.route || 'N/A'}</p>
+                        <h1 id="student-name">${escapeHtml(this.student.name)}</h1>
+                        <p class="student-route" aria-label="Transport route">Route: ${escapeHtml(this.student.route || 'N/A')}</p>
                     </div>
                 </header>
                 <div class="profile-details-grid">
@@ -53,15 +61,15 @@ class StudentProfileCard extends BaseComponent {
                         <dl>
                             <div>
                                 <dt>Father's Name:</dt>
-                                <dd>${this.student.father_name || 'N/A'}</dd>
+                                <dd>${escapeHtml(this.student.father_name || 'N/A')}</dd>
                             </div>
                             <div>
                                 <dt>Class:</dt>
-                                <dd>${this.student.class || 'N/A'}</dd>
+                                <dd>${escapeHtml(this.student.class || 'N/A')}</dd>
                             </div>
                             <div>
                                 <dt>Fees:</dt>
-                                <dd>${this.student.fees ? `₹${this.student.fees}` : 'N/A'}</dd>
+                                <dd>${this.student.fees ? `₹${escapeHtml(this.student.fees)}` : 'N/A'}</dd>
                             </div>
                         </dl>
                     </section>
@@ -72,9 +80,9 @@ class StudentProfileCard extends BaseComponent {
                                 <dt>Primary Mobile:</dt>
                                 <dd>
                                     ${contactInfo.primary_mobile || this.student.mobile ? `
-                                        <a href="tel:${contactInfo.primary_mobile || this.student.mobile}"
-                                           aria-label="Call primary mobile number: ${contactInfo.primary_mobile || this.student.mobile}">
-                                            ${contactInfo.primary_mobile || this.student.mobile}
+                                        <a href="tel:${escapeHtml(contactInfo.primary_mobile || this.student.mobile)}"
+                                           aria-label="Call primary mobile number: ${escapeHtml(contactInfo.primary_mobile || this.student.mobile)}">
+                                            ${escapeHtml(contactInfo.primary_mobile || this.student.mobile)}
                                         </a>
                                     ` : 'N/A'}
                                 </dd>
@@ -108,7 +116,7 @@ class StudentProfileCard extends BaseComponent {
                         <dl>
                             <div>
                                 <dt>Route Number:</dt>
-                                <dd>${locationDetails.route_number || this.student.route || 'N/A'}</dd>
+                                <dd>${escapeHtml(locationDetails.route_number || this.student.route || 'N/A')}</dd>
                             </div>
                             <div>
                                 <dt>Area:</dt>
@@ -116,7 +124,7 @@ class StudentProfileCard extends BaseComponent {
                             </div>
                             <div>
                                 <dt>Full Address:</dt>
-                                <dd>${locationDetails.full_address || this.student.address || 'N/A'}</dd>
+                                <dd>${escapeHtml(locationDetails.full_address || this.student.address || 'N/A')}</dd>
                             </div>
                         </dl>
                     </section>
@@ -193,7 +201,7 @@ class StudentProfileCard extends BaseComponent {
     private handleFocusIn(): void {
         // Announce dynamic content updates if student data changed
         if (this.student) {
-            this.announceToScreenReader(`Student profile for ${this.student.name} loaded`);
+            this.announceToScreenReader(`Student profile for ${escapeHtml(this.student.name)} loaded`);
         }
     }
 
@@ -275,8 +283,8 @@ class StudentProfileCard extends BaseComponent {
         // Announce student change to screen readers
         if (student) {
             const announcement = wasEmpty
-                ? `Student profile loaded for ${student.name}`
-                : `Student profile updated to ${student.name}`;
+                ? `Student profile loaded for ${escapeHtml(student.name)}`
+                : `Student profile updated to ${escapeHtml(student.name)}`;
             this.announceToScreenReader(announcement);
         }
 
