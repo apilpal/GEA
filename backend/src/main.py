@@ -16,6 +16,7 @@ from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.middleware import SlowAPIMiddleware
 from slowapi.util import get_remote_address
+import asyncio
 import logging
 import os
 import ssl
@@ -27,7 +28,8 @@ from src.core.config.config import config
 from src.core.models import HealthResponse
 
 # Import routers
-from src.api.v1.routers import students, drivers, reports, charts, auth, csv_sync, dashboard, chat, attendance, marks, fees, scorecards, analytics, diagnostics, fee_analytics, exports
+from src.core.ops_middleware import ops_middleware
+from src.api.v1.routers import students, drivers, reports, charts, auth, csv_sync, dashboard, chat, attendance, marks, fees, scorecards, analytics, diagnostics, fee_analytics, exports, ops
 
 # Import utilities
 from src.utils import auth_utils
@@ -66,8 +68,24 @@ async def lifespan(app: FastAPI):
     logger.info(f"DATABASE_URL: {config.DATABASE_URL}")
 
     # Database initialization is handled by models module
+
+    # Daily backup while the app runs (issue #40). Set DAILY_BACKUP_ENABLED=false to turn it off.
+    backup_task = None
+    if os.getenv("DAILY_BACKUP_ENABLED", "true").lower() == "true" and config.DATABASE_URL.startswith("sqlite:///"):
+        try:
+            from pathlib import Path
+            from src.services.backup_service import daily_backup_loop
+
+            db_file = (Path(__file__).resolve().parents[1] / config.DATABASE_URL[len("sqlite:///"):]).resolve()
+            backup_task = asyncio.create_task(daily_backup_loop(db_file, int(os.getenv("DAILY_BACKUP_HOUR", "2"))))
+            logger.info("Daily backup is on (after %s:00)", os.getenv("DAILY_BACKUP_HOUR", "2"))
+        except Exception as exc:  # noqa: BLE001 - the app must start even if backups cannot
+            logger.error("Daily backup could not start: %s", exc)
+
     yield
 
+    if backup_task:
+        backup_task.cancel()
     logger.info("Application shutdown completed")
 
 
@@ -95,6 +113,9 @@ def create_app() -> FastAPI:
             status_code=500,
             content={"detail": "Internal server error", "type": "server_error"}
         )
+
+    # Operations log: refused access, failed bulk saves, server errors (issue #40)
+    app.middleware("http")(ops_middleware)
 
     # Add CORS middleware (runs before SlowAPIMiddleware)
     app.add_middleware(
@@ -210,6 +231,7 @@ def create_app() -> FastAPI:
     app.include_router(diagnostics.router, prefix="/api", tags=["diagnostics"])
     app.include_router(fee_analytics.router, prefix="/api", tags=["fee-analytics"])
     app.include_router(exports.router, prefix="/api", tags=["exports"])
+    app.include_router(ops.router, prefix="/api", tags=["operations"])
 
     # Health check endpoint
     @app.get("/api/health", response_model=HealthResponse)

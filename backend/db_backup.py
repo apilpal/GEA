@@ -7,6 +7,8 @@ Run from backend/ (or use the pnpm shortcuts from the repo root):
     python db_backup.py list                show the backups
     python db_backup.py verify FILE         check a backup file
     python db_backup.py restore FILE [--yes]  put a backup back (stop the app first!)
+    python db_backup.py drill [FILE]        practise a restore on a temporary copy (live data is never touched)
+    python db_backup.py status              how old the newest backup is and what went wrong lately
 
 Backups live in ``backend/data/backups/`` (ignored by git) and are named
 ``students-YYYYMMDD-HHMMSS.db``. They are made with SQLite's own backup API, so the copy
@@ -22,7 +24,7 @@ import os
 import re
 import sqlite3
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 BACKEND_DIR = Path(__file__).resolve().parent
@@ -171,6 +173,69 @@ def restore(backup_file, db_path, safety_copy: bool = True) -> dict:
     return {"restored_from": backup_file.name, "rows": counts, "safety_copy": saved.name if saved else None}
 
 
+def _ops(kind: str, **fields) -> None:
+    """Write to the operations log when it is available. Never fails the backup."""
+    try:
+        sys.path.insert(0, str(BACKEND_DIR))
+        from src.core import ops_log
+
+        ops_log.record(kind, **fields)
+    except Exception:  # noqa: BLE001
+        pass
+
+
+def _table_counts(path: Path) -> dict:
+    conn = sqlite3.connect(_ro_uri(path), uri=True)
+    try:
+        names = sorted(r[0] for r in conn.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'"))
+        return {t: conn.execute(f'SELECT COUNT(*) FROM "{t}"').fetchone()[0] for t in names}
+    finally:
+        conn.close()
+
+
+def drill(db_path, backup_file=None, work_dir=None) -> dict:
+    """Practise a restore. Restores a backup into a temporary copy and checks it table by table.
+
+    Uses the newest backup unless ``backup_file`` is given. The live database is only read, to show how
+    many rows were added since the backup. Raises BackupError when the backup cannot be restored or the
+    restored copy differs from the backup.
+    """
+    import tempfile
+
+    db_path = Path(db_path)
+    if backup_file is None:
+        files = [f for f in list_backups(db_path) if REGULAR.match(f.name)]
+        if not files:
+            raise BackupError("there is no backup to practise with")
+        backup_file = max(files, key=lambda f: f.stat().st_mtime)
+    backup_file = Path(backup_file)
+    verify(backup_file)
+    with tempfile.TemporaryDirectory(dir=work_dir) as tmp:
+        copy = Path(tmp) / "restored.db"
+        restore(backup_file, copy, safety_copy=False)
+        before, after = _table_counts(backup_file), _table_counts(copy)
+        if before != after:
+            differing = sorted(t for t in set(before) | set(after) if before.get(t) != after.get(t))
+            raise BackupError(f"restored copy differs from the backup in: {', '.join(differing)}")
+        if "alembic_version" not in after:
+            raise BackupError("restored copy has no migration version, the app would not start")
+    live = _table_counts(db_path) if db_path.exists() else {}
+    since = {t: live[t] - after[t] for t in after if t in live and live[t] != after[t]}
+    return {"backup": backup_file.name, "tables": len(after), "rows": sum(after.values()),
+            "changed_since_backup": since}
+
+
+def status(db_path, now: datetime = None) -> dict:
+    """Age of the newest backup and the recent operations events, for ``status`` and the admin API."""
+    now = now or datetime.now()
+    files = [f for f in list_backups(db_path) if REGULAR.match(f.name)]   # safety copies do not count
+    newest = max(files, key=lambda f: f.stat().st_mtime) if files else None   # by time: names can tie in one second
+    age = (now - datetime.fromtimestamp(newest.stat().st_mtime)).total_seconds() / 3600 if newest else None
+    return {"backups": len(files), "newest": newest.name if newest else None,
+            "age_hours": round(age, 1) if age is not None else None}
+
+
 # --- command line ---------------------------------------------------------------------
 def _database_path() -> Path:
     os.chdir(BACKEND_DIR)
@@ -194,6 +259,7 @@ def main(argv) -> int:
         db_path = _database_path()
         if command == "backup":
             path = backup(db_path)
+            _ops("backup_ok", reason="manual", count=len(list_backups(db_path)))
             print(f"Backup saved: {path}\nRows: {verify(path)}")
         elif command == "list":
             files = list_backups(db_path)
@@ -206,10 +272,33 @@ def main(argv) -> int:
                 print("Cancelled. Nothing was changed.")
                 return 1
             print(restore(args[1], db_path))
+        elif command == "drill" and len(args) <= 2:
+            result = drill(db_path, args[1] if len(args) == 2 else None)
+            _ops("backup_ok", reason="restore drill passed", count=result["tables"])
+            print(f"Restore drill passed. {result['backup']} restored to a temporary copy: "
+                  f"{result['tables']} tables, {result['rows']} rows, all matching.")
+            if result["changed_since_backup"]:
+                print("Changed since this backup (these rows are not in it): "
+                      + ", ".join(f"{t} {d:+d}" for t, d in result["changed_since_backup"].items()))
+            print("Your live data was not touched.")
+        elif command == "status":
+            sys.path.insert(0, str(BACKEND_DIR))
+            from src.core import ops_log
+            from src.services.ops_rules import backup_state, count_by_kind, needs_attention
+
+            info = status(db_path)
+            events = ops_log.recent(limit=200, since=datetime.now() - timedelta(days=1))
+            state = backup_state(info["age_hours"])
+            print(f"Backups: {info['backups']}, newest {info['newest'] or 'none'}"
+                  + (f" ({info['age_hours']} hours old, {state})" if info["newest"] else ""))
+            print("Last 24 hours:", ", ".join(f"{k} {v}" for k, v in count_by_kind(events).items() if v) or "nothing to report")
+            for note in needs_attention(state, count_by_kind(events)):
+                print("Look at:", note)
         else:
             print(__doc__)
             return 2
     except BackupError as exc:
+        _ops("backup_failure", reason=f"{command or 'command'}: {exc}")
         log.error("%s failed: %s", command or "command", exc)
         print(f"Failed: {exc}")
         return 1
