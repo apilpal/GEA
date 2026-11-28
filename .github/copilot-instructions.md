@@ -1,7 +1,7 @@
 # GEA repository instructions
 
 ## Project
-- GEA is a FastAPI/SQLAlchemy backend and a React/TypeScript frontend for school operations.
+- GEA is a FastAPI/SQLAlchemy backend and a TypeScript, Vite and SCSS frontend (plain page managers and web components, no React) for school operations.
 - Treat student, guardian, attendance, marks and fee data as sensitive personal data.
 - Prefer server-side authorization and validation; never rely on UI hiding alone.
 - Keep changes focused, tested and compatible with the existing SQLite-first local setup.
@@ -16,9 +16,9 @@
 - Test authorization, validation and transaction behavior together for mutations.
 
 ## Frontend
-- Use TypeScript, React and the existing SCSS/CSS conventions.
+- Use TypeScript and the existing SCSS/CSS conventions (see `CLAUDE.md`). Do not add React.
 - Do not use raw `innerHTML` or template strings for server-provided text.
-- Use `textContent`, escape helpers or framework-bound text rendering.
+- Use `textContent` or an escape helper.
 - Avoid inline `onclick` handlers and inline style blocks; put behavior and styles in source files.
 - Preserve 360px responsive behavior and both light and dark themes.
 - Keep controls touch-friendly, with visible labels and focus states.

@@ -5,11 +5,10 @@ Run from backend/ (or use the pnpm shortcuts from the repo root):
 
     python db_backup.py backup              make a backup now
     python db_backup.py list                show the backups
-    python db_backup.py status              show database and latest-backup health
+    python db_backup.py status              database and latest-backup health, backup age, problems in the last 24 hours
     python db_backup.py verify FILE         check a backup file
     python db_backup.py restore FILE [--yes]  put a backup back (stop the app first!)
     python db_backup.py drill [FILE]        practise a restore on a temporary copy (live data is never touched)
-    python db_backup.py status              how old the newest backup is and what went wrong lately
 
 Backups live in ``backend/data/backups/`` (ignored by git) and are named
 ``students-YYYYMMDD-HHMMSS.db``. They are made with SQLite's own backup API, so the copy
@@ -227,8 +226,8 @@ def drill(db_path, backup_file=None, work_dir=None) -> dict:
             "changed_since_backup": since}
 
 
-def status(db_path, now: datetime = None) -> dict:
-    """Age of the newest backup and the recent operations events, for ``status`` and the admin API."""
+def backup_age(db_path, now: datetime = None) -> dict:
+    """Age of the newest regular backup, for the ``status`` command and the admin API (/api/ops/status)."""
     now = now or datetime.now()
     files = [f for f in list_backups(db_path) if REGULAR.match(f.name)]   # safety copies do not count
     newest = max(files, key=lambda f: f.stat().st_mtime) if files else None   # by time: names can tie in one second
@@ -273,6 +272,22 @@ def status(db_path) -> dict:
     return result
 
 
+def _print_health(db_path) -> None:
+    """Backup age and the last 24 hours of problems from the operations log (issue #40)."""
+    sys.path.insert(0, str(BACKEND_DIR))
+    from src.core import ops_log
+    from src.services.ops_rules import backup_state, count_by_kind, needs_attention
+
+    info = backup_age(db_path)
+    events = ops_log.recent(limit=200, since=datetime.now() - timedelta(days=1))
+    state = backup_state(info["age_hours"])
+    print(f"Newest regular backup: {info['newest'] or 'none'}"
+          + (f" ({info['age_hours']} hours old, {state})" if info["newest"] else ""))
+    print("Last 24 hours:", ", ".join(f"{k} {v}" for k, v in count_by_kind(events).items() if v) or "nothing to report")
+    for note in needs_attention(state, count_by_kind(events)):
+        print("Look at:", note)
+
+
 def main(argv) -> int:
     logs = BACKEND_DIR / "logs"
     logs.mkdir(exist_ok=True)
@@ -298,6 +313,7 @@ def main(argv) -> int:
                 print("Latest: none")
             log.info("status checked: %d backups; latest verified=%s",
                      snapshot["backup_count"], snapshot["latest_backup_verified"])
+            _print_health(db_path)
         elif command == "backup":
             path = backup(db_path)
             _ops("backup_ok", reason="manual", count=len(list_backups(db_path)))
@@ -322,19 +338,6 @@ def main(argv) -> int:
                 print("Changed since this backup (these rows are not in it): "
                       + ", ".join(f"{t} {d:+d}" for t, d in result["changed_since_backup"].items()))
             print("Your live data was not touched.")
-        elif command == "status":
-            sys.path.insert(0, str(BACKEND_DIR))
-            from src.core import ops_log
-            from src.services.ops_rules import backup_state, count_by_kind, needs_attention
-
-            info = status(db_path)
-            events = ops_log.recent(limit=200, since=datetime.now() - timedelta(days=1))
-            state = backup_state(info["age_hours"])
-            print(f"Backups: {info['backups']}, newest {info['newest'] or 'none'}"
-                  + (f" ({info['age_hours']} hours old, {state})" if info["newest"] else ""))
-            print("Last 24 hours:", ", ".join(f"{k} {v}" for k, v in count_by_kind(events).items() if v) or "nothing to report")
-            for note in needs_attention(state, count_by_kind(events)):
-                print("Look at:", note)
         else:
             print(__doc__)
             return 2

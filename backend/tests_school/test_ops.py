@@ -195,12 +195,12 @@ def test_drill_refuses_without_a_backup_and_with_a_broken_one(db, tmp_path):
         db_backup.drill(db, broken)
 
 
-def test_status_ignores_safety_copies(db):
-    assert db_backup.status(db, NOW) == {"backups": 0, "newest": None, "age_hours": None}
+def test_backup_age_ignores_safety_copies(db):
+    assert db_backup.backup_age(db, NOW) == {"backups": 0, "newest": None, "age_hours": None}
     db_backup.backup(db, suffix="before-upgrade")
-    assert db_backup.status(db, NOW)["newest"] is None
+    assert db_backup.backup_age(db, NOW)["newest"] is None
     regular = db_backup.backup(db)
-    info = db_backup.status(db, datetime.now() + timedelta(hours=3))
+    info = db_backup.backup_age(db, datetime.now() + timedelta(hours=3))
     assert info["newest"] == regular.name and 2.9 <= info["age_hours"] <= 3.1
 
 
