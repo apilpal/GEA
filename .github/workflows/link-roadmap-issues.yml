@@ -4,7 +4,9 @@ name: Check and link roadmap sub-issues
 # The "Epic: #N" line that create-roadmap-issues.yml writes only mentions the epic in text; it does not
 # make the issue a sub-issue, so the epic shows no progress. This workflow fixes that.
 # Run it once with "confirm_link" unticked to see the report, then ticked to link what is missing.
+# SEC- issues were made by hand without an Epic line, so they default to epic #71 and PRV- issues to #74.
 # It never changes an issue that is already a sub-issue of another parent, and never edits issue text.
+# An issue whose key is used twice (a duplicate) is not linked: close one, then run this again.
 
 on:
   workflow_dispatch:
@@ -38,18 +40,23 @@ jobs:
 
             const byNumber = new Map(all.map(item => [item.number, item]));
             const keyOf = item => (item.title.match(/^([A-Z]+-\d+)\b/) || [])[1];
+            // Issues made by hand have no "Epic: #N" line, so these prefixes fall back to their epic.
+            const defaultEpics = { SEC: 71, PRV: 74 };
             const epicOf = item => {
               const found = (item.body || "").match(/\*\*Epic:\*\*\s*#(\d+)/i);
-              return found ? Number(found[1]) : null;
+              if (found) return Number(found[1]);
+              return defaultEpics[(keyOf(item) || "").split("-")[0]] || null;
             };
+            const epicName = number => `#${number} ${byNumber.has(number) ? byNumber.get(number).title.slice(0, 40) : ""}`.trim();
             const roadmap = all.filter(item => keyOf(item) && /^(STU|DSH|TRN|RPT|UX|SEC|PRV)-/.test(keyOf(item)));
 
             // Same key used by two issues is a duplicate worth knowing about.
             const seen = new Map();
             const duplicates = [];
+            const duplicateKeys = new Set();
             for (const item of roadmap) {
               const key = keyOf(item);
-              if (seen.has(key)) duplicates.push(`${key}: #${seen.get(key)} and #${item.number}`);
+              if (seen.has(key)) { duplicates.push(`${key}: #${seen.get(key)} and #${item.number}`); duplicateKeys.add(key); }
               else seen.set(key, item.number);
             }
 
@@ -57,6 +64,7 @@ jobs:
             for (const item of roadmap.sort((a, b) => a.number - b.number)) {
               const key = keyOf(item);
               const epic = epicOf(item);
+              if (duplicateKeys.has(key)) { rows.push([key, `#${item.number}`, epic ? epicName(epic) : "none", "duplicate key: not linked, close one and run again"]); continue; }
               if (!epic) { rows.push([key, `#${item.number}`, "none", "no Epic line: link by hand"]); continue; }
               if (!byNumber.has(epic)) { rows.push([key, `#${item.number}`, `#${epic}`, "epic issue not found"]); continue; }
 
@@ -68,14 +76,14 @@ jobs:
                 if (error.status !== 404) { rows.push([key, `#${item.number}`, `#${epic}`, `error ${error.status}`]); continue; }
               }
 
-              if (parent && parent.number === epic) { rows.push([key, `#${item.number}`, `#${epic}`, "ok, already linked"]); continue; }
-              if (parent) { rows.push([key, `#${item.number}`, `#${epic}`, `linked to #${parent.number} instead: left as it is`]); continue; }
-              if (!confirmLink) { rows.push([key, `#${item.number}`, `#${epic}`, "missing: would link"]); continue; }
+              if (parent && parent.number === epic) { rows.push([key, `#${item.number}`, epicName(epic), "ok, already linked"]); continue; }
+              if (parent) { rows.push([key, `#${item.number}`, epicName(epic), `linked to #${parent.number} instead: left as it is`]); continue; }
+              if (!confirmLink) { rows.push([key, `#${item.number}`, epicName(epic), "missing: would link"]); continue; }
 
               try {
                 await github.request("POST /repos/{owner}/{repo}/issues/{issue_number}/sub_issues",
                   { owner, repo, issue_number: epic, sub_issue_id: item.id });
-                rows.push([key, `#${item.number}`, `#${epic}`, "linked now"]);
+                rows.push([key, `#${item.number}`, epicName(epic), "linked now"]);
               } catch (error) {
                 rows.push([key, `#${item.number}`, `#${epic}`, `could not link (error ${error.status})`]);
               }
