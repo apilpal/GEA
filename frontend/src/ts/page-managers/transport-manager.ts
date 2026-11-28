@@ -6,6 +6,14 @@ import { apiService } from '@/ts/services/api-service';
  * Sets up change event handler for driver selection if not already attached.
  * @returns {Promise<void>} Resolves when drivers are loaded and dropdown populated.
  */
+
+/** Escape untrusted values before interpolating them into HTML templates. */
+function escapeHtml(value: unknown): string {
+    return String(value ?? '').replace(/[&<>\"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]!);
+}
+
 export async function loadDriversForTransportPage(): Promise<void> {
     try {
         const response = await apiService.get('/drivers/');
@@ -78,13 +86,13 @@ export async function loadDriverStudents(driverName: string): Promise<void> {
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>${index + 1}</td>
-                    <td>${student.route || ''}</td>
-                    <td>${student.name || ''}</td>
-                    <td>${student.father_name || ''}</td>
-                    <td>${student.mobile || ''}</td>
-                    <td>${student.class || ''}</td>
-                    <td>${student.address || ''}</td>
-                    <td>₹${student.fees || 0}</td>
+                    <td>${escapeHtml(student.route || '')}</td>
+                    <td>${escapeHtml(student.name || '')}</td>
+                    <td>${escapeHtml(student.father_name || '')}</td>
+                    <td>${escapeHtml(student.mobile || '')}</td>
+                    <td>${escapeHtml(student.class || '')}</td>
+                    <td>${escapeHtml(student.address || '')}</td>
+                    <td>₹${escapeHtml(student.fees || 0)}</td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -127,12 +135,12 @@ export async function loadAllDriversTable(): Promise<void> {
             drivers.forEach((driver: any) => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${driver.name || 'N/A'}</td>
-                    <td>${driver.route || 'N/A'}</td>
-                    <td>${driver.vehicle_number || 'N/A'}</td>
-                    <td>${driver.contact_number || 'N/A'}</td>
-                    <td><span class="status-${driver.status || 'active'}">${(driver.status || 'active').toUpperCase()}</span></td>
-                    <td>${driver.total_students || 0}</td>
+                    <td>${escapeHtml(driver.name || 'N/A')}</td>
+                    <td>${escapeHtml(driver.route || 'N/A')}</td>
+                    <td>${escapeHtml(driver.vehicle_number || 'N/A')}</td>
+                    <td>${escapeHtml(driver.contact_number || 'N/A')}</td>
+                    <td><span class="status-${escapeHtml(driver.status || 'active')}">${escapeHtml((driver.status || 'active').toUpperCase())}</span></td>
+                    <td>${escapeHtml(driver.total_students || 0)}</td>
                 `;
                 tableBody.appendChild(row);
             });
@@ -200,7 +208,7 @@ function showToast(message: string, type: 'success' | 'error' | 'info' = 'info')
 
     toast.innerHTML = `
         <icon-${iconMap[type]} size="16"></icon-${iconMap[type]}>
-        <span>${message}</span>
+        <span>${escapeHtml(message)}</span>
         <button class="toast-close" onclick="this.parentElement.remove()">
             <icon-times size="12"></icon-times>
         </button>

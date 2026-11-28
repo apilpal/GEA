@@ -8,6 +8,14 @@ import { formatRupees } from '@/ts/services/money';
  * then updates the UI with the retrieved information.
  * @returns {Promise<void>} Resolves when all reports have been generated and UI updated.
  */
+
+/** Escape untrusted values before interpolating them into HTML templates. */
+function escapeHtml(value: unknown): string {
+    return String(value ?? '').replace(/[&<>\"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]!);
+}
+
 export async function generateAllReports(): Promise<void> {
     try {
         showToast('Generating reports...', 'info');
@@ -72,9 +80,9 @@ function updateReportsSummary(summary: any) {
         summary.drivers.forEach((driver: any) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${driver.driver_name}</td>
-                <td>${driver.student_count}</td>
-                <td>${formatRupees(driver.revenue)}</td>
+                <td>${escapeHtml(driver.driver_name)}</td>
+                <td>${escapeHtml(driver.student_count)}</td>
+                <td>${escapeHtml(formatRupees(driver.revenue))}</td>
             `;
             tbody.appendChild(row);
         });
@@ -101,8 +109,8 @@ function updateDriverStudentStats(stats: any) {
         stats.driver_statistics.forEach((driver: any) => {
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${driver.driver_name}</td>
-                <td>${driver.student_count}</td>
+                <td>${escapeHtml(driver.driver_name)}</td>
+                <td>${escapeHtml(driver.student_count)}</td>
             `;
             statsTbody.appendChild(row);
         });
@@ -169,7 +177,7 @@ function showToast(message: string, type: 'success' | 'error' | 'info' = 'info')
 
     toast.innerHTML = `
         <icon-${iconMap[type]} size="16"></icon-${iconMap[type]}>
-        <span>${message}</span>
+        <span>${escapeHtml(message)}</span>
         <button class="toast-close" onclick="this.parentElement.remove()">
             <icon-times size="12"></icon-times>
         </button>

@@ -5,6 +5,14 @@ import { authContext } from '@/ts/components/auth/auth-context';
 /**
  * Interface representing the current state of page navigation.
  */
+
+/** Escape untrusted values before interpolating them into HTML templates. */
+function escapeHtml(value: unknown): string {
+    return String(value ?? '').replace(/[&<>\"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]!);
+}
+
 interface PageState {
     /** The currently active page identifier. */
     currentPage: string;
@@ -387,7 +395,7 @@ function showToast(message: string, type: 'success' | 'error' | 'info' = 'info')
 
     toast.innerHTML = `
         <icon-${iconMap[type]} size="16"></icon-${iconMap[type]}>
-        <span>${message}</span>
+        <span>${escapeHtml(message)}</span>
         <button class="toast-close" onclick="this.parentElement.remove()">
             <icon-times size="12"></icon-times>
         </button>

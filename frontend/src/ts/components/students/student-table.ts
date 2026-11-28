@@ -7,6 +7,14 @@ import { formatRupees } from '@/ts/services/money';
  * Used for displaying and managing student data in table format.
  * Contains comprehensive student information including personal details, contact info, and transportation data.
  */
+
+/** Escape untrusted values before interpolating them into HTML templates. */
+function escapeHtml(value: unknown): string {
+    return String(value ?? '').replace(/[&<>\"']/g, character => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[character]!);
+}
+
 interface Student {
     /** Transportation route assigned to the student */
     route: string;
@@ -175,30 +183,30 @@ class StudentTable extends BaseComponent {
         // you'd calculate which rows are actually visible in the viewport
         const visibleStudents = this.students.slice(0, 50);
         return visibleStudents.map((student, index) => `
-            <tr class="student-row" data-index="${index}" role="row" tabindex="${index === 0 ? '0' : '-1'}" aria-rowindex="${index + 2}" aria-label="Student ${student.name || 'Unknown'}">
+            <tr class="student-row" data-index="${index}" role="row" tabindex="${index === 0 ? '0' : '-1'}" aria-rowindex="${index + 2}" aria-label="Student ${escapeHtml(student.name || 'Unknown')}">
                 <td role="gridcell" aria-label="Row ${index + 1}">${index + 1}</td>
                 <td role="gridcell" aria-label="Status: ${student.status === 'inactive' ? 'Inactive' : 'Active'}">
-                    <span class="status-indicator ${student.status || 'active'}" aria-hidden="true">
+                    <span class="status-indicator ${escapeHtml(student.status || 'active')}" aria-hidden="true">
                         ${student.status === 'inactive' ? 'Inactive' : 'Active'}
                     </span>
                 </td>
-                <td role="gridcell" aria-label="Route: ${student.route || 'N/A'}">${student.route || 'N/A'}</td>
-                <td role="gridcell" aria-label="Name: ${student.name || 'N/A'}">${student.name || 'N/A'}</td>
-                <td role="gridcell" aria-label="Father's Name: ${student.father_name || 'N/A'}">${student.father_name || 'N/A'}</td>
-                <td role="gridcell" aria-label="Class: ${student.class || 'N/A'}">${student.class || 'N/A'}</td>
-                <td role="gridcell" aria-label="Mobile: ${student.mobile || 'N/A'}">${student.mobile || 'N/A'}</td>
-                <td role="gridcell" aria-label="Address: ${student.address || 'N/A'}" title="${student.address || ''}">${student.address ? (student.address.length > 30 ? student.address.substring(0, 27) + '...' : student.address) : 'N/A'}</td>
-                <td role="gridcell" aria-label="Fees: ${student.fees ? formatRupees(student.fees) : 'N/A'}">${student.fees ? formatRupees(student.fees) : 'N/A'}</td>
-                <td class="actions-cell" role="gridcell" aria-label="Actions for ${student.name || 'Unknown'}">
-                    <button class="action-btn view-btn" data-action="view" data-index="${index}" aria-label="View details for ${student.name}" title="View Details">
+                <td role="gridcell" aria-label="Route: ${escapeHtml(student.route || 'N/A')}">${escapeHtml(student.route || 'N/A')}</td>
+                <td role="gridcell" aria-label="Name: ${escapeHtml(student.name || 'N/A')}">${escapeHtml(student.name || 'N/A')}</td>
+                <td role="gridcell" aria-label="Father's Name: ${escapeHtml(student.father_name || 'N/A')}">${escapeHtml(student.father_name || 'N/A')}</td>
+                <td role="gridcell" aria-label="Class: ${escapeHtml(student.class || 'N/A')}">${escapeHtml(student.class || 'N/A')}</td>
+                <td role="gridcell" aria-label="Mobile: ${escapeHtml(student.mobile || 'N/A')}">${escapeHtml(student.mobile || 'N/A')}</td>
+                <td role="gridcell" aria-label="Address: ${escapeHtml(student.address || 'N/A')}" title="${escapeHtml(student.address || '')}">${escapeHtml(student.address ? (student.address.length > 30 ? student.address.substring(0, 27) + '...' : student.address) : 'N/A')}</td>
+                <td role="gridcell" aria-label="Fees: ${escapeHtml(student.fees ? formatRupees(student.fees) : 'N/A')}">${escapeHtml(student.fees ? formatRupees(student.fees) : 'N/A')}</td>
+                <td class="actions-cell" role="gridcell" aria-label="Actions for ${escapeHtml(student.name || 'Unknown')}">
+                    <button class="action-btn view-btn" data-action="view" data-index="${index}" aria-label="View details for ${escapeHtml(student.name)}" title="View Details">
                         <icon-eye size="16"></icon-eye>
                         <span class="sr-only">View</span>
                     </button>
-                    <button class="action-btn edit-btn" data-action="edit" data-index="${index}" aria-label="Edit ${student.name}" title="Edit Student">
+                    <button class="action-btn edit-btn" data-action="edit" data-index="${index}" aria-label="Edit ${escapeHtml(student.name)}" title="Edit Student">
                         <icon-edit size="16"></icon-edit>
                         <span class="sr-only">Edit</span>
                     </button>
-                    <button class="action-btn delete-btn" data-action="delete" data-index="${index}" aria-label="Delete ${student.name}" title="Delete Student">
+                    <button class="action-btn delete-btn" data-action="delete" data-index="${index}" aria-label="Delete ${escapeHtml(student.name)}" title="Delete Student">
                         <icon-trash size="16"></icon-trash>
                         <span class="sr-only">Delete</span>
                     </button>
@@ -275,24 +283,24 @@ class StudentTable extends BaseComponent {
      */
     private renderStudentCards(): string {
         return this.students.map((student, index) => `
-            <div class="student-card" data-index="${index}" role="listitem" tabindex="${index === 0 ? '0' : '-1'}" aria-label="Student ${student.name || 'Unknown'}">
+            <div class="student-card" data-index="${index}" role="listitem" tabindex="${index === 0 ? '0' : '-1'}" aria-label="Student ${escapeHtml(student.name || 'Unknown')}">
                 <div class="card-header">
                     <div class="card-title">
-                        <h3>${student.name || 'N/A'}</h3>
-                        <span class="status-indicator ${student.status || 'active'}" aria-label="Status: ${student.status === 'inactive' ? 'Inactive' : 'Active'}">
+                        <h3>${escapeHtml(student.name || 'N/A')}</h3>
+                        <span class="status-indicator ${escapeHtml(student.status || 'active')}" aria-label="Status: ${student.status === 'inactive' ? 'Inactive' : 'Active'}">
                             ${student.status === 'inactive' ? 'Inactive' : 'Active'}
                         </span>
                     </div>
-                    <div class="card-actions" role="group" aria-label="Actions for ${student.name || 'Unknown'}">
-                        <button class="action-btn view-btn" data-action="view" data-index="${index}" aria-label="View details for ${student.name}" title="View Details">
+                    <div class="card-actions" role="group" aria-label="Actions for ${escapeHtml(student.name || 'Unknown')}">
+                        <button class="action-btn view-btn" data-action="view" data-index="${index}" aria-label="View details for ${escapeHtml(student.name)}" title="View Details">
                             <icon-eye size="18"></icon-eye>
                             <span class="sr-only">View</span>
                         </button>
-                        <button class="action-btn edit-btn" data-action="edit" data-index="${index}" aria-label="Edit ${student.name}" title="Edit Student">
+                        <button class="action-btn edit-btn" data-action="edit" data-index="${index}" aria-label="Edit ${escapeHtml(student.name)}" title="Edit Student">
                             <icon-edit size="18"></icon-edit>
                             <span class="sr-only">Edit</span>
                         </button>
-                        <button class="action-btn delete-btn" data-action="delete" data-index="${index}" aria-label="Delete ${student.name}" title="Delete Student">
+                        <button class="action-btn delete-btn" data-action="delete" data-index="${index}" aria-label="Delete ${escapeHtml(student.name)}" title="Delete Student">
                             <icon-trash size="18"></icon-trash>
                             <span class="sr-only">Delete</span>
                         </button>
@@ -302,27 +310,27 @@ class StudentTable extends BaseComponent {
                     <div class="card-info">
                         <div class="info-item">
                             <span class="label">Route:</span>
-                            <span class="value">${student.route || 'N/A'}</span>
+                            <span class="value">${escapeHtml(student.route || 'N/A')}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">Father's Name:</span>
-                            <span class="value">${student.father_name || 'N/A'}</span>
+                            <span class="value">${escapeHtml(student.father_name || 'N/A')}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">Class:</span>
-                            <span class="value">${student.class || 'N/A'}</span>
+                            <span class="value">${escapeHtml(student.class || 'N/A')}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">Mobile:</span>
-                            <span class="value">${student.mobile || 'N/A'}</span>
+                            <span class="value">${escapeHtml(student.mobile || 'N/A')}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">Address:</span>
-                            <span class="value" title="${student.address || ''}">${student.address ? (student.address.length > 50 ? student.address.substring(0, 47) + '...' : student.address) : 'N/A'}</span>
+                            <span class="value" title="${escapeHtml(student.address || '')}">${escapeHtml(student.address ? (student.address.length > 50 ? student.address.substring(0, 47) + '...' : student.address) : 'N/A')}</span>
                         </div>
                         <div class="info-item">
                             <span class="label">Fees:</span>
-                            <span class="value">${student.fees ? formatRupees(student.fees) : 'N/A'}</span>
+                            <span class="value">${escapeHtml(student.fees ? formatRupees(student.fees) : 'N/A')}</span>
                         </div>
                     </div>
                 </div>
@@ -337,30 +345,30 @@ class StudentTable extends BaseComponent {
       */
      private renderTableRows(): string {
          return this.students.map((student, index) => `
-             <tr class="student-row" data-index="${index}" role="row" tabindex="${index === 0 ? '0' : '-1'}" aria-rowindex="${index + 2}" aria-label="Student ${student.name || 'Unknown'}">
+             <tr class="student-row" data-index="${index}" role="row" tabindex="${index === 0 ? '0' : '-1'}" aria-rowindex="${index + 2}" aria-label="Student ${escapeHtml(student.name || 'Unknown')}">
                  <td role="gridcell" aria-label="Row ${index + 1}">${index + 1}</td>
                  <td role="gridcell" aria-label="Status: ${student.status === 'inactive' ? 'Inactive' : 'Active'}">
-                     <span class="status-indicator ${student.status || 'active'}" aria-hidden="true">
+                     <span class="status-indicator ${escapeHtml(student.status || 'active')}" aria-hidden="true">
                          ${student.status === 'inactive' ? 'Inactive' : 'Active'}
                      </span>
                  </td>
-                 <td role="gridcell" aria-label="Route: ${student.route || 'N/A'}">${student.route || 'N/A'}</td>
-                 <td role="gridcell" aria-label="Name: ${student.name || 'N/A'}">${student.name || 'N/A'}</td>
-                 <td role="gridcell" aria-label="Father's Name: ${student.father_name || 'N/A'}">${student.father_name || 'N/A'}</td>
-                 <td role="gridcell" aria-label="Class: ${student.class || 'N/A'}">${student.class || 'N/A'}</td>
-                 <td role="gridcell" aria-label="Mobile: ${student.mobile || 'N/A'}">${student.mobile || 'N/A'}</td>
-                 <td role="gridcell" aria-label="Address: ${student.address || 'N/A'}" title="${student.address || ''}">${student.address ? (student.address.length > 30 ? student.address.substring(0, 27) + '...' : student.address) : 'N/A'}</td>
-                 <td role="gridcell" aria-label="Fees: ${student.fees ? formatRupees(student.fees) : 'N/A'}">${student.fees ? formatRupees(student.fees) : 'N/A'}</td>
-                 <td class="actions-cell" role="gridcell" aria-label="Actions for ${student.name || 'Unknown'}">
-                     <button class="action-btn view-btn" data-action="view" data-index="${index}" aria-label="View details for ${student.name}" title="View Details">
+                 <td role="gridcell" aria-label="Route: ${escapeHtml(student.route || 'N/A')}">${escapeHtml(student.route || 'N/A')}</td>
+                 <td role="gridcell" aria-label="Name: ${escapeHtml(student.name || 'N/A')}">${escapeHtml(student.name || 'N/A')}</td>
+                 <td role="gridcell" aria-label="Father's Name: ${escapeHtml(student.father_name || 'N/A')}">${escapeHtml(student.father_name || 'N/A')}</td>
+                 <td role="gridcell" aria-label="Class: ${escapeHtml(student.class || 'N/A')}">${escapeHtml(student.class || 'N/A')}</td>
+                 <td role="gridcell" aria-label="Mobile: ${escapeHtml(student.mobile || 'N/A')}">${escapeHtml(student.mobile || 'N/A')}</td>
+                 <td role="gridcell" aria-label="Address: ${escapeHtml(student.address || 'N/A')}" title="${escapeHtml(student.address || '')}">${escapeHtml(student.address ? (student.address.length > 30 ? student.address.substring(0, 27) + '...' : student.address) : 'N/A')}</td>
+                 <td role="gridcell" aria-label="Fees: ${escapeHtml(student.fees ? formatRupees(student.fees) : 'N/A')}">${escapeHtml(student.fees ? formatRupees(student.fees) : 'N/A')}</td>
+                 <td class="actions-cell" role="gridcell" aria-label="Actions for ${escapeHtml(student.name || 'Unknown')}">
+                     <button class="action-btn view-btn" data-action="view" data-index="${index}" aria-label="View details for ${escapeHtml(student.name)}" title="View Details">
                          <icon-eye size="16"></icon-eye>
                          <span class="sr-only">View</span>
                      </button>
-                     <button class="action-btn edit-btn" data-action="edit" data-index="${index}" aria-label="Edit ${student.name}" title="Edit Student">
+                     <button class="action-btn edit-btn" data-action="edit" data-index="${index}" aria-label="Edit ${escapeHtml(student.name)}" title="Edit Student">
                          <icon-edit size="16"></icon-edit>
                          <span class="sr-only">Edit</span>
                      </button>
-                     <button class="action-btn delete-btn" data-action="delete" data-index="${index}" aria-label="Delete ${student.name}" title="Delete Student">
+                     <button class="action-btn delete-btn" data-action="delete" data-index="${index}" aria-label="Delete ${escapeHtml(student.name)}" title="Delete Student">
                          <icon-trash size="16"></icon-trash>
                          <span class="sr-only">Delete</span>
                      </button>
