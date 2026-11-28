@@ -38,7 +38,7 @@ def database_path() -> Path:
 async def ops_status(user: User = Depends(require_admin)):
     import db_backup
 
-    info = db_backup.status(database_path(), now())
+    info = db_backup.backup_age(database_path(), now())
     state = backup_state(info["age_hours"])
     events = ops_log.recent(limit=500, since=now() - timedelta(days=1))
     counts = count_by_kind(events)
